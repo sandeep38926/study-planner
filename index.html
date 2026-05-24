@@ -565,22 +565,27 @@ window.addEventListener('load', () => {
   DAYS_SHORT.forEach(d => { const el=document.createElement('div'); el.className='day-hdr'; el.textContent=d; dh.appendChild(el); });
 
   // Check saved firebase config
-  if (!localStorage.getItem('fb_config')) {
-  localStorage.setItem('fb_config', JSON.stringify({
-    "apiKey": "AIzaSyBgw9H5zTOyP8u-FAxWh5-VIC3Nka69gCM",
-    "authDomain": "studyplanner-1ab64.firebaseapp.com",
-    "databaseURL": "https://studyplanner-1ab64-default-rtdb.asia-southeast1.firebasedatabase.app",
-    "projectId": "studyplanner-1ab64",
-    "storageBucket": "studyplanner-1ab64.firebasestorage.app",
-    "messagingSenderId": "1027107496017",
-    "appId": "1:1027107496017:web:1626655885af09b9851870"
-  }));
-}
   const saved = localStorage.getItem('fb_config');
   if (saved) {
     try {
       const config = JSON.parse(saved);
       if (initFirebase(config)) {
+        // Check saved session — auto-login if found
+        const session = localStorage.getItem('session');
+        if (session) {
+          try {
+            const { name, role } = JSON.parse(session);
+            if (name && role) {
+              userName = name;
+              userRole = role;
+              lbDate = todayStr();
+              updateNavBadge();
+              showScreen('calendar');
+              startListeners();
+              return;
+            }
+          } catch(e) {}
+        }
         showScreen('login');
         return;
       }
@@ -678,6 +683,8 @@ function finishLogin(name, role) {
   userRole = role;
   lbDate = todayStr();
   document.getElementById('login-pass').value = '';
+  // Save session so device remembers the user
+  localStorage.setItem('session', JSON.stringify({ name, role }));
   updateNavBadge();
   showScreen('calendar');
   startListeners();
@@ -725,8 +732,8 @@ async function confirmEditMyName() {
   if (newName === userName) { closeModal(); return; }
 
   if (userRole === 'creator') {
-    // Just update local display name
     userName = newName;
+    localStorage.setItem('session', JSON.stringify({ name: newName, role: 'creator' }));
     updateNavBadge();
     closeModal();
     showToast(`✅ Name changed to "${newName}"`);
@@ -751,6 +758,7 @@ async function confirmEditMyName() {
     updates[`users/${userName}`] = null;
     await db.ref().update(updates);
     userName = newName;
+    localStorage.setItem('session', JSON.stringify({ name: newName, role: 'user' }));
     updateNavBadge();
     closeModal();
     showToast(`✅ Name changed to "${newName}"`);
@@ -765,6 +773,7 @@ function signOut() {
   planListeners = {}; progListeners = {};
   allPlans = {}; allProgress = {}; allUsersData = {};
   userName = ''; userRole = ''; pendingRole = 'user';
+  localStorage.removeItem('session');
   document.getElementById('login-name').value = '';
   document.getElementById('login-pass').value = '';
   showScreen('login');
@@ -876,16 +885,89 @@ function getMyProgress(date) {
   return (allProgress[date] && allProgress[date][userName]) || {};
 }
 
+// Rich quote bank — categorised by progress level
+const QUOTES_START = [
+  {q:"The secret of getting ahead is getting started.", a:"Mark Twain", e:"🚀"},
+  {q:"You don't have to be great to start, but you have to start to be great.", a:"Zig Ziglar", e:"⚡"},
+  {q:"One step at a time is all it takes to get you there.", a:"Emily Dickinson", e:"👣"},
+  {q:"The journey of a thousand miles begins with one step.", a:"Lao Tzu", e:"🌏"},
+  {q:"Start where you are. Use what you have. Do what you can.", a:"Arthur Ashe", e:"💪"},
+  {q:"Believe you can and you're halfway there.", a:"Theodore Roosevelt", e:"🌟"},
+  {q:"Your future is created by what you do today, not tomorrow.", a:"Robert Kiyosaki", e:"🔥"},
+  {q:"Dream big. Start small. Act now.", a:"Robin Sharma", e:"🎯"},
+];
+const QUOTES_MID = [
+  {q:"Keep going. Everything you need will come to you at the perfect time.", a:"Anonymous", e:"⏩"},
+  {q:"You are doing better than you think.", a:"Anonymous", e:"💡"},
+  {q:"Push yourself because no one else is going to do it for you.", a:"Anonymous", e:"💥"},
+  {q:"Success is the sum of small efforts repeated day in and day out.", a:"Robert Collier", e:"📈"},
+  {q:"Hard work beats talent when talent doesn't work hard.", a:"Tim Notke", e:"🏆"},
+  {q:"Don't watch the clock; do what it does. Keep going.", a:"Sam Levenson", e:"⏰"},
+  {q:"The difference between ordinary and extraordinary is that little extra.", a:"Jimmy Johnson", e:"✨"},
+  {q:"Concentrate all your thoughts upon the work at hand.", a:"Alexander Graham Bell", e:"🎯"},
+];
+const QUOTES_DONE = [
+  {q:"Well done is better than well said.", a:"Benjamin Franklin", e:"🏅"},
+  {q:"Success is not final; failure is not fatal. It is the courage to continue that counts.", a:"Winston Churchill", e:"👑"},
+  {q:"You did it! Champions keep playing until they get it right.", a:"Billie Jean King", e:"🎊"},
+  {q:"The harder you work, the luckier you get.", a:"Gary Player", e:"🍀"},
+  {q:"Today you are one step closer to your dream.", a:"Anonymous", e:"🌈"},
+];
+
+// Day themes — rotate by date hash
+const DAY_THEMES = [
+  { grad:'linear-gradient(135deg,#1a237e,#283593)', accent:'#f9a825', ring:'#f9a825' },
+  { grad:'linear-gradient(135deg,#1b5e20,#2e7d32)', accent:'#69f0ae', ring:'#69f0ae' },
+  { grad:'linear-gradient(135deg,#4a148c,#6a1b9a)', accent:'#ea80fc', ring:'#ea80fc' },
+  { grad:'linear-gradient(135deg,#bf360c,#e64a19)', accent:'#ffccbc', ring:'#ffccbc' },
+  { grad:'linear-gradient(135deg,#006064,#00838f)', accent:'#80deea', ring:'#80deea' },
+  { grad:'linear-gradient(135deg,#880e4f,#ad1457)', accent:'#f48fb1', ring:'#f48fb1' },
+];
+
+// Milestone emojis shown as pct increases
+const MILESTONES = [
+  {at:25, emoji:'⚡', msg:'Great start!'},
+  {at:50, emoji:'🔥', msg:'Halfway there!'},
+  {at:75, emoji:'💪', msg:'Almost done!'},
+  {at:100, emoji:'🏆', msg:'Completed!'},
+];
+
+function dateHash(ds) {
+  return Math.abs(ds.split('-').reduce((a,b)=>a*31+parseInt(b),0));
+}
+
+function getDayTheme(ds) { return DAY_THEMES[dateHash(ds) % DAY_THEMES.length]; }
+
+function getDayQuote(ds, pct) {
+  const h = dateHash(ds);
+  if (pct === 100) return QUOTES_DONE[h % QUOTES_DONE.length];
+  if (pct >= 40)   return QUOTES_MID[h % QUOTES_MID.length];
+  return QUOTES_START[h % QUOTES_START.length];
+}
+
+// Fun session icons — larger pool
+const SESS_ICONS = ['🌅','📖','✏️','🔬','💡','🎯','🧠','⚡','🌙','🔭','📐','🎓','🧮','🗂️','📊','🏹'];
+const SESS_GRADIENTS = [
+  'linear-gradient(135deg,#1a237e,#3949ab)',
+  'linear-gradient(135deg,#1b5e20,#43a047)',
+  'linear-gradient(135deg,#4a148c,#8e24aa)',
+  'linear-gradient(135deg,#bf360c,#f4511e)',
+  'linear-gradient(135deg,#006064,#0097a7)',
+  'linear-gradient(135deg,#880e4f,#e91e63)',
+];
+
 function renderDayView(date) {
   const plan = allPlans[date];
   const myProg = getMyProgress(date);
   const container = document.getElementById('day-content');
-
   const keys = getPlanTaskKeys(plan);
   const done = keys.filter(k=>myProg[k]).length;
   const pct = keys.length ? Math.round(done/keys.length*100) : 0;
-  const C = 2*Math.PI*54;
+  const theme = getDayTheme(date);
+  const quote = plan ? getDayQuote(date, pct) : null;
+  const streak = getStreak(userName);
 
+  // Header
   let html = `<div class="day-back">
     <button onclick="showScreen('calendar')">‹ Calendar</button>
     <div class="day-title">
@@ -893,127 +975,203 @@ function renderDayView(date) {
       <p>${plan?.examName||'Study Plan'}</p>
     </div>
     ${userRole==='creator' ? `<button class="edit-toggle" onclick="openEditor('${date}')">${plan?'✏️ Edit':'➕ Create'}</button>` : ''}
-    </div>`;
+  </div>`;
 
   if (!plan) {
     html += `<div class="no-plan">
-      <div class="emoji">📭</div>
+      <div style="font-size:4rem;margin-bottom:8px">📭</div>
       <h3>No plan yet</h3>
       <p>${userRole==='creator' ? 'Create a plan for this day.' : 'The creator hasn\'t published a plan for this day yet.'}</p>
-      ${userRole==='creator' ? `<button class="btn btn-navy" style="padding:10px 24px" onclick="openEditor('${date}')">➕ Create Plan</button>` : ''}
+      ${userRole==='creator' ? `<button class="btn btn-navy" style="padding:10px 24px;margin-top:8px" onclick="openEditor('${date}')">➕ Create Plan</button>` : ''}
     </div>`;
     container.innerHTML = html;
     return;
   }
 
-  // Progress ring
-  html += `<div class="ring-card">
-    <div class="ring-wrap">
-      <svg width="110" height="110">
-        <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="7"/>
-        <circle cx="55" cy="55" r="46" fill="none" stroke="${pct===100?'#69f0ae':'#f9a825'}" stroke-width="7"
-          stroke-dasharray="${2*Math.PI*46}" stroke-dashoffset="${2*Math.PI*46*(1-pct/100)}"
-          stroke-linecap="round" style="transform:rotate(-90deg);transform-origin:55px 55px;transition:stroke-dashoffset .6s"/>
-        <text x="55" y="51" text-anchor="middle" fill="white" font-size="18" font-weight="900" font-family="Nunito,sans-serif">${pct}%</text>
-        <text x="55" y="65" text-anchor="middle" fill="rgba(255,255,255,.7)" font-size="9" font-family="Poppins,sans-serif">DONE</text>
-      </svg>
-    </div>
-    <div class="ring-info">
-      <div class="ring-name">${esc(plan.examName||'Study Plan')}</div>
-      <div class="ring-tagline">${esc(plan.tagline||'')}</div>
-      <div class="ring-stats">
-        <div class="ring-stat"><div class="ring-stat-n">${done}</div><div class="ring-stat-l">Done</div></div>
-        <div class="ring-stat"><div class="ring-stat-n">${keys.length}</div><div class="ring-stat-l">Total</div></div>
-        <div class="ring-stat"><div class="ring-stat-n">${(plan.sessions||[]).filter(s=>(s.tasks||[]).every((_,ti)=>myProg[`${s.id}_${ti}`])).length}</div><div class="ring-stat-l">Sessions ✓</div></div>
+  // ── Hero progress card ──
+  const milestone = [...MILESTONES].reverse().find(m => pct >= m.at);
+  const sessionsDone = (plan.sessions||[]).filter(s=>(s.tasks||[]).every((_,ti)=>myProg[`${s.id}_${ti}`])).length;
+  html += `<div style="background:${theme.grad};border-radius:20px;padding:20px 18px;margin-bottom:14px;position:relative;overflow:hidden">
+    <!-- decorative circles -->
+    <div style="position:absolute;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.06);top:-30px;right:-30px"></div>
+    <div style="position:absolute;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.05);bottom:-20px;left:20px"></div>
+
+    <div style="display:flex;align-items:center;gap:16px;position:relative">
+      <!-- Ring -->
+      <div style="flex-shrink:0">
+        <svg width="100" height="100">
+          <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="7"/>
+          <circle cx="50" cy="50" r="42" fill="none" stroke="${theme.accent}" stroke-width="7"
+            stroke-dasharray="${2*Math.PI*42}" stroke-dashoffset="${2*Math.PI*42*(1-pct/100)}"
+            stroke-linecap="round" style="transform:rotate(-90deg);transform-origin:50px 50px;transition:stroke-dashoffset .8s ease"/>
+          <text x="50" y="45" text-anchor="middle" fill="white" font-size="17" font-weight="900" font-family="Nunito,sans-serif">${pct}%</text>
+          <text x="50" y="60" text-anchor="middle" fill="rgba(255,255,255,.6)" font-size="8.5" font-family="Poppins,sans-serif">${milestone?milestone.emoji:'📚'} ${milestone?milestone.msg:'Let\'s go!'}</text>
+        </svg>
       </div>
+      <!-- Info -->
+      <div style="flex:1;color:#fff">
+        <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1.05rem;line-height:1.2">${esc(plan.examName||'Study Plan')}</div>
+        ${plan.tagline?`<div style="font-size:.72rem;opacity:.75;font-style:italic;margin:3px 0 8px">${esc(plan.tagline)}</div>`:'<div style="margin-bottom:8px"></div>'}
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          ${[
+            [done, keys.length, '✅ Tasks'],
+            [sessionsDone, (plan.sessions||[]).length, '📚 Sessions'],
+            [streak, null, '🔥 Day Streak'],
+          ].map(([n,t,l])=>`<div style="text-align:center;background:rgba(255,255,255,.12);border-radius:8px;padding:5px 8px;min-width:48px">
+            <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem">${t!=null?n+'/'+t:n}</div>
+            <div style="font-size:.58rem;opacity:.8">${l}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div style="margin-top:14px;height:6px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden;position:relative">
+      <div style="height:100%;width:${pct}%;background:${theme.accent};border-radius:3px;transition:width .8s ease"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:4px">
+      ${[0,25,50,75,100].map(v=>`<span style="font-size:.58rem;color:rgba(255,255,255,.5)">${v}%</span>`).join('')}
     </div>
   </div>`;
 
-  // Motivation
-  const qi = Math.abs(date.split('-').reduce((a,b)=>a+parseInt(b),0)) % QUOTES.length;
-  html += `<div class="motivation">"${QUOTES[qi]}"</div>`;
+  // ── Quote card ──
+  html += `<div style="background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:flex-start;gap:12px;box-shadow:0 4px 18px rgba(26,35,126,.08);border-left:4px solid ${theme.accent.replace(')',',0.8)').replace('rgb','rgba')||'#f9a825'}">
+    <div style="font-size:1.8rem;flex-shrink:0;line-height:1">${quote.e}</div>
+    <div>
+      <div style="font-size:.82rem;font-style:italic;color:#444;line-height:1.6;font-weight:500">"${quote.q}"</div>
+      <div style="font-size:.68rem;color:#aaa;margin-top:4px;font-weight:600">— ${quote.a}</div>
+    </div>
+  </div>`;
 
-  // Sessions
+  // ── Milestone banner (shows when milestone just hit) ──
+  if (pct > 0 && pct < 100 && milestone) {
+    const nextM = MILESTONES.find(m => m.at > pct);
+    if (nextM) {
+      const remaining = keys.length - done;
+      html += `<div style="background:linear-gradient(90deg,#fff8e1,#fff3cd);border:1.5px solid #ffe082;border-radius:12px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:1.4rem">${nextM.emoji}</span>
+        <div>
+          <div style="font-size:.8rem;font-weight:700;color:#e65100">${nextM.msg} — only ${remaining} task${remaining>1?'s':''} to go!</div>
+          <div style="font-size:.7rem;color:#f57f17;margin-top:2px">Next milestone at ${nextM.at}% 🎯</div>
+        </div>
+      </div>`;
+    }
+  }
+
+  // ── Sessions ──
   (plan.sessions||[]).forEach((s,si) => {
     const tasks = s.tasks||[];
     const sDone = tasks.filter((_,ti)=>myProg[`${s.id}_${ti}`]).length;
     const sPct = tasks.length ? Math.round(sDone/tasks.length*100) : 0;
-    const col = COLORS[si%COLORS.length];
-    html += `<div class="session-card${sPct===100?' all-done':''}">
-      <div class="sess-header" onclick="toggleSection(this)">
-        <span class="sess-icon">${ICONS[si%ICONS.length]}</span>
-        <div class="sess-info">
-          <div class="sess-label">${esc(s.label||'Session')}</div>
-          <div class="sess-sub">${esc(s.subject||'')}${s.duration?' · '+esc(s.duration):''}</div>
-        </div>
-        <div class="sess-right">
-          <span class="sess-pct">${sPct}%</span>
-          ${sPct===100?'<span class="done-badge">DONE</span>':''}
-          <span class="chevron">▼</span>
+    const grad = SESS_GRADIENTS[si % SESS_GRADIENTS.length];
+    const icon = SESS_ICONS[si % SESS_ICONS.length];
+    html += `<div style="background:#fff;border-radius:16px;margin-bottom:10px;overflow:hidden;box-shadow:0 4px 18px rgba(26,35,126,.08);${sPct===100?'border:2px solid #a5d6a7':'border:1.5px solid transparent'}">
+      <div class="sess-header" onclick="toggleSection(this)" style="padding:0">
+        <div style="background:${grad};padding:11px 14px;display:flex;align-items:center;gap:10px;width:100%">
+          <span style="font-size:1.4rem;flex-shrink:0">${icon}</span>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:800;font-size:.9rem;color:#fff;font-family:'Nunito',sans-serif">${esc(s.label||'Session')}</div>
+            <div style="font-size:.68rem;color:rgba(255,255,255,.75)">${esc(s.subject||'')}${s.duration?' · '+esc(s.duration):''}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+            ${sPct===100?`<span style="background:rgba(255,255,255,.25);color:#fff;font-size:.62rem;font-weight:800;padding:2px 8px;border-radius:8px">✓ DONE</span>`:`<span style="color:rgba(255,255,255,.9);font-size:.78rem;font-weight:800">${sPct}%</span>`}
+            <span class="chevron open" style="color:rgba(255,255,255,.7)">▼</span>
+          </div>
         </div>
       </div>
-      <div class="sess-prog"><div class="sess-prog-fill" style="width:${sPct}%;background:${col}"></div></div>
-      <div class="sess-body">
+      <div style="height:4px;background:#f0f2ff"><div style="height:100%;width:${sPct}%;background:${sPct===100?'#2e7d32':'#5c6bc0'};transition:width .5s"></div></div>
+      <div class="sess-body" style="padding:10px 14px 12px">
         ${tasks.map((t,ti) => {
           const k=`${s.id}_${ti}`;
           return `<div class="tick-row${myProg[k]?' done':''}" onclick="toggleTask('${date}','${k}',this)">
-            <div class="tick-box">${myProg[k]?'✓':''}</div>
+            <div class="tick-box" style="${myProg[k]?'background:#2e7d32;border-color:#2e7d32':''}">${myProg[k]?'✓':''}</div>
             <span class="tick-label">${esc(t)}</span>
+            ${myProg[k]?`<span style="font-size:.9rem">✨</span>`:''}
           </div>`;
         }).join('')}
-        ${s.goal?`<div class="sess-goal">🎯 ${esc(s.goal)}</div>`:''}
+        ${s.goal?`<div style="font-size:.72rem;color:#555;background:linear-gradient(90deg,#f0f4ff,#e8eaf6);border-radius:8px;padding:7px 10px;margin-top:6px;border-left:3px solid #5c6bc0">🎯 Goal: ${esc(s.goal)}</div>`:''}
+        ${sPct===100?`<div style="text-align:center;padding:8px 0 2px;font-size:.82rem;font-weight:700;color:#2e7d32">🎉 Session Complete! Keep it up!</div>`:''}
       </div>
     </div>`;
   });
 
-  // Mini segments
+  // ── Mini segments ──
   if ((plan.miniSegments||[]).length) {
-    html += `<div class="mini-grid">`;
+    html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">`;
     (plan.miniSegments||[]).forEach((m,mi) => {
       const tasks = m.tasks||[];
       const mDone = tasks.filter((_,ti)=>myProg[`${m.id}_${ti}`]).length;
       const mPct = tasks.length ? Math.round(mDone/tasks.length*100) : 0;
-      const col = COLORS[(mi+2)%COLORS.length];
-      html += `<div class="mini-card">
-        <div class="mini-header" style="background:${col}">
-          <span class="mini-title-text">${esc(m.title||'Segment')}</span>
-          <span class="mini-dur">${esc(m.duration||'')}</span>
+      const grad = SESS_GRADIENTS[(mi+3)%SESS_GRADIENTS.length];
+      html += `<div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 14px rgba(26,35,126,.08)">
+        <div style="background:${grad};padding:8px 11px;display:flex;align-items:center;justify-content:space-between">
+          <span style="color:#fff;font-weight:800;font-size:.78rem">${esc(m.title||'Segment')}</span>
+          <span style="color:rgba(255,255,255,.8);font-size:.65rem">${esc(m.duration||'')}</span>
         </div>
-        <div class="mini-prog"><div class="mini-prog-fill" style="width:${mPct}%"></div></div>
-        <div class="mini-body">
+        <div style="height:3px;background:rgba(255,255,255,.3)"><div style="height:100%;width:${mPct}%;background:#fff;opacity:.8;transition:width .4s"></div></div>
+        <div style="padding:9px 11px">
           ${tasks.map((t,ti) => {
             const k=`${m.id}_${ti}`;
             return `<div class="mini-tick${myProg[k]?' done':''}" onclick="toggleTask('${date}','${k}',this)">
-              <div class="mini-tick-box">${myProg[k]?'✓':''}</div>
+              <div class="mini-tick-box" style="${myProg[k]?'background:#2e7d32;border-color:#2e7d32':''}">${myProg[k]?'✓':''}</div>
               <span class="mini-tick-label">${esc(t)}</span>
             </div>`;
           }).join('')}
           ${!tasks.length?'<p style="font-size:.7rem;color:#ccc;text-align:center;padding:6px">No tasks</p>':''}
+          ${mPct===100?`<div style="text-align:center;font-size:.75rem;color:#2e7d32;font-weight:700;padding-top:4px">✅ Done!</div>`:''}
         </div>
       </div>`;
     });
     html += `</div>`;
   }
 
-  // Daily targets
+  // ── Daily targets ──
   if ((plan.dailyTargets||[]).length) {
-    html += `<div class="targets-card">
-      <div class="targets-title">🎯 Daily Targets</div>
-      <div class="targets-pills">
+    const tDone = (plan.dailyTargets||[]).filter((_,ti)=>myProg[`daily_${ti}`]).length;
+    html += `<div style="background:${theme.grad};border-radius:16px;padding:14px 16px;margin-bottom:14px;position:relative;overflow:hidden">
+      <div style="position:absolute;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.07);top:-20px;right:-20px"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="color:${theme.accent};font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:1px">🎯 Daily Targets</div>
+        <div style="color:rgba(255,255,255,.7);font-size:.72rem;font-weight:700">${tDone}/${(plan.dailyTargets||[]).length} done</div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:7px">
         ${(plan.dailyTargets||[]).map((t,ti) => {
           const k=`daily_${ti}`;
-          return `<button class="target-pill${myProg[k]?' done':''}" onclick="toggleTask('${date}','${k}',null)">${myProg[k]?'✔ ':''}${esc(t)}</button>`;
+          return `<button onclick="toggleTask('${date}','${k}',null)"
+            style="background:${myProg[k]?'rgba(46,125,50,.7)':'rgba(255,255,255,.15)'};border:none;border-radius:9px;padding:6px 13px;color:#fff;font-size:.74rem;font-weight:600;cursor:pointer;font-family:Poppins,sans-serif;text-decoration:${myProg[k]?'line-through':'none'};opacity:${myProg[k]?.8:1};transition:.15s">
+            ${myProg[k]?'✅ ':'⬜ '}${esc(t)}
+          </button>`;
         }).join('')}
       </div>
     </div>`;
   }
 
-  // Complete banner
-  if (pct===100) {
-    html += `<div class="complete-banner">
-      <div class="emoji">🎉</div>
-      <h3>All tasks complete!</h3>
-      <p>Outstanding work today, ${esc(userName)}!</p>
+  // ── Completion banner ──
+  if (pct === 100) {
+    const h = dateHash(date);
+    const celebEmojis = ['🎉','🏆','🌟','🎊','👑','🥇','💯','🔥'];
+    const celebMsg = [
+      `Incredible work, ${esc(userName)}! You crushed it today!`,
+      `${esc(userName)}, you are unstoppable! 100% complete!`,
+      `Outstanding, ${esc(userName)}! This is what champions look like!`,
+      `${esc(userName)} — another day, another victory! Keep going!`,
+    ][h % 4];
+    html += `<div style="background:linear-gradient(135deg,#1b5e20,#2e7d32);border-radius:18px;padding:22px;text-align:center;margin-top:4px;position:relative;overflow:hidden">
+      <div style="position:absolute;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.07);top:-30px;left:-20px"></div>
+      <div style="position:absolute;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.07);bottom:-20px;right:-10px"></div>
+      <div style="font-size:2.5rem;margin-bottom:6px">${celebEmojis[h%celebEmojis.length]}</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;color:#fff;font-size:1.2rem;margin-bottom:4px">All Tasks Complete!</div>
+      <div style="color:rgba(255,255,255,.85);font-size:.82rem;line-height:1.5">${celebMsg}</div>
+      <div style="display:flex;justify-content:center;gap:6px;margin-top:12px">
+        ${celebEmojis.slice(0,6).map(e=>`<span style="font-size:1.1rem">${e}</span>`).join('')}
+      </div>
+    </div>`;
+  } else if (pct === 0 && keys.length > 0) {
+    // Kick-start banner for 0%
+    html += `<div style="background:#fff;border:2px dashed #c5cae9;border-radius:14px;padding:16px;text-align:center;margin-top:4px">
+      <div style="font-size:2rem;margin-bottom:6px">🚀</div>
+      <div style="font-weight:700;color:#1a237e;font-size:.9rem">Ready to start your day?</div>
+      <div style="color:#888;font-size:.78rem;margin-top:4px">Tap any task above to begin. You've got this, ${esc(userName)}!</div>
     </div>`;
   }
 
