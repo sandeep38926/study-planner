@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1a237e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Study Planner">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Study Planner</title>
+
+<!-- PWA Manifest inline -->
+<script>
+const manifestData = {
+  name: "Daily Study Planner",
+  short_name: "StudyPlan",
+  description: "Collaborative daily study to-do list planner",
+  start_url: "./",
+  display: "standalone",
+  background_color: "#f0f4ff",
+  theme_color: "#1a237e",
+  orientation: "portrait-primary",
+  icons: [
+    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%231a237e'/><text y='130' x='96' font-size='110' text-anchor='middle' font-family='serif'>📅</text></svg>", sizes: "192x192", type: "image/svg+xml" },
+    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%231a237e'/><text y='360' x='256' font-size='300' text-anchor='middle' font-family='serif'>📅</text></svg>", sizes: "512x512", type: "image/svg+xml" }
+  ]
+};
+const blob = new Blob([JSON.stringify(manifestData)], {type:'application/json'});
+const manifestURL = URL.createObjectURL(blob);
+document.write('<link rel="manifest" href="' + manifestURL + '">');
+</script>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --navy:#1a237e; --blue:#1565c0; --green:#2e7d32; --purple:#6a1b9a;
+  --red:#c62828; --orange:#e65100; --teal:#00695c; --gold:#f9a825;
+  --bg:#f0f4ff; --border:#c5cae9; --text:#1a1a2e; --white:#fff;
+  --shadow:0 4px 18px rgba(26,35,126,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overscroll-behavior:none}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:100vw;overflow-x:hidden}
+
+/* NAV */
+.nav{background:var(--navy);position:sticky;top:0;z-index:200;display:flex;align-items:center;padding:0 14px;height:52px;gap:10px;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+.nav-title{font-family:'Nunito',sans-serif;font-weight:900;color:#fff;font-size:1rem;flex:1}
+.nav-badge{font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:10px}
+.nav-btn{background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:.8rem;padding:6px 0;font-family:Poppins,sans-serif}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#69f0ae;flex-shrink:0}
+.sync-dot.off{background:#ef9a9a}
+
+/* SCREENS */
+.screen{display:none;min-height:calc(100vh - 52px - 58px)}
+.screen.active{display:block}
+
+/* LOGIN */
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.login-card{background:#fff;border-radius:20px;padding:36px 28px;box-shadow:var(--shadow);max-width:400px;width:100%;text-align:center}
+.login-card h1{font-family:'Nunito',sans-serif;font-size:1.8rem;font-weight:900;color:var(--navy);margin:8px 0 4px}
+.login-card p{color:#888;font-size:.85rem;margin-bottom:24px}
+.inp{font-family:'Poppins',sans-serif;font-size:.9rem;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;width:100%;outline:none;background:#fafbff;color:var(--text);margin-bottom:16px}
+.inp:focus{border-color:var(--blue)}
+.btn-row{display:flex;gap:10px}
+.btn{padding:12px 0;border-radius:10px;border:none;font-family:'Poppins',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;flex:1;transition:.15s}
+.btn:active{transform:scale(.97)}
+.btn-navy{background:var(--navy);color:#fff}
+.btn-green{background:var(--green);color:#fff}
+.btn-ghost{background:#f0f4ff;color:var(--navy);border:1.5px solid var(--border)}
+
+/* FIREBASE SETUP */
+.setup-card{background:#fff;border-radius:16px;padding:22px;margin:20px 14px;box-shadow:var(--shadow);border-left:5px solid var(--orange)}
+.setup-card h2{font-size:1rem;font-weight:700;color:var(--orange);margin-bottom:10px}
+.setup-card p{font-size:.82rem;color:#555;line-height:1.6;margin-bottom:10px}
+.setup-card code{background:#f0f4ff;border-radius:6px;padding:2px 6px;font-size:.78rem;color:var(--navy)}
+.setup-card textarea{width:100%;min-height:100px;font-family:monospace;font-size:.78rem;padding:10px;border:1.5px solid var(--border);border-radius:8px;resize:vertical;outline:none}
+
+/* CALENDAR */
+.cal-wrap{padding:16px 12px 80px}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.cal-nav button{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:8px 18px;cursor:pointer;font-weight:700;font-size:1.1rem;color:var(--navy)}
+.cal-month{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.4rem;color:var(--navy);text-align:center}
+.cal-year{font-size:.78rem;color:#888;text-align:center}
+.day-headers{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px}
+.day-hdr{text-align:center;font-size:.68rem;font-weight:700;color:#999;padding:4px 0}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-day{aspect-ratio:1;border:1.5px solid #e8eaf6;border-radius:10px;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:3px;transition:.12s;position:relative}
+.cal-day:active{transform:scale(.94)}
+.cal-day.today{border:2px solid var(--blue);box-shadow:0 0 0 3px rgba(21,101,192,.15)}
+.cal-day.has-plan{background:#fff}
+.cal-day.done-day{background:#e8f5e9;border-color:#a5d6a7}
+.cal-day.inprog-day{background:#fffde7;border-color:#fff176}
+.cal-day-num{font-weight:700;font-size:.82rem;color:var(--navy);line-height:1}
+.cal-day.past .cal-day-num{color:#bbb}
+.cal-day.today .cal-day-num{color:var(--blue)}
+.cal-prog-bar{width:75%;height:3px;background:#e0e4f4;border-radius:2px;overflow:hidden}
+.cal-prog-fill{height:100%;border-radius:2px;transition:width .3s}
+.cal-pct{font-size:.56rem;font-weight:700;line-height:1}
+.cal-legend{display:flex;gap:12px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:.72rem;color:#666}
+.leg-dot{width:12px;height:12px;border-radius:3px;border:1px solid #ddd}
+
+/* DAY VIEW */
+.day-wrap{padding:14px 12px 80px}
+.day-back{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.day-back button{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:7px 14px;cursor:pointer;font-weight:700;color:var(--navy);font-size:.88rem;font-family:Poppins,sans-serif}
+.day-back button:active{transform:scale(.97)}
+.day-title{flex:1}
+.day-title h2{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.05rem;color:var(--navy);line-height:1.2}
+.day-title p{font-size:.72rem;color:#888;margin-top:2px}
+.edit-toggle{background:var(--navy);color:#fff;border:none;border-radius:9px;padding:7px 12px;cursor:pointer;font-weight:700;font-size:.78rem;font-family:Poppins,sans-serif}
+.edit-toggle:active{transform:scale(.97)}
+
+/* PROGRESS RING CARD */
+.ring-card{background:linear-gradient(135deg,#1a237e,#283593);border-radius:16px;padding:18px 20px;margin-bottom:14px;display:flex;align-items:center;gap:16px}
+.ring-wrap{flex-shrink:0}
+.ring-info{flex:1;color:#fff}
+.ring-name{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.05rem;line-height:1.2}
+.ring-tagline{font-size:.75rem;opacity:.8;font-style:italic;margin:4px 0 10px}
+.ring-stats{display:flex;gap:14px}
+.ring-stat{text-align:center}
+.ring-stat-n{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.3rem;line-height:1}
+.ring-stat-l{font-size:.62rem;opacity:.7}
+
+/* MOTIVATION */
+.motivation{background:#fff;border-radius:12px;padding:11px 14px;margin-bottom:12px;border-left:4px solid var(--gold);font-size:.8rem;font-style:italic;color:#555}
+
+/* SESSIONS */
+.session-card{background:#fff;border-radius:14px;margin-bottom:10px;overflow:hidden;box-shadow:var(--shadow)}
+.session-card.all-done{border:2px solid #a5d6a7}
+.sess-header{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;user-select:none}
+.sess-header:active{background:#fafbff}
+.sess-icon{font-size:1.3rem;flex-shrink:0}
+.sess-info{flex:1}
+.sess-label{font-weight:800;font-size:.88rem;color:var(--navy);font-family:'Nunito',sans-serif}
+.sess-sub{font-size:.7rem;color:#888;margin-top:1px}
+.sess-right{display:flex;align-items:center;gap:6px}
+.sess-pct{font-size:.72rem;font-weight:700;color:var(--green)}
+.done-badge{background:var(--green);color:#fff;font-size:.62rem;font-weight:800;padding:2px 8px;border-radius:8px}
+.chevron{font-size:.75rem;color:#bbb;transition:transform .2s}
+.chevron.open{transform:rotate(180deg)}
+.sess-prog{height:3px;background:#f0f2ff}
+.sess-prog-fill{height:100%;transition:width .4s}
+.sess-body{padding:10px 14px 12px;border-top:1px solid #f0f2ff}
+
+/* TICK ROWS */
+.tick-row{display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:9px;cursor:pointer;margin-bottom:3px;border:1.5px solid transparent;transition:.12s}
+.tick-row:active{transform:scale(.98)}
+.tick-row.done{background:#f0fff4;border-color:#c8e6c9}
+.tick-box{width:22px;height:22px;border-radius:6px;border:2px solid #bdbdbd;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s;font-size:.85rem;color:#fff}
+.tick-row.done .tick-box{background:var(--green);border-color:var(--green)}
+.tick-label{font-size:.8rem;font-weight:500;flex:1}
+.tick-row.done .tick-label{text-decoration:line-through;color:#bbb}
+.sess-goal{font-size:.72rem;color:#666;background:#f0f4ff;border-radius:8px;padding:6px 10px;margin-top:6px}
+
+/* MINI GRID */
+.mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.mini-card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+.mini-header{padding:8px 11px;display:flex;align-items:center;justify-content:space-between}
+.mini-title-text{color:#fff;font-weight:800;font-size:.78rem}
+.mini-dur{color:rgba(255,255,255,.75);font-size:.68rem}
+.mini-prog{height:3px;background:rgba(255,255,255,.3)}
+.mini-prog-fill{height:100%;background:rgba(255,255,255,.8);transition:width .3s}
+.mini-body{padding:9px 11px}
+.mini-tick{display:flex;align-items:center;gap:7px;padding:5px 7px;border-radius:7px;cursor:pointer;margin-bottom:2px}
+.mini-tick:active{transform:scale(.97)}
+.mini-tick-box{width:17px;height:17px;border-radius:4px;border:2px solid #bdbdbd;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.7rem;color:#fff}
+.mini-tick.done .mini-tick-box{background:var(--green);border-color:var(--green)}
+.mini-tick-label{font-size:.73rem;flex:1}
+.mini-tick.done .mini-tick-label{text-decoration:line-through;color:#bbb}
+
+/* DAILY TARGETS */
+.targets-card{background:linear-gradient(135deg,#1a237e,#283593);border-radius:14px;padding:14px 16px;margin-bottom:12px}
+.targets-title{color:var(--gold);font-weight:800;font-size:.78rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.targets-pills{display:flex;flex-wrap:wrap;gap:7px}
+.target-pill{background:rgba(255,255,255,.15);border:none;border-radius:8px;padding:6px 12px;color:#fff;font-size:.74rem;font-weight:600;cursor:pointer;font-family:Poppins,sans-serif;transition:.12s}
+.target-pill:active{transform:scale(.95)}
+.target-pill.done{background:rgba(46,125,50,.55);text-decoration:line-through;opacity:.8}
+
+/* COMPLETE BANNER */
+.complete-banner{background:#e8f5e9;border:2px solid #a5d6a7;border-radius:14px;padding:18px;text-align:center;margin-top:8px}
+.complete-banner .emoji{font-size:2.5rem}
+.complete-banner h3{font-family:'Nunito',sans-serif;font-weight:900;color:var(--green);font-size:1.1rem;margin:4px 0 2px}
+.complete-banner p{color:#388e3c;font-size:.82rem}
+
+/* NO PLAN */
+.no-plan{text-align:center;padding:60px 20px;background:#fff;border-radius:16px;border:2px dashed #c5cae9}
+.no-plan .emoji{font-size:3rem;margin-bottom:10px}
+.no-plan h3{color:#888;font-weight:700;margin-bottom:8px}
+.no-plan p{color:#aaa;font-size:.82rem;margin-bottom:16px}
+
+/* EDITOR */
+.editor-wrap{padding:14px 12px 80px}
+.e-card{background:#fff;border-radius:16px;padding:18px 16px;margin-bottom:14px;box-shadow:var(--shadow)}
+.e-card-title{font-weight:800;font-size:.9rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
+.e-inp{font-family:'Poppins',sans-serif;font-size:.84rem;padding:8px 12px;border:1.5px solid var(--border);border-radius:9px;width:100%;outline:none;background:#fafbff;color:var(--text)}
+.e-inp:focus{border-color:var(--blue)}
+.e-label{font-size:.73rem;font-weight:600;color:#666;display:block;margin-bottom:3px;margin-top:8px}
+.e-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sess-editor{background:#f8f9ff;border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid #e0e4f4;position:relative}
+.task-row{display:flex;gap:6px;margin-bottom:5px;align-items:center}
+.task-row .e-inp{flex:1}
+.del-btn{background:none;border:none;color:#e53935;cursor:pointer;font-size:1rem;flex-shrink:0;padding:0 4px;line-height:1}
+.add-task-btn{background:none;border:1.5px dashed var(--border);border-radius:8px;padding:6px 12px;font-size:.78rem;cursor:pointer;color:#777;font-family:Poppins,sans-serif;width:100%;margin-top:4px}
+.add-task-btn:hover{border-color:var(--blue);color:var(--blue)}
+.remove-sess-btn{position:absolute;top:10px;right:10px;background:none;border:1px solid #e53935;border-radius:7px;padding:3px 9px;font-size:.72rem;cursor:pointer;color:#e53935;font-family:Poppins,sans-serif}
+.add-section-btn{background:none;border:1.5px dashed var(--border);border-radius:10px;padding:9px 0;width:100%;font-size:.84rem;cursor:pointer;color:#777;font-family:Poppins,sans-serif;margin-top:4px}
+.publish-btn{background:var(--navy);color:#fff;border:none;border-radius:12px;padding:13px 40px;font-weight:700;font-size:1rem;cursor:pointer;font-family:Poppins,sans-serif;display:block;margin:0 auto;transition:.15s}
+.publish-btn:active{transform:scale(.97)}
+.publish-btn:disabled{background:#aaa;cursor:not-allowed}
+
+/* FIREBASE CONFIG SCREEN */
+.fb-screen{padding:20px 14px 80px}
+.fb-screen h2{font-family:'Nunito',sans-serif;font-weight:900;color:var(--navy);font-size:1.3rem;margin-bottom:4px}
+.fb-screen p{color:#666;font-size:.82rem;margin-bottom:18px;line-height:1.6}
+.step-num{display:inline-flex;width:24px;height:24px;background:var(--navy);color:#fff;border-radius:50%;font-size:.78rem;font-weight:700;align-items:center;justify-content:center;margin-right:6px;flex-shrink:0}
+.step{display:flex;align-items:flex-start;margin-bottom:12px;gap:0}
+.step-text{font-size:.82rem;color:#444;line-height:1.6;flex:1}
+.step-text a{color:var(--blue);text-decoration:none}
+code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color:var(--navy)}
+
+/* TOAST */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a237e;color:#fff;padding:10px 20px;border-radius:10px;font-size:.82rem;font-weight:600;z-index:500;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* OFFLINE BANNER */
+.offline-bar{background:#e53935;color:#fff;text-align:center;font-size:.78rem;font-weight:700;padding:5px;display:none}
+.offline-bar.show{display:block}
+
+/* BOTTOM TAB BAR */
+.tab-bar{position:fixed;bottom:0;left:0;right:0;height:58px;background:#fff;border-top:1px solid #e0e4f4;display:none;z-index:300;box-shadow:0 -4px 18px rgba(26,35,126,.1)}
+.tab-bar.show{display:flex}
+.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:none;background:none;cursor:pointer;padding:6px 0;transition:.15s;color:#999;font-family:Poppins,sans-serif}
+.tab-btn:active{transform:scale(.92)}
+.tab-btn.active{color:var(--navy)}
+.tab-icon{font-size:1.3rem;line-height:1}
+.tab-label{font-size:.6rem;font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+.tab-btn.active .tab-label{color:var(--navy)}
+.screen{min-height:calc(100vh - 52px - 58px)}
+
+/* LEADERBOARD */
+.lb-wrap{padding:14px 12px 20px}
+.lb-header{text-align:center;margin-bottom:18px}
+.lb-header h2{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.4rem;color:var(--navy)}
+.lb-header p{font-size:.78rem;color:#888;margin-top:2px}
+.lb-date-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:18px}
+.lb-date-btn{background:#fff;border:1.5px solid var(--border);border-radius:9px;padding:6px 14px;cursor:pointer;font-weight:700;color:var(--navy);font-size:.88rem;font-family:Poppins,sans-serif}
+.lb-date-label{font-size:.85rem;font-weight:700;color:var(--navy);background:#fff;border:1.5px solid var(--border);border-radius:9px;padding:6px 14px}
+.lb-top3{display:flex;align-items:flex-end;justify-content:center;gap:10px;margin-bottom:20px}
+.lb-podium{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:.15s}
+.lb-podium:active{transform:scale(.95)}
+.lb-avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:1.2rem;color:#fff;position:relative;border:3px solid transparent}
+.lb-podium.rank1 .lb-avatar{width:64px;height:64px;font-size:1.5rem;border-color:var(--gold);box-shadow:0 0 0 3px rgba(249,168,37,.3)}
+.lb-podium.rank2 .lb-avatar{border-color:#90a4ae}
+.lb-podium.rank3 .lb-avatar{border-color:#a1887f}
+.lb-crown{position:absolute;top:-14px;font-size:1rem}
+.lb-pname{font-size:.72rem;font-weight:700;color:var(--navy);text-align:center;max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-ppct{font-size:.8rem;font-weight:900;color:var(--green)}
+.lb-podium.rank1 .lb-ppct{font-size:1rem}
+.lb-block{height:36px;border-radius:6px 6px 0 0;width:54px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:900;color:#fff}
+.lb-podium.rank1 .lb-block{height:54px;width:66px;background:var(--gold)}
+.lb-podium.rank2 .lb-block{background:#90a4ae}
+.lb-podium.rank3 .lb-block{background:#a1887f}
+.lb-list{display:flex;flex-direction:column;gap:8px}
+.lb-row{background:#fff;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);cursor:pointer;transition:.15s;border:1.5px solid transparent}
+.lb-row:active{transform:scale(.98)}
+.lb-row.me{border-color:var(--blue);background:#f0f4ff}
+.lb-rank{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:#bbb;width:24px;text-align:center;flex-shrink:0}
+.lb-row.rank1-row .lb-rank{color:var(--gold)}
+.lb-row.rank2-row .lb-rank{color:#90a4ae}
+.lb-row.rank3-row .lb-rank{color:#a1887f}
+.lb-uavatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:.95rem;color:#fff;flex-shrink:0}
+.lb-uinfo{flex:1;min-width:0}
+.lb-uname{font-weight:700;font-size:.88rem;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-uname .me-tag{font-size:.65rem;background:var(--blue);color:#fff;border-radius:5px;padding:1px 5px;margin-left:5px;font-weight:700}
+.lb-ubar-wrap{height:5px;background:#f0f2ff;border-radius:3px;margin-top:4px;overflow:hidden}
+.lb-ubar{height:100%;border-radius:3px;transition:width .5s}
+.lb-upct{font-size:.9rem;font-weight:900;flex-shrink:0}
+.lb-streak{font-size:.72rem;color:#f57f17;font-weight:700;margin-top:2px}
+.lb-no-data{text-align:center;padding:40px 20px;color:#aaa;font-size:.85rem}
+.lb-empty-avatar{width:38px;height:38px;border-radius:50%;background:#f0f2ff;flex-shrink:0}
+
+/* PEER VIEW */
+.peer-back{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.peer-back button{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:7px 14px;cursor:pointer;font-weight:700;color:var(--navy);font-size:.88rem;font-family:Poppins,sans-serif}
+.peer-banner{background:linear-gradient(135deg,#1a237e,#283593);border-radius:16px;padding:16px 20px;margin-bottom:14px;display:flex;align-items:center;gap:14px;color:#fff}
+.peer-big-avatar{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:1.4rem;color:#fff;flex-shrink:0;border:3px solid rgba(255,255,255,.4)}
+.peer-banner-info{flex:1}
+.peer-banner-name{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem}
+.peer-banner-sub{font-size:.75rem;opacity:.8;margin-top:2px}
+.peer-tabs{display:flex;background:#f0f4ff;border-radius:12px;padding:3px;margin-bottom:14px;gap:3px}
+.peer-tab{flex:1;padding:8px 0;border:none;border-radius:9px;background:none;font-family:Poppins,sans-serif;font-size:.8rem;font-weight:700;color:#888;cursor:pointer;transition:.15s}
+.peer-tab.active{background:#fff;color:var(--navy);box-shadow:0 2px 8px rgba(26,35,126,.1)}
+.readonly-overlay{pointer-events:none;opacity:.85}
+.readonly-note{background:#fff3e0;border:1px solid #ffe0b2;border-radius:10px;padding:8px 12px;font-size:.75rem;color:#e65100;font-weight:600;text-align:center;margin-bottom:10px}
+</style>
+</head>
+<body>
+
+<!-- OFFLINE BAR -->
+<div class="offline-bar" id="offline-bar">📵 Offline — changes will sync when reconnected</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- NAV (hidden on login/setup) -->
+<div class="nav" id="nav" style="display:none">
+  <span class="nav-title">📅 Study Planner</span>
+  <div class="sync-dot off" id="sync-dot" title="Connection status"></div>
+  <span class="nav-badge" id="role-badge" style="background:var(--gold);color:var(--navy)"></span>
+  <button class="nav-btn" onclick="signOut()">Sign out</button>
+</div>
+
+<!-- ══ SCREEN: FIREBASE SETUP ══ -->
+<div class="screen active" id="screen-setup">
+  <div class="fb-screen">
+    <h2>⚙️ One-time Setup</h2>
+    <p>This app uses <strong>Firebase Realtime Database</strong> (free) so all your users sync live without needing any platform. Do this once — paste your Firebase config below.</p>
+
+    <div class="step"><span class="step-num">1</span><span class="step-text">Go to <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> → Create a project (e.g. "StudyPlanner")</span></div>
+    <div class="step"><span class="step-num">2</span><span class="step-text">Click <strong>Realtime Database</strong> → Create database → Start in <strong>test mode</strong></span></div>
+    <div class="step"><span class="step-num">3</span><span class="step-text">Go to Project Settings (⚙️) → Your apps → Add web app → Register → Copy the <code>firebaseConfig</code> object</span></div>
+    <div class="step"><span class="step-num">4</span><span class="step-text">Paste the entire <code>firebaseConfig = { ... }</code> JSON below and click Save</span></div>
+
+    <div class="e-card" style="margin-top:8px">
+      <div class="e-card-title" style="color:var(--orange)">🔑 Firebase Config</div>
+      <p style="font-size:.78rem;color:#888;margin-bottom:10px">Paste the config object from Firebase console (the part inside the curly braces)</p>
+      <textarea class="e-inp" id="fb-config-input" style="min-height:120px;font-family:monospace;font-size:.76rem" placeholder='{
+  "apiKey": "AIza...",
+  "authDomain": "yourapp.firebaseapp.com",
+  "databaseURL": "https://yourapp-default-rtdb.firebaseio.com",
+  "projectId": "yourapp",
+  "storageBucket": "yourapp.appspot.com",
+  "messagingSenderId": "123456",
+  "appId": "1:123456:web:abc123"
+}'></textarea>
+      <button class="btn btn-navy" style="margin-top:12px;width:100%;padding:12px" onclick="saveFirebaseConfig()">💾 Save & Connect</button>
+      <p style="font-size:.72rem;color:#aaa;margin-top:8px;text-align:center">Config is saved locally on this device only.</p>
+    </div>
+
+    <div class="e-card" style="border-left:4px solid var(--green)">
+      <div class="e-card-title" style="color:var(--green)">📱 How to distribute to users</div>
+      <p style="font-size:.82rem;color:#555;line-height:1.6">
+        1. After setup, the creator saves this HTML file with the config pre-filled<br>
+        2. Share the HTML file via WhatsApp / Google Drive / any link<br>
+        3. Users open it in <strong>Chrome</strong> → tap the menu → <strong>"Add to Home Screen"</strong><br>
+        4. It installs as an app — works offline too, syncs when back online
+      </p>
+      <p style="font-size:.78rem;color:#888;margin-top:8px">💡 Tip: After you configure Firebase, use your browser's "Save as" to save this page — the config gets embedded in the saved HTML for easy sharing.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN: LOGIN ══ -->
+<div class="screen" id="screen-login">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div style="font-size:3.5rem">📅</div>
+      <h1>Study Planner</h1>
+      <p>Daily collaborative study tracker</p>
+      <input class="inp" id="login-name" placeholder="Your name…" maxlength="30" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
+      <input class="inp" id="login-pass" type="password" placeholder="Password…" maxlength="20" onkeydown="if(event.key==='Enter')doLogin(pendingRole||'user')">
+      <div class="btn-row">
+        <button class="btn btn-navy" onclick="pendingRole='creator';doLogin('creator')">✏️ Creator</button>
+        <button class="btn btn-green" onclick="pendingRole='user';doLogin('user')">✅ User</button>
+      </div>
+      <p style="font-size:.72rem;color:#aaa;margin-top:14px">Creator publishes plans · Users track progress</p>
+      <button onclick="showSetup()" style="background:none;border:none;color:#bbb;font-size:.72rem;cursor:pointer;margin-top:10px;font-family:Poppins,sans-serif">⚙️ Change Firebase config</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN: CALENDAR ══ -->
+<div class="screen" id="screen-calendar">
+  <div class="cal-wrap">
+    <div class="cal-nav">
+      <button onclick="changeMonth(-1)">‹</button>
+      <div>
+        <div class="cal-month" id="cal-month-label"></div>
+        <div class="cal-year" id="cal-year-label"></div>
+      </div>
+      <button onclick="changeMonth(1)">›</button>
+    </div>
+    <div class="day-headers" id="day-headers"></div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#e8f5e9;border-color:#a5d6a7"></div>Complete</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#fffde7;border-color:#fff176"></div>In progress</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#fff"></div>No plan</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN: DAY ══ -->
+<div class="screen" id="screen-day">
+  <div class="day-wrap" id="day-content"></div>
+</div>
+
+<!-- ══ SCREEN: LEADERBOARD ══ -->
+<div class="screen" id="screen-leaderboard">
+  <div class="lb-wrap" id="lb-content"></div>
+</div>
+
+<!-- ══ SCREEN: PEER VIEW ══ -->
+<div class="screen" id="screen-peer">
+  <div class="day-wrap" id="peer-content"></div>
+</div>
+
+<!-- BOTTOM TAB BAR -->
+<div class="tab-bar" id="tab-bar">
+  <button class="tab-btn active" id="tab-my" onclick="switchTab('my')">
+    <span class="tab-icon">📅</span>
+    <span class="tab-label">My Plan</span>
+  </button>
+  <button class="tab-btn" id="tab-lb" onclick="switchTab('lb')">
+    <span class="tab-icon">🏆</span>
+    <span class="tab-label">Leaderboard</span>
+  </button>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════ */
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const COLORS = ['#1a237e','#2e7d32','#6a1b9a','#e65100','#00695c','#c62828'];
+const ICONS = ['🌅','🌤️','🌙','📖','✏️','🔬','💡','🎯'];
+const QUOTES = [
+  "Small daily improvements lead to staggering results.",
+  "Success is the sum of small efforts repeated day in and day out.",
+  "The secret of getting ahead is getting started.",
+  "Consistency is the hallmark of the unbeatable.",
+  "Push yourself — no one else will do it for you.",
+];
+
+let db = null;
+let userName = '';
+let userRole = '';
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+let selectedDate = todayStr();
+let allPlans = {};      // date → plan
+let allProgress = {};   // date → {userName → {taskKey: bool}}
+let editingPlan = null;
+let planListeners = {};
+let progListeners = {};
+let isOnline = navigator.onLine;
+
+function todayStr() { return new Date().toISOString().split('T')[0]; }
+function dateStr(y,m,d) { return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
+function daysInMonth(y,m) { return new Date(y,m+1,0).getDate(); }
+function firstDay(y,m) { return new Date(y,m,1).getDay(); }
+function fmtDisplay(ds) {
+  if(!ds) return '';
+  const d = new Date(ds+'T12:00:00');
+  return d.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+
+/* ═══════════════════════════════════════════
+   FIREBASE INIT
+═══════════════════════════════════════════ */
+function initFirebase(config) {
+  try {
+    if (firebase.apps.length) firebase.app().delete().catch(()=>{});
+    firebase.initializeApp(config);
+    db = firebase.database();
+    db.ref('.info/connected').on('value', snap => {
+      isOnline = !!snap.val();
+      document.getElementById('sync-dot').className = 'sync-dot' + (isOnline ? '' : ' off');
+      document.getElementById('offline-bar').className = 'offline-bar' + (isOnline ? '' : ' show');
+    });
+    return true;
+  } catch(e) {
+    console.error(e);
+    return false;
+  }
+}
+
+function saveFirebaseConfig() {
+  const raw = document.getElementById('fb-config-input').value.trim();
+  let config;
+  try {
+    // allow pasting with or without the variable name
+    const cleaned = raw.replace(/^.*?=\s*/,'').replace(/;?\s*$/,'');
+    config = JSON.parse(cleaned);
+  } catch(e) {
+    showToast('❌ Invalid JSON — check your config');
+    return;
+  }
+  if (!config.databaseURL) { showToast('❌ Missing databaseURL in config'); return; }
+  localStorage.setItem('fb_config', JSON.stringify(config));
+  if (initFirebase(config)) {
+    showToast('✅ Firebase connected!');
+    showScreen('login');
+  } else {
+    showToast('❌ Firebase init failed — check config');
+  }
+}
+
+function showSetup() { showScreen('setup'); }
+
+/* ═══════════════════════════════════════════
+   BOOT
+═══════════════════════════════════════════ */
+window.addEventListener('load', () => {
+  // Build day headers
+  const dh = document.getElementById('day-headers');
+  DAYS_SHORT.forEach(d => { const el=document.createElement('div'); el.className='day-hdr'; el.textContent=d; dh.appendChild(el); });
+
+  // Check saved firebase config
+  const saved = localStorage.getItem('fb_config');
+  if (saved) {
+    try {
+      const config = JSON.parse(saved);
+      if (initFirebase(config)) {
+        showScreen('login');
+        return;
+      }
+    } catch(e) {}
+  }
+  showScreen('setup');
+});
+
+window.addEventListener('online',  () => { isOnline=true; });
+window.addEventListener('offline', () => { isOnline=false; });
+
+/* ═══════════════════════════════════════════
+   SCREENS & TABS
+═══════════════════════════════════════════ */
+let activeTab = 'my';
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  const noNav = name==='setup'||name==='login';
+  document.getElementById('nav').style.display = noNav ? 'none' : 'flex';
+  document.getElementById('tab-bar').className = 'tab-bar' + (noNav ? '' : ' show');
+  if (name === 'calendar') { activeTab='my'; updateTabBar(); renderCalendar(); }
+  if (name === 'leaderboard') { activeTab='lb'; updateTabBar(); renderLeaderboard(); }
+}
+
+function updateTabBar() {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const t = document.getElementById('tab-' + activeTab);
+  if (t) t.classList.add('active');
+}
+
+function switchTab(tab) {
+  activeTab = tab;
+  updateTabBar();
+  if (tab === 'my') {
+    // Go back to calendar (my plan)
+    showScreen('calendar');
+  } else if (tab === 'lb') {
+    showScreen('leaderboard');
+  }
+}
+
+/* ═══════════════════════════════════════════
+   PASSWORDS
+   Creator : 54321
+   User 1  : 101, User 2 : 102, User 3 : 103 …
+   User number is stored in Firebase under users/{name}
+   First time a name logs in → assigned next available number
+═══════════════════════════════════════════ */
+const CREATOR_PASS = '54321';
+const USER_PASS_BASE = 100; // user 1 → 101, user 2 → 102 …
+let pendingRole = 'user';
+
+async function doLogin(role) {
+  const name = document.getElementById('login-name').value.trim();
+  const pass = document.getElementById('login-pass').value.trim();
+  if (!name) { showToast('Please enter your name'); return; }
+  if (!pass)  { showToast('Please enter your password'); return; }
+
+  if (role === 'creator') {
+    if (pass !== CREATOR_PASS) { showToast('❌ Wrong creator password'); return; }
+    finishLogin(name, 'creator');
+    return;
+  }
+
+  // User login — look up or assign user number
+  if (!db) { showToast('❌ Not connected to Firebase'); return; }
+  try {
+    const snap = await db.ref(`users/${name}`).get();
+    let userNum;
+    if (snap.exists()) {
+      userNum = snap.val().num;
+    } else {
+      // New user — assign next number
+      const allSnap = await db.ref('users').get();
+      const allUsers = allSnap.val() || {};
+      const nums = Object.values(allUsers).map(u => u.num || 0);
+      userNum = nums.length ? Math.max(...nums) + 1 : 1;
+      await db.ref(`users/${name}`).set({ num: userNum });
+    }
+    const expectedPass = String(USER_PASS_BASE + userNum);
+    if (pass !== expectedPass) {
+      showToast(`❌ Wrong password for ${name}`);
+      return;
+    }
+    finishLogin(name, 'user');
+  } catch(e) {
+    showToast('❌ Login error — check connection');
+  }
+}
+
+function finishLogin(name, role) {
+  userName = name;
+  userRole = role;
+  lbDate = todayStr();
+  document.getElementById('login-pass').value = '';
+  const badge = document.getElementById('role-badge');
+  badge.textContent = role === 'creator' ? '✏️ Creator' : '✅ ' + name;
+  badge.style.background = role === 'creator' ? 'var(--gold)' : '#4caf50';
+  badge.style.color = '#1a237e';
+  showScreen('calendar');
+  startListeners();
+}
+
+function signOut() {
+  Object.values(planListeners).forEach(off => off && off());
+  Object.values(progListeners).forEach(off => off && off());
+  planListeners = {}; progListeners = {};
+  allPlans = {}; allProgress = {};
+  userName = ''; userRole = ''; pendingRole = 'user';
+  document.getElementById('login-name').value = '';
+  document.getElementById('login-pass').value = '';
+  showScreen('login');
+}
+
+/* ═══════════════════════════════════════════
+   REALTIME LISTENERS
+═══════════════════════════════════════════ */
+function startListeners() {
+  if (!db) return;
+  db.ref('plans').on('value', snap => {
+    allPlans = snap.val() || {};
+    if (document.getElementById('screen-calendar').classList.contains('active')) renderCalendar();
+    if (document.getElementById('screen-day').classList.contains('active')) renderDayView(selectedDate);
+    if (document.getElementById('screen-leaderboard').classList.contains('active')) renderLeaderboard();
+    if (document.getElementById('screen-peer').classList.contains('active')) renderPeerView();
+  });
+  db.ref('progress').on('value', snap => {
+    allProgress = snap.val() || {};
+    if (document.getElementById('screen-calendar').classList.contains('active')) renderCalendar();
+    if (document.getElementById('screen-day').classList.contains('active')) renderDayView(selectedDate);
+    if (document.getElementById('screen-leaderboard').classList.contains('active')) renderLeaderboard();
+    if (document.getElementById('screen-peer').classList.contains('active')) renderPeerView();
+  });
+}
+
+/* ═══════════════════════════════════════════
+   CALENDAR
+═══════════════════════════════════════════ */
+function changeMonth(dir) {
+  calMonth += dir;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCalendar();
+}
+
+function renderCalendar() {
+  document.getElementById('cal-month-label').textContent = MONTHS[calMonth];
+  document.getElementById('cal-year-label').textContent = calYear;
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+  const today = todayStr();
+  const days = daysInMonth(calYear, calMonth);
+  const fd = firstDay(calYear, calMonth);
+
+  // Empty cells
+  for (let i=0; i<fd; i++) { const el=document.createElement('div'); grid.appendChild(el); }
+
+  for (let d=1; d<=days; d++) {
+    const ds = dateStr(calYear, calMonth, d);
+    const plan = allPlans[ds];
+    const dayProg = allProgress[ds] || {};
+    const el = document.createElement('div');
+    el.className = 'cal-day';
+    if (ds === today) el.classList.add('today');
+    if (ds < today) el.classList.add('past');
+
+    let pct = 0;
+    if (plan) {
+      const keys = getPlanTaskKeys(plan);
+      // aggregate progress across all users
+      const allDone = new Set();
+      Object.values(dayProg).forEach(userProg => {
+        if (userProg) Object.keys(userProg).filter(k=>userProg[k]).forEach(k=>allDone.add(k));
+      });
+      // for single user view use their own progress
+      const myProg = dayProg[userName] || {};
+      const myDone = keys.filter(k=>myProg[k]).length;
+      pct = keys.length ? Math.round(myDone/keys.length*100) : 0;
+      el.classList.add('has-plan');
+      if (pct===100) el.classList.add('done-day');
+      else if (pct>0) el.classList.add('inprog-day');
+    }
+
+    el.innerHTML = `<span class="cal-day-num">${d}</span>
+      ${plan ? `<div class="cal-prog-bar"><div class="cal-prog-fill" style="width:${pct}%;background:${pct===100?'#2e7d32':'#f9a825'}"></div></div>
+      <span class="cal-pct" style="color:${pct===100?'#2e7d32':'#f57f17'}">${pct}%</span>` :
+      (userRole==='creator' ? `<span style="font-size:.5rem;color:#ddd">+</span>` : '')}`;
+
+    el.onclick = () => openDay(ds);
+    grid.appendChild(el);
+  }
+}
+
+function openDay(ds) {
+  selectedDate = ds;
+  renderDayView(ds);
+  showScreen('day');
+}
+
+/* ═══════════════════════════════════════════
+   DAY VIEW
+═══════════════════════════════════════════ */
+function getPlanTaskKeys(plan) {
+  if (!plan) return [];
+  const keys = [];
+  (plan.sessions||[]).forEach(s => (s.tasks||[]).forEach((_,ti) => keys.push(`${s.id}_${ti}`)));
+  (plan.miniSegments||[]).forEach(s => (s.tasks||[]).forEach((_,ti) => keys.push(`${s.id}_${ti}`)));
+  (plan.dailyTargets||[]).forEach((_,ti) => keys.push(`daily_${ti}`));
+  return keys;
+}
+
+function getMyProgress(date) {
+  return (allProgress[date] && allProgress[date][userName]) || {};
+}
+
+function renderDayView(date) {
+  const plan = allPlans[date];
+  const myProg = getMyProgress(date);
+  const container = document.getElementById('day-content');
+
+  const keys = getPlanTaskKeys(plan);
+  const done = keys.filter(k=>myProg[k]).length;
+  const pct = keys.length ? Math.round(done/keys.length*100) : 0;
+  const C = 2*Math.PI*54;
+
+  let html = `<div class="day-back">
+    <button onclick="showScreen('calendar')">‹ Calendar</button>
+    <div class="day-title">
+      <h2>${fmtDisplay(date)}</h2>
+      <p>${plan?.examName||'Study Plan'}</p>
+    </div>
+    ${userRole==='creator' ? `<button class="edit-toggle" onclick="openEditor('${date}')">${plan?'✏️ Edit':'➕ Create'}</button>` : ''}
+    </div>`;
+
+  if (!plan) {
+    html += `<div class="no-plan">
+      <div class="emoji">📭</div>
+      <h3>No plan yet</h3>
+      <p>${userRole==='creator' ? 'Create a plan for this day.' : 'The creator hasn\'t published a plan for this day yet.'}</p>
+      ${userRole==='creator' ? `<button class="btn btn-navy" style="padding:10px 24px" onclick="openEditor('${date}')">➕ Create Plan</button>` : ''}
+    </div>`;
+    container.innerHTML = html;
+    return;
+  }
+
+  // Progress ring
+  html += `<div class="ring-card">
+    <div class="ring-wrap">
+      <svg width="110" height="110">
+        <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="7"/>
+        <circle cx="55" cy="55" r="46" fill="none" stroke="${pct===100?'#69f0ae':'#f9a825'}" stroke-width="7"
+          stroke-dasharray="${2*Math.PI*46}" stroke-dashoffset="${2*Math.PI*46*(1-pct/100)}"
+          stroke-linecap="round" style="transform:rotate(-90deg);transform-origin:55px 55px;transition:stroke-dashoffset .6s"/>
+        <text x="55" y="51" text-anchor="middle" fill="white" font-size="18" font-weight="900" font-family="Nunito,sans-serif">${pct}%</text>
+        <text x="55" y="65" text-anchor="middle" fill="rgba(255,255,255,.7)" font-size="9" font-family="Poppins,sans-serif">DONE</text>
+      </svg>
+    </div>
+    <div class="ring-info">
+      <div class="ring-name">${esc(plan.examName||'Study Plan')}</div>
+      <div class="ring-tagline">${esc(plan.tagline||'')}</div>
+      <div class="ring-stats">
+        <div class="ring-stat"><div class="ring-stat-n">${done}</div><div class="ring-stat-l">Done</div></div>
+        <div class="ring-stat"><div class="ring-stat-n">${keys.length}</div><div class="ring-stat-l">Total</div></div>
+        <div class="ring-stat"><div class="ring-stat-n">${(plan.sessions||[]).filter(s=>(s.tasks||[]).every((_,ti)=>myProg[`${s.id}_${ti}`])).length}</div><div class="ring-stat-l">Sessions ✓</div></div>
+      </div>
+    </div>
+  </div>`;
+
+  // Motivation
+  const qi = Math.abs(date.split('-').reduce((a,b)=>a+parseInt(b),0)) % QUOTES.length;
+  html += `<div class="motivation">"${QUOTES[qi]}"</div>`;
+
+  // Sessions
+  (plan.sessions||[]).forEach((s,si) => {
+    const tasks = s.tasks||[];
+    const sDone = tasks.filter((_,ti)=>myProg[`${s.id}_${ti}`]).length;
+    const sPct = tasks.length ? Math.round(sDone/tasks.length*100) : 0;
+    const col = COLORS[si%COLORS.length];
+    html += `<div class="session-card${sPct===100?' all-done':''}">
+      <div class="sess-header" onclick="toggleSection(this)">
+        <span class="sess-icon">${ICONS[si%ICONS.length]}</span>
+        <div class="sess-info">
+          <div class="sess-label">${esc(s.label||'Session')}</div>
+          <div class="sess-sub">${esc(s.subject||'')}${s.duration?' · '+esc(s.duration):''}</div>
+        </div>
+        <div class="sess-right">
+          <span class="sess-pct">${sPct}%</span>
+          ${sPct===100?'<span class="done-badge">DONE</span>':''}
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="sess-prog"><div class="sess-prog-fill" style="width:${sPct}%;background:${col}"></div></div>
+      <div class="sess-body">
+        ${tasks.map((t,ti) => {
+          const k=`${s.id}_${ti}`;
+          return `<div class="tick-row${myProg[k]?' done':''}" onclick="toggleTask('${date}','${k}',this)">
+            <div class="tick-box">${myProg[k]?'✓':''}</div>
+            <span class="tick-label">${esc(t)}</span>
+          </div>`;
+        }).join('')}
+        ${s.goal?`<div class="sess-goal">🎯 ${esc(s.goal)}</div>`:''}
+      </div>
+    </div>`;
+  });
+
+  // Mini segments
+  if ((plan.miniSegments||[]).length) {
+    html += `<div class="mini-grid">`;
+    (plan.miniSegments||[]).forEach((m,mi) => {
+      const tasks = m.tasks||[];
+      const mDone = tasks.filter((_,ti)=>myProg[`${m.id}_${ti}`]).length;
+      const mPct = tasks.length ? Math.round(mDone/tasks.length*100) : 0;
+      const col = COLORS[(mi+2)%COLORS.length];
+      html += `<div class="mini-card">
+        <div class="mini-header" style="background:${col}">
+          <span class="mini-title-text">${esc(m.title||'Segment')}</span>
+          <span class="mini-dur">${esc(m.duration||'')}</span>
+        </div>
+        <div class="mini-prog"><div class="mini-prog-fill" style="width:${mPct}%"></div></div>
+        <div class="mini-body">
+          ${tasks.map((t,ti) => {
+            const k=`${m.id}_${ti}`;
+            return `<div class="mini-tick${myProg[k]?' done':''}" onclick="toggleTask('${date}','${k}',this)">
+              <div class="mini-tick-box">${myProg[k]?'✓':''}</div>
+              <span class="mini-tick-label">${esc(t)}</span>
+            </div>`;
+          }).join('')}
+          ${!tasks.length?'<p style="font-size:.7rem;color:#ccc;text-align:center;padding:6px">No tasks</p>':''}
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Daily targets
+  if ((plan.dailyTargets||[]).length) {
+    html += `<div class="targets-card">
+      <div class="targets-title">🎯 Daily Targets</div>
+      <div class="targets-pills">
+        ${(plan.dailyTargets||[]).map((t,ti) => {
+          const k=`daily_${ti}`;
+          return `<button class="target-pill${myProg[k]?' done':''}" onclick="toggleTask('${date}','${k}',null)">${myProg[k]?'✔ ':''}${esc(t)}</button>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
+
+  // Complete banner
+  if (pct===100) {
+    html += `<div class="complete-banner">
+      <div class="emoji">🎉</div>
+      <h3>All tasks complete!</h3>
+      <p>Outstanding work today, ${esc(userName)}!</p>
+    </div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+function toggleSection(header) {
+  const body = header.nextElementSibling?.nextElementSibling;
+  if (!body) return;
+  const chevron = header.querySelector('.chevron');
+  if (body.style.display === 'none') { body.style.display='block'; chevron.classList.add('open'); }
+  else { body.style.display='none'; chevron.classList.remove('open'); }
+}
+
+async function toggleTask(date, key, el) {
+  if (!db) return;
+  const myProg = getMyProgress(date);
+  const newVal = !myProg[key];
+  // Optimistic local update
+  if (!allProgress[date]) allProgress[date] = {};
+  if (!allProgress[date][userName]) allProgress[date][userName] = {};
+  allProgress[date][userName][key] = newVal;
+  renderDayView(date);
+  // Write to Firebase
+  try {
+    await db.ref(`progress/${date}/${userName}/${key}`).set(newVal);
+  } catch(e) {
+    showToast('⚠️ Sync failed — check connection');
+  }
+}
+
+/* ═══════════════════════════════════════════
+   EDITOR
+═══════════════════════════════════════════ */
+function openEditor(date) {
+  selectedDate = date;
+  editingPlan = allPlans[date] ? JSON.parse(JSON.stringify(allPlans[date])) : {
+    examName:'Study Plan', tagline:'Plan Your Day, Ace Your Exam!',
+    totalTime:'', sessions:[], miniSegments:[], dailyTargets:[], date
+  };
+  renderEditor();
+  showScreen('day'); // editor renders inside day screen
+}
+
+function renderEditor() {
+  const plan = editingPlan;
+  const inp = 'class="e-inp"';
+  let html = `<div class="day-back">
+    <button onclick="cancelEditor()">‹ Back</button>
+    <div class="day-title"><h2>${fmtDisplay(selectedDate)}</h2><p>Edit Plan</p></div>
+  </div>`;
+
+  // Meta
+  html += `<div class="e-card">
+    <div class="e-card-title" style="color:var(--navy)">🏷️ Plan Details</div>
+    <div class="e-grid2">
+      <div><label class="e-label">Exam / Course</label><input ${inp} id="e-examName" value="${esc(plan.examName||'')}" placeholder="SBI PO 2026"></div>
+      <div><label class="e-label">Total Study Time</label><input ${inp} id="e-totalTime" value="${esc(plan.totalTime||'')}" placeholder="7–8 Hrs"></div>
+    </div>
+    <label class="e-label">Tagline</label>
+    <input ${inp} id="e-tagline" value="${esc(plan.tagline||'')}" placeholder="Plan Your Day, Ace Your Exam!">
+  </div>`;
+
+  // Sessions
+  html += `<div class="e-card">
+    <div class="e-card-title" style="color:var(--blue)">📚 Study Sessions</div>
+    <div id="sessions-editor">`;
+  (plan.sessions||[]).forEach((s,si) => { html += renderSessionEditor(s,si); });
+  html += `</div>
+    <button class="add-section-btn" onclick="addEditorSession()">＋ Add Session</button>
+  </div>`;
+
+  // Mini segments
+  html += `<div class="e-card">
+    <div class="e-card-title" style="color:var(--orange)">📰 Short Segments</div>
+    <div id="mini-editor" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">`;
+  (plan.miniSegments||[]).forEach((m,mi) => { html += renderMiniEditor(m,mi); });
+  html += `</div>
+    <button class="add-section-btn" onclick="addEditorMini()">＋ Add Short Segment</button>
+  </div>`;
+
+  // Targets
+  html += `<div class="e-card">
+    <div class="e-card-title" style="color:var(--green)">🎯 Daily Targets</div>
+    <div id="targets-editor">`;
+  (plan.dailyTargets||[]).forEach((t,ti) => { html += renderTargetEditor(t,ti); });
+  html += `</div>
+    <button class="add-section-btn" onclick="addEditorTarget()">＋ Add Target</button>
+  </div>`;
+
+  html += `<button class="publish-btn" id="publish-btn" onclick="publishPlan()">💾 Publish Plan</button>`;
+
+  document.getElementById('day-content').innerHTML = html;
+}
+
+function renderSessionEditor(s,si) {
+  return `<div class="sess-editor" id="sess-ed-${s.id}">
+    <button class="remove-sess-btn" onclick="removeEditorSession('${s.id}')">🗑 Remove</button>
+    <div class="e-grid2">
+      <div><label class="e-label">Label</label><input class="e-inp" placeholder="Morning" value="${esc(s.label||'')}" onchange="updateSess('${s.id}','label',this.value)"></div>
+      <div><label class="e-label">Duration</label><input class="e-inp" placeholder="2 Hours" value="${esc(s.duration||'')}" onchange="updateSess('${s.id}','duration',this.value)"></div>
+    </div>
+    <label class="e-label">Subject</label>
+    <input class="e-inp" placeholder="Reasoning" value="${esc(s.subject||'')}" onchange="updateSess('${s.id}','subject',this.value)">
+    <label class="e-label">Goal</label>
+    <input class="e-inp" placeholder="Session goal…" value="${esc(s.goal||'')}" onchange="updateSess('${s.id}','goal',this.value)">
+    <label class="e-label">Tasks</label>
+    <div id="tasks-ed-${s.id}">
+      ${(s.tasks||[]).map((t,ti)=>`<div class="task-row"><input class="e-inp" value="${esc(t)}" onchange="updateTask('${s.id}',${ti},this.value)"><button class="del-btn" onclick="removeTask('${s.id}',${ti})">✕</button></div>`).join('')}
+    </div>
+    <button class="add-task-btn" onclick="addTaskToSess('${s.id}')">＋ Task</button>
+  </div>`;
+}
+
+function renderMiniEditor(m,mi) {
+  return `<div class="sess-editor" id="mini-ed-${m.id}" style="padding:12px">
+    <button class="del-btn" style="position:absolute;top:8px;right:8px" onclick="removeEditorMini('${m.id}')">✕</button>
+    <label class="e-label">Title</label><input class="e-inp" value="${esc(m.title||'')}" placeholder="Current Affairs" onchange="updateMini('${m.id}','title',this.value)">
+    <label class="e-label">Duration</label><input class="e-inp" value="${esc(m.duration||'')}" placeholder="40 min" onchange="updateMini('${m.id}','duration',this.value)">
+    <label class="e-label">Tasks</label>
+    <div id="minitasks-ed-${m.id}">
+      ${(m.tasks||[]).map((t,ti)=>`<div class="task-row"><input class="e-inp" value="${esc(t)}" onchange="updateMiniTask('${m.id}',${ti},this.value)"><button class="del-btn" onclick="removeMiniTask('${m.id}',${ti})">✕</button></div>`).join('')}
+    </div>
+    <button class="add-task-btn" onclick="addMiniTask('${m.id}')">＋ Task</button>
+  </div>`;
+}
+
+function renderTargetEditor(t,ti) {
+  return `<div class="task-row" id="target-ed-${ti}"><input class="e-inp" value="${esc(t)}" placeholder="Target…" onchange="updateTarget(${ti},this.value)"><button class="del-btn" onclick="removeTarget(${ti})">✕</button></div>`;
+}
+
+// Session ops
+function updateSess(id,k,v){ const s=editingPlan.sessions.find(s=>s.id===id); if(s) s[k]=v; }
+function removeEditorSession(id){ editingPlan.sessions=editingPlan.sessions.filter(s=>s.id!==id); renderEditor(); }
+function addEditorSession(){ editingPlan.sessions.push({id:'s_'+Date.now(),label:'',duration:'',subject:'',goal:'',tasks:[]}); renderEditor(); }
+function addTaskToSess(id){ const s=editingPlan.sessions.find(s=>s.id===id); if(s){s.tasks.push(''); renderEditor();} }
+function updateTask(id,ti,v){ const s=editingPlan.sessions.find(s=>s.id===id); if(s)s.tasks[ti]=v; }
+function removeTask(id,ti){ const s=editingPlan.sessions.find(s=>s.id===id); if(s){s.tasks.splice(ti,1); renderEditor();} }
+
+// Mini ops
+function updateMini(id,k,v){ const m=editingPlan.miniSegments.find(m=>m.id===id); if(m) m[k]=v; }
+function removeEditorMini(id){ editingPlan.miniSegments=editingPlan.miniSegments.filter(m=>m.id!==id); renderEditor(); }
+function addEditorMini(){ editingPlan.miniSegments.push({id:'m_'+Date.now(),title:'',duration:'',tasks:[]}); renderEditor(); }
+function addMiniTask(id){ const m=editingPlan.miniSegments.find(m=>m.id===id); if(m){m.tasks.push(''); renderEditor();} }
+function updateMiniTask(id,ti,v){ const m=editingPlan.miniSegments.find(m=>m.id===id); if(m)m.tasks[ti]=v; }
+function removeMiniTask(id,ti){ const m=editingPlan.miniSegments.find(m=>m.id===id); if(m){m.tasks.splice(ti,1); renderEditor();} }
+
+// Target ops
+function updateTarget(ti,v){ editingPlan.dailyTargets[ti]=v; }
+function removeTarget(ti){ editingPlan.dailyTargets.splice(ti,1); renderEditor(); }
+function addEditorTarget(){ editingPlan.dailyTargets.push(''); renderEditor(); }
+
+function cancelEditor() { renderDayView(selectedDate); }
+
+async function publishPlan() {
+  // Sync meta fields
+  editingPlan.examName = document.getElementById('e-examName')?.value||editingPlan.examName;
+  editingPlan.tagline  = document.getElementById('e-tagline')?.value||editingPlan.tagline;
+  editingPlan.totalTime= document.getElementById('e-totalTime')?.value||editingPlan.totalTime;
+
+  const btn = document.getElementById('publish-btn');
+  btn.disabled = true; btn.textContent = '💾 Publishing…';
+  try {
+    await db.ref(`plans/${selectedDate}`).set(editingPlan);
+    allPlans[selectedDate] = editingPlan;
+    showToast('✅ Plan published!');
+    renderDayView(selectedDate);
+  } catch(e) {
+    showToast('❌ Failed to publish — check connection');
+    btn.disabled=false; btn.textContent='💾 Publish Plan';
+  }
+}
+
+/* ═══════════════════════════════════════════
+   LEADERBOARD
+═══════════════════════════════════════════ */
+const AVATAR_COLORS = ['#1a237e','#2e7d32','#6a1b9a','#e65100','#00695c','#c62828','#0277bd','#558b2f','#4527a0','#ad1457'];
+let lbDate = todayStr();
+let lbViewMonth = new Date().getMonth();
+let lbViewYear  = new Date().getFullYear();
+
+function avatarColor(name) {
+  let h = 0; for(let i=0;i<name.length;i++) h = (h*31+name.charCodeAt(i))&0xffffffff;
+  return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+}
+function avatarInitial(name) { return name.trim().charAt(0).toUpperCase(); }
+
+function getUserPct(uname, date) {
+  const plan = allPlans[date];
+  if (!plan) return null;
+  const keys = getPlanTaskKeys(plan);
+  if (!keys.length) return null;
+  const prog = (allProgress[date] && allProgress[date][uname]) || {};
+  return Math.round(keys.filter(k=>prog[k]).length / keys.length * 100);
+}
+
+function getStreak(uname) {
+  // Count consecutive days up to today where user completed ≥1 task
+  let streak = 0;
+  const today = new Date();
+  for (let i=0; i<60; i++) {
+    const d = new Date(today); d.setDate(today.getDate() - i);
+    const ds = d.toISOString().split('T')[0];
+    const plan = allPlans[ds];
+    if (!plan) continue;
+    const keys = getPlanTaskKeys(plan);
+    const prog = (allProgress[ds] && allProgress[ds][uname]) || {};
+    const done = keys.filter(k=>prog[k]).length;
+    if (done > 0) streak++;
+    else if (i > 0) break; // gap in streak
+  }
+  return streak;
+}
+
+function getAllUsers() {
+  // Gather all users from allProgress and allPlans
+  const names = new Set();
+  Object.values(allProgress).forEach(dayProg => {
+    Object.keys(dayProg||{}).forEach(n => names.add(n));
+  });
+  return [...names];
+}
+
+function renderLeaderboard() {
+  const container = document.getElementById('lb-content');
+  const users = getAllUsers();
+  const plan = allPlans[lbDate];
+
+  // Build sorted list by pct for lbDate
+  let ranked = users.map(u => ({
+    name: u,
+    pct: getUserPct(u, lbDate) ?? 0,
+    hasPlan: !!plan,
+    streak: getStreak(u),
+    color: avatarColor(u),
+  })).sort((a,b) => b.pct - a.pct || a.name.localeCompare(b.name));
+
+  const fmtLbDate = (ds) => {
+    const d = new Date(ds+'T12:00:00');
+    return d.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+  };
+
+  let html = `<div class="lb-header">
+    <h2>🏆 Leaderboard</h2>
+    <p>See how everyone is doing · tap a name to view their plan</p>
+  </div>
+  <div class="lb-date-row">
+    <button class="lb-date-btn" onclick="lbChangeDate(-1)">‹</button>
+    <span class="lb-date-label">${fmtLbDate(lbDate)}</span>
+    <button class="lb-date-btn" onclick="lbChangeDate(1)">›</button>
+  </div>`;
+
+  if (!plan) {
+    html += `<div class="lb-no-data">📭 No plan published for this day yet.<br><span style="font-size:.75rem">Navigate to a day with a plan.</span></div>`;
+  } else if (!ranked.length) {
+    html += `<div class="lb-no-data">👥 No users have logged in yet.</div>`;
+  } else {
+    // Podium (top 3)
+    if (ranked.length >= 2) {
+      const podiumOrder = ranked.length >= 3
+        ? [ranked[1], ranked[0], ranked[2]]
+        : [ranked[1], ranked[0]];
+      const podiumRanks = ranked.length >= 3 ? ['rank2','rank1','rank3'] : ['rank2','rank1'];
+      const podiumLabels = ranked.length >= 3 ? ['2nd','1st','3rd'] : ['2nd','1st'];
+
+      html += `<div class="lb-top3">`;
+      podiumOrder.forEach((u, pi) => {
+        const r = podiumRanks[pi];
+        html += `<div class="lb-podium ${r}" onclick="openPeerView('${esc(u.name)}')">
+          <div class="lb-avatar" style="background:${u.color}">
+            ${r==='rank1'?'<span class="lb-crown">👑</span>':''}
+            ${avatarInitial(u.name)}
+          </div>
+          <span class="lb-pname">${esc(u.name)}</span>
+          <span class="lb-ppct" style="color:${u.pct===100?'var(--green)':'var(--navy)'}">${u.pct}%</span>
+          <div class="lb-block">${podiumLabels[pi]}</div>
+        </div>`;
+      });
+      html += `</div>`;
+    }
+
+    // Full list
+    html += `<div class="lb-list">`;
+    ranked.forEach((u, i) => {
+      const rankClass = i===0?'rank1-row':i===1?'rank2-row':i===2?'rank3-row':'';
+      const rankEmoji = i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1;
+      const isMe = u.name === userName;
+      html += `<div class="lb-row ${rankClass}${isMe?' me':''}" onclick="openPeerView('${esc(u.name)}')">
+        <span class="lb-rank">${rankEmoji}</span>
+        <div class="lb-uavatar" style="background:${u.color}">${avatarInitial(u.name)}</div>
+        <div class="lb-uinfo">
+          <div class="lb-uname">${esc(u.name)}${isMe?'<span class="me-tag">YOU</span>':''}</div>
+          <div class="lb-ubar-wrap">
+            <div class="lb-ubar" style="width:${u.pct}%;background:${u.pct===100?'var(--green)':'var(--blue)'}"></div>
+          </div>
+          ${u.streak>1?`<div class="lb-streak">🔥 ${u.streak}-day streak</div>`:''}
+        </div>
+        <span class="lb-upct" style="color:${u.pct===100?'var(--green)':u.pct>0?'var(--navy)':'#bbb'}">${u.pct}%</span>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+function lbChangeDate(dir) {
+  const d = new Date(lbDate+'T12:00:00');
+  d.setDate(d.getDate() + dir);
+  lbDate = d.toISOString().split('T')[0];
+  renderLeaderboard();
+}
+
+/* ═══════════════════════════════════════════
+   PEER VIEW (read-only)
+═══════════════════════════════════════════ */
+let peerName = '';
+let peerTab = 'today'; // 'today' | 'calendar'
+let peerCalYear = new Date().getFullYear();
+let peerCalMonth = new Date().getMonth();
+let peerSelectedDate = todayStr();
+
+function openPeerView(name) {
+  peerName = name;
+  peerTab = 'today';
+  peerSelectedDate = lbDate;
+  peerCalYear = new Date().getFullYear();
+  peerCalMonth = new Date().getMonth();
+  renderPeerView();
+  document.getElementById('screen-peer').classList.remove('active');
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-peer').classList.add('active');
+}
+
+function renderPeerView() {
+  const container = document.getElementById('peer-content');
+  const color = avatarColor(peerName);
+  const isMe = peerName === userName;
+
+  // Overall stats
+  const allDates = Object.keys(allPlans);
+  const daysWithPlan = allDates.length;
+  const daysCompleted = allDates.filter(ds => {
+    const keys = getPlanTaskKeys(allPlans[ds]);
+    const prog = (allProgress[ds]&&allProgress[ds][peerName])||{};
+    return keys.length && keys.every(k=>prog[k]);
+  }).length;
+  const streak = getStreak(peerName);
+
+  let html = `<div class="peer-back">
+    <button onclick="showScreen('leaderboard')">‹ Leaderboard</button>
+    <div style="flex:1"></div>
+  </div>
+  <div class="peer-banner">
+    <div class="peer-big-avatar" style="background:${color}">${avatarInitial(peerName)}</div>
+    <div class="peer-banner-info">
+      <div class="peer-banner-name">${esc(peerName)}${isMe?' (You)':''}</div>
+      <div class="peer-banner-sub">${daysCompleted}/${daysWithPlan} days completed · ${streak>0?`🔥 ${streak}-day streak`:'No streak yet'}</div>
+    </div>
+  </div>
+  ${!isMe?`<div class="readonly-note">👁️ View only — you cannot edit ${esc(peerName)}'s progress</div>`:''}
+  <div class="peer-tabs">
+    <button class="peer-tab${peerTab==='today'?' active':''}" onclick="peerTab='today';renderPeerView()">📋 Today's Plan</button>
+    <button class="peer-tab${peerTab==='calendar'?' active':''}" onclick="peerTab='calendar';renderPeerView()">📅 Calendar</button>
+  </div>`;
+
+  if (peerTab === 'today') {
+    html += renderPeerDay(peerSelectedDate);
+  } else {
+    html += renderPeerCalendar();
+  }
+
+  container.innerHTML = html;
+}
+
+function renderPeerDay(date) {
+  const plan = allPlans[date];
+  const prog = (allProgress[date] && allProgress[date][peerName]) || {};
+  const keys = getPlanTaskKeys(plan);
+  const done = keys.filter(k=>prog[k]).length;
+  const pct = keys.length ? Math.round(done/keys.length*100) : 0;
+
+  if (!plan) {
+    return `<div class="no-plan"><div class="emoji">📭</div><h3>No plan for ${fmtDisplay(date)}</h3><p>The creator hasn't published a plan for this day.</p></div>`;
+  }
+
+  let html = `<div style="font-size:.8rem;color:#888;font-weight:600;margin-bottom:10px;text-align:center">${fmtDisplay(date)}</div>`;
+
+  // Ring
+  html += `<div class="ring-card" style="margin-bottom:14px">
+    <div class="ring-wrap">
+      <svg width="110" height="110">
+        <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="7"/>
+        <circle cx="55" cy="55" r="46" fill="none" stroke="${pct===100?'#69f0ae':'#f9a825'}" stroke-width="7"
+          stroke-dasharray="${2*Math.PI*46}" stroke-dashoffset="${2*Math.PI*46*(1-pct/100)}"
+          stroke-linecap="round" style="transform:rotate(-90deg);transform-origin:55px 55px"/>
+        <text x="55" y="51" text-anchor="middle" fill="white" font-size="18" font-weight="900" font-family="Nunito,sans-serif">${pct}%</text>
+        <text x="55" y="65" text-anchor="middle" fill="rgba(255,255,255,.7)" font-size="9" font-family="Poppins,sans-serif">DONE</text>
+      </svg>
+    </div>
+    <div class="ring-info">
+      <div class="ring-name">${esc(plan.examName||'Study Plan')}</div>
+      <div class="ring-tagline">${esc(plan.tagline||'')}</div>
+      <div class="ring-stats">
+        <div class="ring-stat"><div class="ring-stat-n">${done}</div><div class="ring-stat-l">Done</div></div>
+        <div class="ring-stat"><div class="ring-stat-n">${keys.length}</div><div class="ring-stat-l">Total</div></div>
+      </div>
+    </div>
+  </div>`;
+
+  // Sessions — read-only
+  const wrap = (inner) => `<div class="readonly-overlay">${inner}</div>`;
+
+  (plan.sessions||[]).forEach((s,si) => {
+    const tasks = s.tasks||[];
+    const sDone = tasks.filter((_,ti)=>prog[`${s.id}_${ti}`]).length;
+    const sPct = tasks.length ? Math.round(sDone/tasks.length*100) : 0;
+    const col = COLORS[si%COLORS.length];
+    html += `<div class="session-card${sPct===100?' all-done':''}">
+      <div class="sess-header" onclick="toggleSection(this)">
+        <span class="sess-icon">${ICONS[si%ICONS.length]}</span>
+        <div class="sess-info">
+          <div class="sess-label">${esc(s.label||'Session')}</div>
+          <div class="sess-sub">${esc(s.subject||'')}${s.duration?' · '+esc(s.duration):''}</div>
+        </div>
+        <div class="sess-right">
+          <span class="sess-pct">${sPct}%</span>
+          ${sPct===100?'<span class="done-badge">DONE</span>':''}
+          <span class="chevron open">▼</span>
+        </div>
+      </div>
+      <div class="sess-prog"><div class="sess-prog-fill" style="width:${sPct}%;background:${col}"></div></div>
+      <div class="sess-body">
+        ${tasks.map((t,ti) => {
+          const k=`${s.id}_${ti}`;
+          const isDone = !!prog[k];
+          return `<div class="tick-row${isDone?' done':''}">
+            <div class="tick-box">${isDone?'✓':''}</div>
+            <span class="tick-label">${esc(t)}</span>
+          </div>`;
+        }).join('')}
+        ${s.goal?`<div class="sess-goal">🎯 ${esc(s.goal)}</div>`:''}
+      </div>
+    </div>`;
+  });
+
+  // Mini segments — read-only
+  if ((plan.miniSegments||[]).length) {
+    html += `<div class="mini-grid">`;
+    (plan.miniSegments||[]).forEach((m,mi) => {
+      const tasks = m.tasks||[];
+      const mDone = tasks.filter((_,ti)=>prog[`${m.id}_${ti}`]).length;
+      const mPct = tasks.length ? Math.round(mDone/tasks.length*100) : 0;
+      const col = COLORS[(mi+2)%COLORS.length];
+      html += `<div class="mini-card">
+        <div class="mini-header" style="background:${col}">
+          <span class="mini-title-text">${esc(m.title||'Segment')}</span>
+          <span class="mini-dur">${esc(m.duration||'')}</span>
+        </div>
+        <div class="mini-prog"><div class="mini-prog-fill" style="width:${mPct}%"></div></div>
+        <div class="mini-body">
+          ${tasks.map((t,ti) => {
+            const k=`${m.id}_${ti}`; const isDone=!!prog[k];
+            return `<div class="mini-tick${isDone?' done':''}">
+              <div class="mini-tick-box">${isDone?'✓':''}</div>
+              <span class="mini-tick-label">${esc(t)}</span>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Daily targets — read-only
+  if ((plan.dailyTargets||[]).length) {
+    html += `<div class="targets-card">
+      <div class="targets-title">🎯 Daily Targets</div>
+      <div class="targets-pills">
+        ${(plan.dailyTargets||[]).map((t,ti) => {
+          const k=`daily_${ti}`; const isDone=!!prog[k];
+          return `<span class="target-pill${isDone?' done':''}" style="cursor:default">${isDone?'✔ ':''}${esc(t)}</span>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
+
+  if (pct===100) html += `<div class="complete-banner"><div class="emoji">🎉</div><h3>${esc(peerName)} completed everything!</h3></div>`;
+  return html;
+}
+
+function renderPeerCalendar() {
+  const MONTHS_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const today = todayStr();
+  const days = daysInMonth(peerCalYear, peerCalMonth);
+  const fd = firstDay(peerCalYear, peerCalMonth);
+
+  let html = `<div class="cal-nav" style="margin-bottom:12px">
+    <button class="lb-date-btn" onclick="peerCalMonth--;if(peerCalMonth<0){peerCalMonth=11;peerCalYear--;}renderPeerView()">‹</button>
+    <div>
+      <div class="cal-month">${MONTHS_FULL[peerCalMonth]}</div>
+      <div class="cal-year">${peerCalYear}</div>
+    </div>
+    <button class="lb-date-btn" onclick="peerCalMonth++;if(peerCalMonth>11){peerCalMonth=0;peerCalYear++;}renderPeerView()">›</button>
+  </div>
+  <div class="day-headers">`;
+  DAYS_SHORT.forEach(d=>{ html+=`<div class="day-hdr">${d}</div>`; });
+  html += `</div><div class="cal-grid">`;
+  for(let i=0;i<fd;i++) html+=`<div></div>`;
+  for(let d=1;d<=days;d++) {
+    const ds = dateStr(peerCalYear, peerCalMonth, d);
+    const plan = allPlans[ds];
+    const prog = (allProgress[ds]&&allProgress[ds][peerName])||{};
+    let pct = 0, hasPlan = false;
+    if (plan) {
+      hasPlan = true;
+      const keys = getPlanTaskKeys(plan);
+      pct = keys.length ? Math.round(keys.filter(k=>prog[k]).length/keys.length*100) : 0;
+    }
+    const isToday = ds===today;
+    const isPast = ds<today;
+    const classes = ['cal-day', hasPlan?'has-plan':'', pct===100?'done-day':pct>0?'inprog-day':'', isToday?'today':'', isPast?'past':''].filter(Boolean).join(' ');
+    html += `<div class="${classes}" onclick="peerSelectedDate='${ds}';peerTab='today';renderPeerView()">
+      <span class="cal-day-num">${d}</span>
+      ${hasPlan?`<div class="cal-prog-bar"><div class="cal-prog-fill" style="width:${pct}%;background:${pct===100?'#2e7d32':'#f9a825'}"></div></div>
+      <span class="cal-pct" style="color:${pct===100?'#2e7d32':'#f57f17'}">${pct}%</span>`:''}
+    </div>`;
+  }
+  html += `</div>
+  <div class="cal-legend" style="margin-top:12px">
+    <div class="leg-item"><div class="leg-dot" style="background:#e8f5e9;border-color:#a5d6a7"></div>Complete</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#fffde7;border-color:#fff176"></div>In progress</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#fff"></div>No plan</div>
+  </div>
+  <p style="font-size:.72rem;color:#aaa;text-align:center;margin-top:10px">Tap any day to see ${esc(peerName)}'s task progress</p>`;
+  return html;
+}
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2800);
+}
+
+/* ═══════════════════════════════════════════
+   SERVICE WORKER (PWA offline)
+═══════════════════════════════════════════ */
+if ('serviceWorker' in navigator) {
+  const swCode = `
+const CACHE='study-planner-v1';
+const ASSETS=['./'];
+self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
+self.addEventListener('fetch',e=>{
+  if(e.request.url.includes('firebaseio.com')||e.request.url.includes('googleapis.com')){
+    e.respondWith(fetch(e.request).catch(()=>new Response('',{status:503})));
+    return;
+  }
+  e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));
+});`;
+  const swBlob = new Blob([swCode], {type:'application/javascript'});
+  const swURL = URL.createObjectURL(swBlob);
+  navigator.serviceWorker.register(swURL).catch(()=>{});
+}
+</script>
+</body>
+</html>
