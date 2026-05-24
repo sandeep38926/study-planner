@@ -349,6 +349,7 @@ code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color
   <span class="nav-title">📅 Study Planner</span>
   <div class="sync-dot off" id="sync-dot" title="Connection status"></div>
   <span class="nav-badge" id="role-badge" style="background:var(--gold);color:var(--navy)"></span>
+  <button class="nav-btn" onclick="showEditMyNameModal()" title="Edit my name">✏️</button>
   <button class="nav-btn" onclick="signOut()">Sign out</button>
 </div>
 
@@ -666,19 +667,92 @@ function finishLogin(name, role) {
   userRole = role;
   lbDate = todayStr();
   document.getElementById('login-pass').value = '';
-  const badge = document.getElementById('role-badge');
-  badge.textContent = role === 'creator' ? '✏️ Creator' : '✅ ' + name;
-  badge.style.background = role === 'creator' ? 'var(--gold)' : '#4caf50';
-  badge.style.color = '#1a237e';
+  updateNavBadge();
   showScreen('calendar');
   startListeners();
+}
+
+function updateNavBadge() {
+  const badge = document.getElementById('role-badge');
+  badge.textContent = userRole === 'creator' ? '✏️ Creator' : '✅ ' + userName;
+  badge.style.background = userRole === 'creator' ? 'var(--gold)' : '#4caf50';
+  badge.style.color = '#1a237e';
+}
+
+function showEditMyNameModal() {
+  if (userRole === 'creator') {
+    showModal(`
+      <h3>✏️ Edit Your Name</h3>
+      <p>Change the name shown for your Creator account.</p>
+      <input class="modal-inp" id="my-name-inp" value="${esc(userName)}" placeholder="Your name…" maxlength="30">
+      <div class="modal-btns">
+        <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+        <button class="modal-confirm green" onclick="confirmEditMyName()">✅ Save</button>
+      </div>
+    `);
+  } else {
+    const myData = allUsersData[userName];
+    const myNum = myData ? myData.num : null;
+    showModal(`
+      <h3>✏️ Edit Your Name</h3>
+      <p>Changing your name transfers all your progress to the new name. Your password stays the same (<strong>${myNum ? USER_PASS_BASE + myNum : '—'}</strong>).</p>
+      <input class="modal-inp" id="my-name-inp" value="${esc(userName)}" placeholder="Your name…" maxlength="30">
+      <div class="modal-btns">
+        <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+        <button class="modal-confirm green" onclick="confirmEditMyName()">✅ Save</button>
+      </div>
+    `);
+  }
+  const inp = document.getElementById('my-name-inp');
+  if (inp) { inp.focus(); inp.select(); }
+  inp && inp.addEventListener('keydown', e => { if(e.key==='Enter') confirmEditMyName(); });
+}
+
+async function confirmEditMyName() {
+  const newName = document.getElementById('my-name-inp')?.value.trim();
+  if (!newName) { showToast('Please enter a name'); return; }
+  if (newName === userName) { closeModal(); return; }
+
+  if (userRole === 'creator') {
+    // Just update local display name
+    userName = newName;
+    updateNavBadge();
+    closeModal();
+    showToast(`✅ Name changed to "${newName}"`);
+    return;
+  }
+
+  // User — rename in Firebase
+  if (allUsersData[newName]) { showToast('❌ That name is already taken'); return; }
+  try {
+    const myData = allUsersData[userName];
+    const myNum = myData ? myData.num : 1;
+    const progSnap = await db.ref('progress').get();
+    const progData = progSnap.val() || {};
+    const updates = {};
+    Object.keys(progData).forEach(date => {
+      if (progData[date][userName]) {
+        updates[`progress/${date}/${newName}`] = progData[date][userName];
+        updates[`progress/${date}/${userName}`] = null;
+      }
+    });
+    updates[`users/${newName}`] = { num: myNum };
+    updates[`users/${userName}`] = null;
+    await db.ref().update(updates);
+    userName = newName;
+    updateNavBadge();
+    closeModal();
+    showToast(`✅ Name changed to "${newName}"`);
+  } catch(e) {
+    showToast('❌ Failed — check connection');
+  }
 }
 
 function signOut() {
   Object.values(planListeners).forEach(off => off && off());
   Object.values(progListeners).forEach(off => off && off());
   planListeners = {}; progListeners = {};
-  allPlans = {}; allProgress = {};
+  allPlans = {}; allProgress = {}; allUsersData = {};
   userName = ''; userRole = ''; pendingRole = 'user';
   document.getElementById('login-name').value = '';
   document.getElementById('login-pass').value = '';
@@ -1480,14 +1554,6 @@ function showToast(msg) {
 ═══════════════════════════════════════════ */
 let allUsersData = {};
 
-function startUsersListener() {
-  if (!db) return;
-  db.ref('users').on('value', snap => {
-    allUsersData = snap.val() || {};
-    if (document.getElementById('screen-users').classList.contains('active')) renderUserManagement();
-  });
-}
-
 function renderUserManagement() {
   const container = document.getElementById('um-content');
   const users = Object.entries(allUsersData).sort((a,b) => (a[1].num||0)-(b[1].num||0));
@@ -1530,7 +1596,8 @@ function renderUserManagement() {
       const color = avatarColor(name);
       const pct = getUserPct(name, today);
       const streak = getStreak(name);
-      html += `<div class="um-row">
+      const safeNum = Number(num) || 0;
+      html += `<div class="um-row" data-name="${esc(name)}" data-num="${safeNum}">
         <div class="um-avatar" style="background:${color}">${avatarInitial(name)}</div>
         <div class="um-info">
           <div class="um-name">${esc(name)}</div>
@@ -1538,17 +1605,29 @@ function renderUserManagement() {
           ${pct!==null?`<div style="margin-top:5px;height:4px;background:#f0f2ff;border-radius:2px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${pct===100?'var(--green)':'var(--blue)'};border-radius:2px;transition:width .4s"></div></div>`:''}
         </div>
         <div class="um-actions">
-          <button class="um-edit-btn" onclick="showEditUserModal('${esc(name)}',${num})">✏️</button>
-          <button class="um-del-btn" onclick="showDeleteUserModal('${esc(name)}',${num})">🗑️</button>
+          <button class="um-edit-btn um-edit-trigger">✏️ Edit</button>
+          <button class="um-del-btn um-del-trigger">🗑️ Del</button>
         </div>
       </div>`;
     });
     html += `</div>`;
   }
   container.innerHTML = html;
-}
 
-/* ── Modals ── */
+  // Event delegation — attach after innerHTML set
+  container.querySelectorAll('.um-edit-trigger').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const row = btn.closest('.um-row');
+      showEditUserModal(row.dataset.name, Number(row.dataset.num));
+    });
+  });
+  container.querySelectorAll('.um-del-trigger').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const row = btn.closest('.um-row');
+      showDeleteUserModal(row.dataset.name, Number(row.dataset.num));
+    });
+  });
+}
 function showModal(html) {
   document.getElementById('modal-box').innerHTML = html;
   document.getElementById('modal-overlay').classList.add('show');
@@ -1560,21 +1639,31 @@ document.addEventListener('click', e => {
   if (e.target.id === 'modal-overlay') closeModal();
 });
 
+// Store pending edit/delete target so we don't pass names through onclick strings
+let _pendingEditName = '';
+let _pendingEditNum = 0;
+let _pendingDeleteName = '';
+
 function showEditUserModal(name, num) {
+  _pendingEditName = name;
+  _pendingEditNum = num;
   showModal(`
     <h3>✏️ Edit User Name</h3>
-    <p>Renaming <strong>${esc(name)}</strong> will transfer all their progress to the new name. Their password stays <strong>${USER_PASS_BASE+num}</strong>.</p>
-    <input class="modal-inp" id="edit-name-inp" value="${esc(name)}" placeholder="New name…" maxlength="30"
-      onkeydown="if(event.key==='Enter')confirmEditUser('${esc(name)}',${num})">
+    <p>Renaming <strong>${esc(name)}</strong> will transfer all their progress to the new name. Their password stays <strong>${USER_PASS_BASE + num}</strong>.</p>
+    <input class="modal-inp" id="edit-name-inp" value="${esc(name)}" placeholder="New name…" maxlength="30">
     <div class="modal-btns">
       <button class="modal-cancel" onclick="closeModal()">Cancel</button>
-      <button class="modal-confirm green" onclick="confirmEditUser('${esc(name)}',${num})">✅ Save</button>
+      <button class="modal-confirm green" onclick="confirmEditUser()">✅ Save</button>
     </div>
   `);
-  setTimeout(()=>document.getElementById('edit-name-inp')?.focus(),100);
+  const inp = document.getElementById('edit-name-inp');
+  if (inp) { inp.focus(); inp.select(); }
+  inp && inp.addEventListener('keydown', e => { if(e.key==='Enter') confirmEditUser(); });
 }
 
-async function confirmEditUser(oldName, num) {
+async function confirmEditUser() {
+  const oldName = _pendingEditName;
+  const num = _pendingEditNum;
   const newName = document.getElementById('edit-name-inp')?.value.trim();
   if (!newName) { showToast('Please enter a name'); return; }
   if (newName === oldName) { closeModal(); return; }
@@ -1583,14 +1672,12 @@ async function confirmEditUser(oldName, num) {
     const progSnap = await db.ref('progress').get();
     const progData = progSnap.val() || {};
     const updates = {};
-    // Move progress to new name
     Object.keys(progData).forEach(date => {
-      if (progData[date][oldName]) {
+      if (progData[date] && progData[date][oldName]) {
         updates[`progress/${date}/${newName}`] = progData[date][oldName];
         updates[`progress/${date}/${oldName}`] = null;
       }
     });
-    // Move user record
     updates[`users/${newName}`] = { num };
     updates[`users/${oldName}`] = null;
     await db.ref().update(updates);
@@ -1602,17 +1689,19 @@ async function confirmEditUser(oldName, num) {
 }
 
 function showDeleteUserModal(name, num) {
+  _pendingDeleteName = name;
   showModal(`
     <h3>🗑️ Delete User</h3>
-    <p>This will permanently delete <strong>${esc(name)}</strong> (User #${num}, password ${USER_PASS_BASE+num}) and <strong>all their progress data</strong>. This cannot be undone.</p>
+    <p>This will permanently delete <strong>${esc(name)}</strong> (User #${num}, password ${USER_PASS_BASE + num}) and <strong>all their progress data</strong>. This cannot be undone.</p>
     <div class="modal-btns">
       <button class="modal-cancel" onclick="closeModal()">Cancel</button>
-      <button class="modal-confirm red" onclick="confirmDeleteUser('${esc(name)}')">🗑️ Delete</button>
+      <button class="modal-confirm red" onclick="confirmDeleteUser()">🗑️ Delete</button>
     </div>
   `);
 }
 
-async function confirmDeleteUser(name) {
+async function confirmDeleteUser() {
+  const name = _pendingDeleteName;
   try {
     const progSnap = await db.ref('progress').get();
     const progData = progSnap.val() || {};
