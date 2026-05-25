@@ -451,22 +451,8 @@ code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color
 
 <!-- ══ SCREEN: CALENDAR ══ -->
 <div class="screen" id="screen-calendar">
-  <div class="cal-wrap">
-    <div class="cal-nav">
-      <button onclick="changeMonth(-1)">‹</button>
-      <div>
-        <div class="cal-month" id="cal-month-label"></div>
-        <div class="cal-year" id="cal-year-label"></div>
-      </div>
-      <button onclick="changeMonth(1)">›</button>
-    </div>
-    <div class="day-headers" id="day-headers"></div>
-    <div class="cal-grid" id="cal-grid"></div>
-    <div class="cal-legend">
-      <div class="leg-item"><div class="leg-dot" style="background:#e8f5e9;border-color:#a5d6a7"></div>Complete</div>
-      <div class="leg-item"><div class="leg-dot" style="background:#fffde7;border-color:#fff176"></div>In progress</div>
-      <div class="leg-item"><div class="leg-dot" style="background:#fff"></div>No plan</div>
-    </div>
+  <div class="cal-wrap" style="padding:14px 12px 80px">
+    <div id="cal-wrap-inner"></div>
   </div>
 </div>
 
@@ -603,10 +589,6 @@ window.addEventListener('load', () => {
     const d = new Date();
     loginDate.textContent = d.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   }
-
-  // Build day headers
-  const dh = document.getElementById('day-headers');
-  DAYS_SHORT.forEach(d => { const el=document.createElement('div'); el.className='day-hdr'; el.textContent=d; dh.appendChild(el); });
 
   // Check saved firebase config
   if (!localStorage.getItem('fb_config')) {
@@ -888,52 +870,169 @@ function changeMonth(dir) {
   renderCalendar();
 }
 
+const CAL_QUOTES = [
+  {e:'🔥', t:'Every day is a new opportunity to grow!'},
+  {e:'⚡', t:'Consistency beats perfection every time.'},
+  {e:'🏆', t:'Champions train even when they don\'t feel like it.'},
+  {e:'🌟', t:'Your daily effort compounds into greatness.'},
+  {e:'💪', t:'One more task done. One step closer to success!'},
+  {e:'🎯', t:'Focus on progress, not perfection.'},
+  {e:'🚀', t:'Small steps daily = giant leaps yearly.'},
+  {e:'🌈', t:'Stay consistent. Your results are coming.'},
+];
+
 function renderCalendar() {
-  document.getElementById('cal-month-label').textContent = MONTHS[calMonth];
-  document.getElementById('cal-year-label').textContent = calYear;
-  const grid = document.getElementById('cal-grid');
-  grid.innerHTML = '';
+  const container = document.getElementById('cal-wrap-inner');
+  if (!container) return;
+
   const today = todayStr();
+  const todayD = new Date();
   const days = daysInMonth(calYear, calMonth);
   const fd = firstDay(calYear, calMonth);
+  const isCurrentMonth = (calYear === todayD.getFullYear() && calMonth === todayD.getMonth());
 
-  // Empty cells
-  for (let i=0; i<fd; i++) { const el=document.createElement('div'); grid.appendChild(el); }
-
+  // Compute monthly stats for current user
+  let totalTasks=0, doneTasks=0, plannedDays=0, completedDays=0, streakCount=getStreak(userName);
   for (let d=1; d<=days; d++) {
     const ds = dateStr(calYear, calMonth, d);
     const plan = allPlans[ds];
-    const dayProg = allProgress[ds] || {};
-    const el = document.createElement('div');
-    el.className = 'cal-day';
-    if (ds === today) el.classList.add('today');
-    if (ds < today) el.classList.add('past');
-
-    let pct = 0;
-    if (plan) {
-      const keys = getPlanTaskKeys(plan);
-      // aggregate progress across all users
-      const allDone = new Set();
-      Object.values(dayProg).forEach(userProg => {
-        if (userProg) Object.keys(userProg).filter(k=>userProg[k]).forEach(k=>allDone.add(k));
-      });
-      // for single user view use their own progress
-      const myProg = dayProg[userName] || {};
-      const myDone = keys.filter(k=>myProg[k]).length;
-      pct = keys.length ? Math.round(myDone/keys.length*100) : 0;
-      el.classList.add('has-plan');
-      if (pct===100) el.classList.add('done-day');
-      else if (pct>0) el.classList.add('inprog-day');
-    }
-
-    el.innerHTML = `<span class="cal-day-num">${d}</span>
-      ${plan ? `<div class="cal-prog-bar"><div class="cal-prog-fill" style="width:${pct}%;background:${pct===100?'#2e7d32':'#f9a825'}"></div></div>
-      <span class="cal-pct" style="color:${pct===100?'#2e7d32':'#f57f17'}">${pct}%</span>` :
-      (userRole==='creator' ? `<span style="font-size:.5rem;color:#ddd">+</span>` : '')}`;
-
-    el.onclick = () => openDay(ds);
-    grid.appendChild(el);
+    if (!plan) continue;
+    plannedDays++;
+    const keys = getPlanTaskKeys(plan);
+    const myProg = (allProgress[ds]&&allProgress[ds][userName])||{};
+    const done = keys.filter(k=>myProg[k]).length;
+    totalTasks += keys.length;
+    doneTasks += done;
+    if (keys.length && keys.every(k=>myProg[k])) completedDays++;
   }
+  const monthPct = totalTasks ? Math.round(doneTasks/totalTasks*100) : 0;
+
+  // Pick a daily rotating quote
+  const qIdx = (todayD.getDate() + todayD.getMonth()) % CAL_QUOTES.length;
+  const cq = CAL_QUOTES[qIdx];
+
+  const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DAY_LABELS = ['S','M','T','W','T','F','S'];
+
+  let html = `
+  <!-- ── Hero banner ── -->
+  <div style="background:linear-gradient(135deg,#1a237e 0%,#283593 60%,#3949ab 100%);border-radius:20px;padding:18px 16px 16px;margin-bottom:14px;position:relative;overflow:hidden">
+    <div style="position:absolute;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.05);top:-40px;right:-30px"></div>
+    <div style="position:absolute;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.06);bottom:-20px;left:10px"></div>
+
+    <!-- month nav -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;position:relative">
+      <button onclick="changeMonth(-1)" style="background:rgba(255,255,255,.15);border:none;border-radius:10px;width:36px;height:36px;color:#fff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center">‹</button>
+      <div style="text-align:center">
+        <div style="font-family:'Nunito',sans-serif;font-weight:900;color:#fff;font-size:1.5rem;line-height:1">${MONTH_NAMES[calMonth]}</div>
+        <div style="color:rgba(255,255,255,.6);font-size:.75rem;margin-top:2px">${calYear}</div>
+      </div>
+      <button onclick="changeMonth(1)" style="background:rgba(255,255,255,.15);border:none;border-radius:10px;width:36px;height:36px;color:#fff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center">›</button>
+    </div>
+
+    <!-- monthly stats row -->
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      ${[
+        [`${completedDays}/${plannedDays}`,'Days Done','📅'],
+        [`${monthPct}%`,'Progress','📊'],
+        [`${streakCount}`,'Day Streak','🔥'],
+        [`${doneTasks}/${totalTasks}`,'Tasks','✅'],
+      ].map(([v,l,e])=>`<div style="flex:1;background:rgba(255,255,255,.12);border-radius:10px;padding:7px 4px;text-align:center">
+        <div style="font-size:.75rem;margin-bottom:1px">${e}</div>
+        <div style="font-family:'Nunito',sans-serif;font-weight:900;color:#fff;font-size:.88rem;line-height:1">${v}</div>
+        <div style="font-size:.55rem;color:rgba(255,255,255,.65);margin-top:1px">${l}</div>
+      </div>`).join('')}
+    </div>
+
+    <!-- monthly progress bar -->
+    <div style="height:5px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden;margin-bottom:6px">
+      <div style="height:100%;width:${monthPct}%;background:#f9a825;border-radius:3px;transition:width .6s ease"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between">
+      ${[0,25,50,75,100].map(v=>`<span style="font-size:.55rem;color:rgba(255,255,255,.4)">${v}%</span>`).join('')}
+    </div>
+  </div>
+
+  <!-- ── Daily quote strip ── -->
+  <div style="background:#fff;border-radius:14px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 14px rgba(26,35,126,.08);border-left:4px solid #f9a825">
+    <span style="font-size:1.5rem;flex-shrink:0">${cq.e}</span>
+    <span style="font-size:.78rem;color:#444;font-style:italic;font-weight:500;line-height:1.5">${cq.t}</span>
+  </div>
+
+  <!-- ── Day-of-week headers ── -->
+  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px">
+    ${DAY_LABELS.map((d,i)=>`<div style="text-align:center;font-size:.65rem;font-weight:800;color:${i===0||i===6?'#e53935':'#888'};padding:3px 0">${d}</div>`).join('')}
+  </div>
+
+  <!-- ── Calendar grid ── -->
+  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:14px">
+    ${Array.from({length:fd}).map(()=>`<div></div>`).join('')}
+    ${Array.from({length:days},(_,i)=>i+1).map(d=>{
+      const ds = dateStr(calYear, calMonth, d);
+      const plan = allPlans[ds];
+      const myProg = (allProgress[ds]&&allProgress[ds][userName])||{};
+      const keys = plan ? getPlanTaskKeys(plan) : [];
+      const done = keys.filter(k=>myProg[k]).length;
+      const pct = keys.length ? Math.round(done/keys.length*100) : 0;
+      const isToday = ds===today;
+      const isPast = ds<today;
+      const isFuture = ds>today;
+      const dow = new Date(ds+'T12:00:00').getDay();
+      const isWeekend = dow===0||dow===6;
+      const allDone = pct===100;
+      const inProg = pct>0&&pct<100;
+
+      // Pick background and border based on state
+      let bg='#fff', border='#e8eaf6', numColor=isWeekend?'#e53935':'#1a237e', shadow='';
+      if (isToday) { bg='#1a237e'; border='#1a237e'; numColor='#fff'; shadow='0 4px 14px rgba(26,35,126,.35)'; }
+      else if (allDone) { bg='linear-gradient(135deg,#e8f5e9,#f1f8e9)'; border='#81c784'; }
+      else if (inProg) { bg='linear-gradient(135deg,#fff8e1,#fffde7)'; border='#ffd54f'; }
+      else if (plan && pct===0) { bg='#f0f4ff'; border='#9fa8da'; }
+      else if (isPast && !plan) { bg='#fafafa'; numColor='#ccc'; border='#f0f0f0'; }
+
+      const emoji = allDone?'✅':inProg?'📖':isToday?'⭐':plan?'📋':'';
+
+      return `<div onclick="openDay('${ds}')"
+        style="aspect-ratio:1;border-radius:12px;background:${bg};border:1.5px solid ${border};cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:3px;box-shadow:${shadow};transition:transform .12s,box-shadow .12s;position:relative"
+        onmousedown="this.style.transform='scale(.93)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(.93)'" ontouchend="this.style.transform=''">
+        ${isToday?`<div style="position:absolute;top:-1px;right:-1px;width:8px;height:8px;background:#f9a825;border-radius:50%;border:1.5px solid #fff"></div>`:''}
+        <span style="font-weight:900;font-size:.82rem;color:${numColor};line-height:1">${d}</span>
+        ${emoji?`<span style="font-size:.65rem;line-height:1">${emoji}</span>`:''}
+        ${plan&&!allDone&&keys.length?`<div style="width:70%;height:2.5px;background:#e0e4f4;border-radius:2px;overflow:hidden;margin-top:1px">
+          <div style="height:100%;width:${pct}%;background:${inProg?'#f9a825':'#9fa8da'};border-radius:2px"></div>
+        </div>`:''}
+        ${plan&&keys.length?`<span style="font-size:.52rem;font-weight:700;color:${allDone?'#2e7d32':inProg?'#f57f17':'#9fa8da'};line-height:1">${pct}%</span>`:''}
+        ${userRole==='creator'&&!plan?`<span style="font-size:.5rem;color:#d0d4e8;line-height:1">+add</span>`:''}
+      </div>`;
+    }).join('')}
+  </div>
+
+  <!-- ── Legend ── -->
+  <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:12px">
+    ${[
+      ['linear-gradient(135deg,#e8f5e9,#f1f8e9)','#81c784','✅ Complete'],
+      ['linear-gradient(135deg,#fff8e1,#fffde7)','#ffd54f','📖 In Progress'],
+      ['#f0f4ff','#9fa8da','📋 Plan Added'],
+      ['#fff','#e8eaf6','— No Plan'],
+    ].map(([bg,border,label])=>`<div style="display:flex;align-items:center;gap:5px">
+      <div style="width:14px;height:14px;border-radius:4px;background:${bg};border:1.5px solid ${border}"></div>
+      <span style="font-size:.68rem;color:#666">${label}</span>
+    </div>`).join('')}
+  </div>
+
+  <!-- ── Motivational bottom strip ── -->
+  <div style="background:linear-gradient(90deg,#1a237e,#283593);border-radius:14px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+    <div>
+      <div style="color:#f9a825;font-family:'Nunito',sans-serif;font-weight:900;font-size:.82rem">🎯 ${isCurrentMonth?`Today is ${todayD.toLocaleDateString('en-IN',{weekday:'long'})}!`:`Keep going, ${userName}!`}</div>
+      <div style="color:rgba(255,255,255,.75);font-size:.7rem;margin-top:2px">${monthPct===100?'🏆 Perfect month! Legendary!':monthPct>=75?'💪 Almost a perfect month!':monthPct>=50?'⚡ Halfway there — keep pushing!':monthPct>0?'🚀 Good start — stay consistent!':'📅 Tap any day to start tracking'}</div>
+    </div>
+    <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:6px 12px;text-align:center;flex-shrink:0">
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;color:#f9a825;font-size:1.2rem">${monthPct}%</div>
+      <div style="font-size:.58rem;color:rgba(255,255,255,.6)">this month</div>
+    </div>
+  </div>`;
+
+  container.innerHTML = html;
 }
 
 function openDay(ds) {
