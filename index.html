@@ -12,6 +12,12 @@
 
 <!-- PWA Manifest inline -->
 <script>
+// Dynamic date for icon
+const _now = new Date();
+const _day = _now.getDate();
+const _months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const _mon = _months[_now.getMonth()];
+
 const manifestData = {
   name: "Daily Study Planner",
   short_name: "StudyPlan",
@@ -22,8 +28,8 @@ const manifestData = {
   theme_color: "#1a237e",
   orientation: "portrait-primary",
   icons: [
-    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%231a237e'/><text y='130' x='96' font-size='110' text-anchor='middle' font-family='serif'>📅</text></svg>", sizes: "192x192", type: "image/svg+xml" },
-    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%231a237e'/><text y='360' x='256' font-size='300' text-anchor='middle' font-family='serif'>📅</text></svg>", sizes: "512x512", type: "image/svg+xml" }
+    { src: `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%231a237e'/><rect x='16' y='40' width='160' height='136' rx='16' fill='white'/><rect x='16' y='40' width='160' height='44' rx='0' fill='%231a237e'/><rect x='16' y='64' width='160' height='20' fill='%231a237e'/><text y='74' x='96' font-size='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='900' fill='white'>${_mon}</text><text y='130' x='96' font-size='72' text-anchor='middle' font-family='Arial,sans-serif' font-weight='900' fill='%231a237e'>${_day}</text><circle cx='52' cy='40' r='12' fill='%23283593'/><circle cx='140' cy='40' r='12' fill='%23283593'/></svg>`, sizes: "192x192", type: "image/svg+xml" },
+    { src: `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%231a237e'/><rect x='40' y='100' width='432' height='372' rx='40' fill='white'/><rect x='40' y='100' width='432' height='120' rx='0' fill='%231a237e'/><rect x='40' y='180' width='432' height='40' fill='%231a237e'/><text y='190' x='256' font-size='64' text-anchor='middle' font-family='Arial,sans-serif' font-weight='900' fill='white'>${_mon}</text><text y='360' x='256' font-size='200' text-anchor='middle' font-family='Arial,sans-serif' font-weight='900' fill='%231a237e'>${_day}</text></svg>`, sizes: "512x512", type: "image/svg+xml" }
   ]
 };
 const blob = new Blob([JSON.stringify(manifestData)], {type:'application/json'});
@@ -397,8 +403,9 @@ code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color
 <div class="screen" id="screen-login">
   <div class="login-wrap">
     <div class="login-card">
-      <div style="font-size:3.5rem">📅</div>
-      <h1>Study Planner</h1>
+      <div style="font-size:3rem">📅</div>
+      <div id="login-date-display" style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;color:var(--navy);margin:4px 0 2px"></div>
+      <h1 style="font-size:1.5rem">Study Planner</h1>
       <p>Daily collaborative study tracker</p>
       <input class="inp" id="login-name" placeholder="Your name…" maxlength="30" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
       <input class="inp" id="login-pass" type="password" placeholder="Password…" maxlength="20" onkeydown="if(event.key==='Enter')doLogin(pendingRole||'user')">
@@ -560,6 +567,13 @@ function showSetup() { showScreen('setup'); }
    BOOT
 ═══════════════════════════════════════════ */
 window.addEventListener('load', () => {
+  // Set live date on login screen
+  const loginDate = document.getElementById('login-date-display');
+  if (loginDate) {
+    const d = new Date();
+    loginDate.textContent = d.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
   // Build day headers
   const dh = document.getElementById('day-headers');
   DAYS_SHORT.forEach(d => { const el=document.createElement('div'); el.className='day-hdr'; el.textContent=d; dh.appendChild(el); });
@@ -590,9 +604,10 @@ window.addEventListener('load', () => {
               userName = name;
               userRole = role;
               lbDate = todayStr();
+              selectedDate = todayStr();
               updateNavBadge();
-              showScreen('calendar');
               startListeners();
+              openDayAfterLoad();
               return;
             }
           } catch(e) {}
@@ -635,9 +650,17 @@ function updateTabBar() {
 function switchTab(tab) {
   activeTab = tab;
   updateTabBar();
-  if (tab === 'my') showScreen('calendar');
-  else if (tab === 'lb') showScreen('leaderboard');
-  else if (tab === 'users') showScreen('users');
+  if (tab === 'my') {
+    // Go to today's plan directly
+    selectedDate = todayStr();
+    renderDayView(selectedDate);
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-day').classList.add('active');
+  } else if (tab === 'lb') {
+    showScreen('leaderboard');
+  } else if (tab === 'users') {
+    showScreen('users');
+  }
 }
 
 /* ═══════════════════════════════════════════
@@ -693,12 +716,21 @@ function finishLogin(name, role) {
   userName = name;
   userRole = role;
   lbDate = todayStr();
+  selectedDate = todayStr();
   document.getElementById('login-pass').value = '';
   // Save session so device remembers the user
   localStorage.setItem('session', JSON.stringify({ name, role }));
   updateNavBadge();
-  showScreen('calendar');
   startListeners();
+  // Go straight to today's plan
+  openDayAfterLoad();
+}
+
+async function openDayAfterLoad() {
+  // Small delay to let Firebase load today's plan first
+  await new Promise(r => setTimeout(r, 800));
+  renderDayView(todayStr());
+  showScreen('day');
 }
 
 function updateNavBadge() {
@@ -1069,90 +1101,159 @@ function renderDayView(date) {
     }
   }
 
-  // ── Sessions ──
+  // ── Sessions — SBI PO style (3-column: time | tasks | goal) ──
+  const SESSION_ICONS_LEFT = ['🌅','⛅','🌆','🌙','📖','🔬'];
+  const SESSION_BG_LEFT    = ['#fff8e1','#e8f5e9','#e3f2fd','#f3e5f5','#fff3e0','#e0f7fa'];
+  const SESSION_TEXT_LEFT  = ['#f57f17','#2e7d32','#1565c0','#6a1b9a','#e65100','#006064'];
+
   (plan.sessions||[]).forEach((s,si) => {
-    const tasks = s.tasks||[];
-    const sDone = tasks.filter((_,ti)=>myProg[`${s.id}_${ti}`]).length;
-    const sPct = tasks.length ? Math.round(sDone/tasks.length*100) : 0;
-    const grad = SESS_GRADIENTS[si % SESS_GRADIENTS.length];
-    const icon = SESS_ICONS[si % SESS_ICONS.length];
-    html += `<div style="background:#fff;border-radius:16px;margin-bottom:10px;overflow:hidden;box-shadow:0 4px 18px rgba(26,35,126,.08);${sPct===100?'border:2px solid #a5d6a7':'border:1.5px solid transparent'}">
-      <div class="sess-header" onclick="toggleSection(this)" style="padding:0">
-        <div style="background:${grad};padding:11px 14px;display:flex;align-items:center;gap:10px;width:100%">
-          <span style="font-size:1.4rem;flex-shrink:0">${icon}</span>
-          <div style="flex:1;min-width:0">
-            <div style="font-weight:800;font-size:.9rem;color:#fff;font-family:'Nunito',sans-serif">${esc(s.label||'Session')}</div>
-            <div style="font-size:.68rem;color:rgba(255,255,255,.75)">${esc(s.subject||'')}${s.duration?' · '+esc(s.duration):''}</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-            ${sPct===100?`<span style="background:rgba(255,255,255,.25);color:#fff;font-size:.62rem;font-weight:800;padding:2px 8px;border-radius:8px">✓ DONE</span>`:`<span style="color:rgba(255,255,255,.9);font-size:.78rem;font-weight:800">${sPct}%</span>`}
-            <span class="chevron open" style="color:rgba(255,255,255,.7)">▼</span>
-          </div>
+    const tasks   = s.tasks||[];
+    const sDone   = tasks.filter((_,ti)=>myProg[`${s.id}_${ti}`]).length;
+    const sPct    = tasks.length ? Math.round(sDone/tasks.length*100) : 0;
+    const subCol  = s.subjectColor || ['#1a237e','#2e7d32','#6a1b9a','#c62828','#006064','#e65100'][si%6];
+    const leftBg  = SESSION_BG_LEFT[si%SESSION_BG_LEFT.length];
+    const leftTxt = SESSION_TEXT_LEFT[si%SESSION_TEXT_LEFT.length];
+    const leftIco = SESSION_ICONS_LEFT[si%SESSION_ICONS_LEFT.length];
+
+    html += `<div style="background:#fff;border-radius:16px;margin-bottom:12px;overflow:hidden;box-shadow:0 4px 18px rgba(26,35,126,.1);border:1.5px solid ${sPct===100?'#a5d6a7':'#e8eaf6'}">
+
+      <!-- coloured subject header -->
+      <div style="background:${subCol};padding:9px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer"
+           onclick="toggleSessionBody('sb-${s.id}','sc-${s.id}')">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:1.1rem">${SESS_ICONS[si%SESS_ICONS.length]}</span>
+          <span style="color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:.92rem">${esc(s.subject||s.label||'Session')}</span>
+          ${s.duration?`<span style="color:rgba(255,255,255,.7);font-size:.68rem">(${esc(s.duration)})</span>`:''}
+        </div>
+        <div style="display:flex;align-items:center;gap:7px">
+          ${sPct===100
+            ?`<span style="background:rgba(255,255,255,.22);color:#fff;font-size:.62rem;font-weight:800;padding:2px 8px;border-radius:8px">✓ DONE</span>`
+            :`<span style="color:rgba(255,255,255,.9);font-weight:800;font-size:.78rem">${sPct}%</span>`}
+          <span id="sc-${s.id}" style="color:rgba(255,255,255,.7);font-size:.72rem;transition:transform .25s">▼</span>
         </div>
       </div>
-      <div style="height:4px;background:#f0f2ff"><div style="height:100%;width:${sPct}%;background:${sPct===100?'#2e7d32':'#5c6bc0'};transition:width .5s"></div></div>
-      <div class="sess-body" style="padding:10px 14px 12px">
-        ${tasks.map((t,ti) => {
-          const k=`${s.id}_${ti}`;
-          return `<div class="tick-row${myProg[k]?' done':''}" onclick="toggleTask('${date}','${k}',this)">
-            <div class="tick-box" style="${myProg[k]?'background:#2e7d32;border-color:#2e7d32':''}">${myProg[k]?'✓':''}</div>
-            <span class="tick-label">${esc(t)}</span>
-            ${myProg[k]?`<span style="font-size:.9rem">✨</span>`:''}
-          </div>`;
-        }).join('')}
-        ${s.goal?`<div style="font-size:.72rem;color:#555;background:linear-gradient(90deg,#f0f4ff,#e8eaf6);border-radius:8px;padding:7px 10px;margin-top:6px;border-left:3px solid #5c6bc0">🎯 Goal: ${esc(s.goal)}</div>`:''}
-        ${sPct===100?`<div style="text-align:center;padding:8px 0 2px;font-size:.82rem;font-weight:700;color:#2e7d32">🎉 Session Complete! Keep it up!</div>`:''}
+
+      <!-- progress bar -->
+      <div style="height:4px;background:#eef">
+        <div style="height:100%;width:${sPct}%;background:${subCol};opacity:.65;transition:width .55s"></div>
+      </div>
+
+      <!-- 3-column body -->
+      <div id="sb-${s.id}" style="display:flex">
+
+        <!-- LEFT: time panel -->
+        <div style="background:${leftBg};padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:70px;max-width:76px;border-right:1.5px solid #f0f2ff;flex-shrink:0">
+          <span style="font-size:1.5rem">${leftIco}</span>
+          <div style="color:${leftTxt};font-family:'Nunito',sans-serif;font-weight:900;font-size:.72rem;text-align:center;line-height:1.3">${esc(s.label||'Session')}</div>
+          ${s.duration?`<div style="background:${subCol};color:#fff;font-size:.58rem;font-weight:800;padding:2px 6px;border-radius:6px;text-align:center">${esc(s.duration)}</div>`:''}
+          ${s.timeSlot?`<div style="margin-top:3px;display:flex;flex-direction:column;align-items:center;gap:1px">
+            <span style="font-size:.75rem">🕐</span>
+            <span style="font-size:.56rem;color:#888;font-weight:600;text-align:center;line-height:1.4">${esc(s.timeSlot)}</span>
+          </div>`:''}
+        </div>
+
+        <!-- CENTER: tasks -->
+        <div style="flex:1;padding:10px 10px;min-width:0">
+          ${tasks.map((t,ti)=>{
+            const k=`${s.id}_${ti}`, isDone=!!myProg[k];
+            return `<div onclick="toggleTask('${date}','${k}',this)"
+              style="display:flex;align-items:flex-start;gap:7px;padding:6px 7px;border-radius:8px;cursor:pointer;margin-bottom:3px;background:${isDone?'#f0fff4':'#fafbff'};border:1.5px solid ${isDone?'#c8e6c9':'transparent'};transition:.12s">
+              <div style="width:18px;height:18px;border-radius:5px;border:2px solid ${isDone?subCol:'#bdbdbd'};background:${isDone?subCol:'#fff'};display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:.68rem;margin-top:2px">${isDone?'✓':''}</div>
+              <span style="font-size:.77rem;font-weight:${isDone?'400':'500'};flex:1;line-height:1.45;text-decoration:${isDone?'line-through':'none'};color:${isDone?'#bbb':'#222'}">${esc(t)}</span>
+              ${isDone?`<span style="font-size:.75rem">✨</span>`:''}
+            </div>`;
+          }).join('')}
+          ${!tasks.length?`<div style="font-size:.72rem;color:#ccc;padding:10px;text-align:center">No tasks</div>`:''}
+          ${sPct===100?`<div style="text-align:center;padding:5px 0 1px;font-size:.75rem;font-weight:700;color:#2e7d32">🎉 Session Complete!</div>`:''}
+        </div>
+
+        <!-- RIGHT: goal box -->
+        ${s.goal?`<div style="background:#f8f9ff;border-left:1.5px solid #e8eaf6;padding:10px 8px;width:82px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px">
+          <div style="width:30px;height:30px;border-radius:50%;background:${subCol};display:flex;align-items:center;justify-content:center;font-size:.85rem">🎯</div>
+          <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:.65rem;color:${subCol};text-transform:uppercase;letter-spacing:.5px">Goal</div>
+          <div style="font-size:.65rem;color:#555;text-align:center;line-height:1.5">${esc(s.goal)}</div>
+        </div>`:''}
+
       </div>
     </div>`;
   });
 
-  // ── Mini segments ──
+  // ── Mini segments — SBI PO news/bank style ──
   if ((plan.miniSegments||[]).length) {
     html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">`;
-    (plan.miniSegments||[]).forEach((m,mi) => {
+    (plan.miniSegments||[]).forEach((m,mi)=>{
       const tasks = m.tasks||[];
       const mDone = tasks.filter((_,ti)=>myProg[`${m.id}_${ti}`]).length;
-      const mPct = tasks.length ? Math.round(mDone/tasks.length*100) : 0;
-      const grad = SESS_GRADIENTS[(mi+3)%SESS_GRADIENTS.length];
-      html += `<div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 14px rgba(26,35,126,.08)">
-        <div style="background:${grad};padding:8px 11px;display:flex;align-items:center;justify-content:space-between">
-          <span style="color:#fff;font-weight:800;font-size:.78rem">${esc(m.title||'Segment')}</span>
-          <span style="color:rgba(255,255,255,.8);font-size:.65rem">${esc(m.duration||'')}</span>
+      const mPct  = tasks.length ? Math.round(mDone/tasks.length*100) : 0;
+      const col   = m.subjectColor || ['#c62828','#1565c0','#e65100','#2e7d32','#6a1b9a','#006064'][mi%6];
+      html += `<div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 14px rgba(26,35,126,.09);border:1.5px solid ${mPct===100?'#a5d6a7':'#e8eaf6'}">
+        <!-- header -->
+        <div style="background:${col};padding:7px 10px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:.78rem">${esc(m.title||'Segment')}</span>
+            ${mPct===100?`<span style="font-size:.7rem">✅</span>`:`<span style="color:rgba(255,255,255,.8);font-size:.65rem;font-weight:700">${mPct}%</span>`}
+          </div>
+          ${m.duration||m.timeSlot?`<div style="display:flex;align-items:center;gap:4px;margin-top:3px">
+            ${m.duration?`<span style="background:rgba(255,255,255,.2);color:#fff;font-size:.58rem;font-weight:700;padding:1px 6px;border-radius:5px">${esc(m.duration)}</span>`:''}
+            ${m.timeSlot?`<span style="color:rgba(255,255,255,.75);font-size:.58rem">🕐 ${esc(m.timeSlot)}</span>`:''}
+          </div>`:''}
         </div>
-        <div style="height:3px;background:rgba(255,255,255,.3)"><div style="height:100%;width:${mPct}%;background:#fff;opacity:.8;transition:width .4s"></div></div>
-        <div style="padding:9px 11px">
-          ${tasks.map((t,ti) => {
-            const k=`${m.id}_${ti}`;
-            return `<div class="mini-tick${myProg[k]?' done':''}" onclick="toggleTask('${date}','${k}',this)">
-              <div class="mini-tick-box" style="${myProg[k]?'background:#2e7d32;border-color:#2e7d32':''}">${myProg[k]?'✓':''}</div>
-              <span class="mini-tick-label">${esc(t)}</span>
+        <!-- prog -->
+        <div style="height:3px;background:#f0f2ff"><div style="height:100%;width:${mPct}%;background:${col};transition:width .4s"></div></div>
+        <!-- tasks -->
+        <div style="padding:8px 10px">
+          ${tasks.map((t,ti)=>{
+            const k=`${m.id}_${ti}`, isDone=!!myProg[k];
+            return `<div onclick="toggleTask('${date}','${k}',this)"
+              style="display:flex;align-items:flex-start;gap:6px;padding:5px 6px;border-radius:7px;cursor:pointer;margin-bottom:2px;background:${isDone?'#f0fff4':'#fafbff'};border:1px solid ${isDone?'#c8e6c9':'transparent'}">
+              <div style="width:15px;height:15px;border-radius:4px;border:2px solid ${isDone?col:'#bdbdbd'};background:${isDone?col:'#fff'};flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.6rem;margin-top:2px">${isDone?'✓':''}</div>
+              <span style="font-size:.72rem;flex:1;line-height:1.4;text-decoration:${isDone?'line-through':'none'};color:${isDone?'#bbb':'#333'}">${esc(t)}</span>
             </div>`;
           }).join('')}
-          ${!tasks.length?'<p style="font-size:.7rem;color:#ccc;text-align:center;padding:6px">No tasks</p>':''}
-          ${mPct===100?`<div style="text-align:center;font-size:.75rem;color:#2e7d32;font-weight:700;padding-top:4px">✅ Done!</div>`:''}
+          ${!tasks.length?`<p style="font-size:.68rem;color:#ccc;text-align:center;padding:5px">No tasks</p>`:''}
+          ${mPct===100?`<div style="text-align:center;font-size:.7rem;color:#2e7d32;font-weight:700;padding-top:3px">✅ Done!</div>`:''}
         </div>
       </div>`;
     });
     html += `</div>`;
   }
 
-  // ── Daily targets ──
+  // ── Daily targets — SBI PO bottom banner style ──
   if ((plan.dailyTargets||[]).length) {
     const tDone = (plan.dailyTargets||[]).filter((_,ti)=>myProg[`daily_${ti}`]).length;
-    html += `<div style="background:${theme.grad};border-radius:16px;padding:14px 16px;margin-bottom:14px;position:relative;overflow:hidden">
-      <div style="position:absolute;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.07);top:-20px;right:-20px"></div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <div style="color:${theme.accent};font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:1px">🎯 Daily Targets</div>
-        <div style="color:rgba(255,255,255,.7);font-size:.72rem;font-weight:700">${tDone}/${(plan.dailyTargets||[]).length} done</div>
+    const tTotal = plan.dailyTargets.length;
+    html += `<div style="background:#fff;border-radius:16px;margin-bottom:12px;overflow:hidden;box-shadow:0 4px 18px rgba(26,35,126,.1);border:1.5px solid #e8eaf6">
+      <!-- header -->
+      <div style="background:linear-gradient(90deg,#c62828,#e53935);padding:10px 14px;display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:1.1rem">🎯</span>
+          <span style="color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:.88rem">Daily Target${plan.dailyTargets.length>1?'s':''} (${fmtDisplay(date).split(',')[0]})</span>
+        </div>
+        <span style="color:rgba(255,255,255,.85);font-size:.72rem;font-weight:700">${tDone}/${tTotal} ✓</span>
       </div>
-      <div style="display:flex;flex-wrap:wrap;gap:7px">
-        ${(plan.dailyTargets||[]).map((t,ti) => {
-          const k=`daily_${ti}`;
+      <!-- progress -->
+      <div style="height:4px;background:#ffebee"><div style="height:100%;width:${tTotal?Math.round(tDone/tTotal*100):0}%;background:#c62828;transition:width .5s"></div></div>
+      <!-- targets grid -->
+      <div style="padding:10px 12px;display:flex;flex-wrap:wrap;gap:7px">
+        ${(plan.dailyTargets||[]).map((t,ti)=>{
+          const k=`daily_${ti}`, isDone=!!myProg[k];
           return `<button onclick="toggleTask('${date}','${k}',null)"
-            style="background:${myProg[k]?'rgba(46,125,50,.7)':'rgba(255,255,255,.15)'};border:none;border-radius:9px;padding:6px 13px;color:#fff;font-size:.74rem;font-weight:600;cursor:pointer;font-family:Poppins,sans-serif;text-decoration:${myProg[k]?'line-through':'none'};opacity:${myProg[k]?.8:1};transition:.15s">
-            ${myProg[k]?'✅ ':'⬜ '}${esc(t)}
+            style="display:flex;align-items:center;gap:5px;background:${isDone?'#e8f5e9':'#f8f9ff'};border:1.5px solid ${isDone?'#a5d6a7':'#e0e4f4'};border-radius:9px;padding:6px 11px;cursor:pointer;font-family:Poppins,sans-serif;transition:.15s">
+            <span style="font-size:.8rem">${isDone?'✅':'☑️'}</span>
+            <span style="font-size:.75rem;font-weight:600;color:${isDone?'#888':'#1a237e'};text-decoration:${isDone?'line-through':'none'}">${esc(t)}</span>
           </button>`;
         }).join('')}
+      </div>
+      <!-- bottom: motivational + total time -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px 10px;border-top:1px solid #f5f5f5">
+        <div style="font-size:.72rem;color:#555;font-style:italic;font-weight:500">🏆 Consistency + Hard Work = Success</div>
+        ${plan.totalTime?`<div style="display:flex;align-items:center;gap:5px;background:#1a237e;border-radius:8px;padding:4px 10px">
+          <span style="font-size:.75rem">⏱️</span>
+          <div>
+            <div style="font-size:.55rem;color:rgba(255,255,255,.7);font-weight:600;text-transform:uppercase">Total Study</div>
+            <div style="font-size:.72rem;color:#fff;font-weight:800">${esc(plan.totalTime)}</div>
+          </div>
+        </div>`:''}
       </div>
     </div>`;
   }
@@ -1189,12 +1290,21 @@ function renderDayView(date) {
   container.innerHTML = html;
 }
 
+function toggleSessionBody(bodyId, chevId) {
+  const body = document.getElementById(bodyId);
+  const chev = document.getElementById(chevId);
+  if (!body) return;
+  const hidden = body.style.display === 'none';
+  body.style.display = hidden ? 'flex' : 'none';
+  if (chev) chev.style.transform = hidden ? 'rotate(0deg)' : 'rotate(-90deg)';
+}
+
 function toggleSection(header) {
   const body = header.nextElementSibling?.nextElementSibling;
   if (!body) return;
   const chevron = header.querySelector('.chevron');
-  if (body.style.display === 'none') { body.style.display='block'; chevron.classList.add('open'); }
-  else { body.style.display='none'; chevron.classList.remove('open'); }
+  if (body.style.display === 'none') { body.style.display='block'; chevron&&chevron.classList.add('open'); }
+  else { body.style.display='none'; chevron&&chevron.classList.remove('open'); }
 }
 
 async function toggleTask(date, key, el) {
@@ -1279,16 +1389,25 @@ function renderEditor() {
 }
 
 function renderSessionEditor(s,si) {
+  const colorOptions = ['#1a237e','#2e7d32','#6a1b9a','#c62828','#00695c','#e65100','#0277bd','#558b2f'];
   return `<div class="sess-editor" id="sess-ed-${s.id}">
     <button class="remove-sess-btn" onclick="removeEditorSession('${s.id}')">🗑 Remove</button>
     <div class="e-grid2">
-      <div><label class="e-label">Label</label><input class="e-inp" placeholder="Morning" value="${esc(s.label||'')}" onchange="updateSess('${s.id}','label',this.value)"></div>
-      <div><label class="e-label">Duration</label><input class="e-inp" placeholder="2 Hours" value="${esc(s.duration||'')}" onchange="updateSess('${s.id}','duration',this.value)"></div>
+      <div><label class="e-label">Label (e.g. Morning)</label><input class="e-inp" placeholder="Morning" value="${esc(s.label||'')}" onchange="updateSess('${s.id}','label',this.value)"></div>
+      <div><label class="e-label">Duration (e.g. 2 Hours)</label><input class="e-inp" placeholder="2 Hours" value="${esc(s.duration||'')}" onchange="updateSess('${s.id}','duration',this.value)"></div>
     </div>
-    <label class="e-label">Subject</label>
-    <input class="e-inp" placeholder="Reasoning" value="${esc(s.subject||'')}" onchange="updateSess('${s.id}','subject',this.value)">
+    <div class="e-grid2">
+      <div><label class="e-label">Time Slot (e.g. 7:00 AM – 9:00 AM)</label><input class="e-inp" placeholder="7:00 AM – 9:00 AM" value="${esc(s.timeSlot||'')}" onchange="updateSess('${s.id}','timeSlot',this.value)"></div>
+      <div><label class="e-label">Subject Header Color</label>
+        <select class="e-inp" onchange="updateSess('${s.id}','subjectColor',this.value)">
+          ${colorOptions.map(c=>`<option value="${c}" ${(s.subjectColor||'#1a237e')===c?'selected':''} style="background:${c};color:#fff">${c}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <label class="e-label">Subject (e.g. Reasoning (Pre + Mains))</label>
+    <input class="e-inp" placeholder="Reasoning (Pre + Mains)" value="${esc(s.subject||'')}" onchange="updateSess('${s.id}','subject',this.value)">
     <label class="e-label">Goal</label>
-    <input class="e-inp" placeholder="Session goal…" value="${esc(s.goal||'')}" onchange="updateSess('${s.id}','goal',this.value)">
+    <input class="e-inp" placeholder="Accuracy + puzzle solving speed" value="${esc(s.goal||'')}" onchange="updateSess('${s.id}','goal',this.value)">
     <label class="e-label">Tasks</label>
     <div id="tasks-ed-${s.id}">
       ${(s.tasks||[]).map((t,ti)=>`<div class="task-row"><input class="e-inp" value="${esc(t)}" onchange="updateTask('${s.id}',${ti},this.value)"><button class="del-btn" onclick="removeTask('${s.id}',${ti})">✕</button></div>`).join('')}
@@ -1298,10 +1417,16 @@ function renderSessionEditor(s,si) {
 }
 
 function renderMiniEditor(m,mi) {
+  const colorOptions = ['#1a237e','#2e7d32','#6a1b9a','#c62828','#00695c','#e65100','#0277bd','#558b2f'];
   return `<div class="sess-editor" id="mini-ed-${m.id}" style="padding:12px">
     <button class="del-btn" style="position:absolute;top:8px;right:8px" onclick="removeEditorMini('${m.id}')">✕</button>
     <label class="e-label">Title</label><input class="e-inp" value="${esc(m.title||'')}" placeholder="Current Affairs" onchange="updateMini('${m.id}','title',this.value)">
     <label class="e-label">Duration</label><input class="e-inp" value="${esc(m.duration||'')}" placeholder="40 min" onchange="updateMini('${m.id}','duration',this.value)">
+    <label class="e-label">Time Slot</label><input class="e-inp" value="${esc(m.timeSlot||'')}" placeholder="6:00 PM – 6:40 PM" onchange="updateMini('${m.id}','timeSlot',this.value)">
+    <label class="e-label">Header Color</label>
+    <select class="e-inp" onchange="updateMini('${m.id}','subjectColor',this.value)">
+      ${colorOptions.map(c=>`<option value="${c}" ${(m.subjectColor||'#c62828')===c?'selected':''}>${c}</option>`).join('')}
+    </select>
     <label class="e-label">Tasks</label>
     <div id="minitasks-ed-${m.id}">
       ${(m.tasks||[]).map((t,ti)=>`<div class="task-row"><input class="e-inp" value="${esc(t)}" onchange="updateMiniTask('${m.id}',${ti},this.value)"><button class="del-btn" onclick="removeMiniTask('${m.id}',${ti})">✕</button></div>`).join('')}
@@ -1317,7 +1442,7 @@ function renderTargetEditor(t,ti) {
 // Session ops
 function updateSess(id,k,v){ const s=editingPlan.sessions.find(s=>s.id===id); if(s) s[k]=v; }
 function removeEditorSession(id){ editingPlan.sessions=editingPlan.sessions.filter(s=>s.id!==id); renderEditor(); }
-function addEditorSession(){ editingPlan.sessions.push({id:'s_'+Date.now(),label:'',duration:'',subject:'',goal:'',tasks:[]}); renderEditor(); }
+function addEditorSession(){ editingPlan.sessions.push({id:'s_'+Date.now(),label:'',duration:'',timeSlot:'',subjectColor:'#1a237e',subject:'',goal:'',tasks:[]}); renderEditor(); }
 function addTaskToSess(id){ const s=editingPlan.sessions.find(s=>s.id===id); if(s){s.tasks.push(''); renderEditor();} }
 function updateTask(id,ti,v){ const s=editingPlan.sessions.find(s=>s.id===id); if(s)s.tasks[ti]=v; }
 function removeTask(id,ti){ const s=editingPlan.sessions.find(s=>s.id===id); if(s){s.tasks.splice(ti,1); renderEditor();} }
@@ -1325,7 +1450,7 @@ function removeTask(id,ti){ const s=editingPlan.sessions.find(s=>s.id===id); if(
 // Mini ops
 function updateMini(id,k,v){ const m=editingPlan.miniSegments.find(m=>m.id===id); if(m) m[k]=v; }
 function removeEditorMini(id){ editingPlan.miniSegments=editingPlan.miniSegments.filter(m=>m.id!==id); renderEditor(); }
-function addEditorMini(){ editingPlan.miniSegments.push({id:'m_'+Date.now(),title:'',duration:'',tasks:[]}); renderEditor(); }
+function addEditorMini(){ editingPlan.miniSegments.push({id:'m_'+Date.now(),title:'',duration:'',timeSlot:'',subjectColor:'#c62828',tasks:[]}); renderEditor(); }
 function addMiniTask(id){ const m=editingPlan.miniSegments.find(m=>m.id===id); if(m){m.tasks.push(''); renderEditor();} }
 function updateMiniTask(id,ti,v){ const m=editingPlan.miniSegments.find(m=>m.id===id); if(m)m.tasks[ti]=v; }
 function removeMiniTask(id,ti){ const m=editingPlan.miniSegments.find(m=>m.id===id); if(m){m.tasks.splice(ti,1); renderEditor();} }
