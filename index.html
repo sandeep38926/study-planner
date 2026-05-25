@@ -565,6 +565,17 @@ window.addEventListener('load', () => {
   DAYS_SHORT.forEach(d => { const el=document.createElement('div'); el.className='day-hdr'; el.textContent=d; dh.appendChild(el); });
 
   // Check saved firebase config
+  if (!localStorage.getItem('fb_config')) {
+  localStorage.setItem('fb_config', JSON.stringify({
+    "apiKey": "AIzaSyBgw9H5zTOyP8u-FAxWh5-VIC3Nka69gCM",
+    "authDomain": "studyplanner-1ab64.firebaseapp.com",
+    "databaseURL": "https://studyplanner-1ab64-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "projectId": "studyplanner-1ab64",
+    "storageBucket": "studyplanner-1ab64.firebasestorage.app",
+    "messagingSenderId": "1027107496017",
+    "appId": "1:1027107496017:web:1626655885af09b9851870"
+  }));
+}
   const saved = localStorage.getItem('fb_config');
   if (saved) {
     try {
