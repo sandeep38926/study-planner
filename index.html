@@ -12,11 +12,41 @@
 
 <!-- PWA Manifest inline -->
 <script>
-// Dynamic date for icon
+// Set live date on login screen (JS date is fine here, just not in the installed icon)
 const _now = new Date();
 const _day = _now.getDate();
 const _months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 const _mon = _months[_now.getMonth()];
+
+// Static clean calendar icon — works reliably as PWA icon
+const iconSvg192 = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'>
+  <rect width='192' height='192' rx='38' fill='%231a237e'/>
+  <rect x='24' y='48' width='144' height='120' rx='14' fill='white'/>
+  <rect x='24' y='48' width='144' height='46' rx='14' fill='%231a237e'/>
+  <rect x='24' y='74' width='144' height='20' fill='%231a237e'/>
+  <circle cx='66' cy='48' r='10' fill='%23f9a825'/>
+  <circle cx='126' cy='48' r='10' fill='%23f9a825'/>
+  <circle cx='66' cy='38' r='6' fill='%23c5cae9'/>
+  <circle cx='126' cy='38' r='6' fill='%23c5cae9'/>
+  <text x='96' y='82' font-size='18' font-weight='900' text-anchor='middle' font-family='Arial,sans-serif' fill='white'>STUDY</text>
+  <text x='96' y='140' font-size='58' font-weight='900' text-anchor='middle' font-family='Arial,sans-serif' fill='%231a237e'>📚</text>
+</svg>`;
+
+const iconSvg512 = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'>
+  <rect width='512' height='512' rx='100' fill='%231a237e'/>
+  <rect x='56' y='120' width='400' height='332' rx='36' fill='white'/>
+  <rect x='56' y='120' width='400' height='128' rx='36' fill='%231a237e'/>
+  <rect x='56' y='200' width='400' height='48' fill='%231a237e'/>
+  <circle cx='172' cy='120' r='28' fill='%23f9a825'/>
+  <circle cx='340' cy='120' r='28' fill='%23f9a825'/>
+  <circle cx='172' cy='92' r='16' fill='%23c5cae9'/>
+  <circle cx='340' cy='92' r='16' fill='%23c5cae9'/>
+  <text x='256' y='210' font-size='52' font-weight='900' text-anchor='middle' font-family='Arial,sans-serif' fill='white'>STUDY PLAN</text>
+  <text x='256' y='390' font-size='160' font-weight='900' text-anchor='middle' font-family='Arial,sans-serif' fill='%231a237e'>📚</text>
+</svg>`;
+
+const enc192 = encodeURIComponent(iconSvg192);
+const enc512 = encodeURIComponent(iconSvg512);
 
 const manifestData = {
   name: "Daily Study Planner",
@@ -28,8 +58,8 @@ const manifestData = {
   theme_color: "#1a237e",
   orientation: "portrait-primary",
   icons: [
-    { src: `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%231a237e'/><rect x='16' y='40' width='160' height='136' rx='16' fill='white'/><rect x='16' y='40' width='160' height='44' rx='0' fill='%231a237e'/><rect x='16' y='64' width='160' height='20' fill='%231a237e'/><text y='74' x='96' font-size='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='900' fill='white'>${_mon}</text><text y='130' x='96' font-size='72' text-anchor='middle' font-family='Arial,sans-serif' font-weight='900' fill='%231a237e'>${_day}</text><circle cx='52' cy='40' r='12' fill='%23283593'/><circle cx='140' cy='40' r='12' fill='%23283593'/></svg>`, sizes: "192x192", type: "image/svg+xml" },
-    { src: `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%231a237e'/><rect x='40' y='100' width='432' height='372' rx='40' fill='white'/><rect x='40' y='100' width='432' height='120' rx='0' fill='%231a237e'/><rect x='40' y='180' width='432' height='40' fill='%231a237e'/><text y='190' x='256' font-size='64' text-anchor='middle' font-family='Arial,sans-serif' font-weight='900' fill='white'>${_mon}</text><text y='360' x='256' font-size='200' text-anchor='middle' font-family='Arial,sans-serif' font-weight='900' fill='%231a237e'>${_day}</text></svg>`, sizes: "512x512", type: "image/svg+xml" }
+    { src: `data:image/svg+xml,${enc192}`, sizes: "192x192", type: "image/svg+xml" },
+    { src: `data:image/svg+xml,${enc512}`, sizes: "512x512", type: "image/svg+xml" }
   ]
 };
 const blob = new Blob([JSON.stringify(manifestData)], {type:'application/json'});
