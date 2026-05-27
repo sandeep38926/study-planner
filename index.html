@@ -834,8 +834,42 @@ code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color
 </head>
 <body>
 
-<!-- ══ NOTEBOOK DOODLES — injected dynamically each load ══ -->
-<div id="doodle-host"></div>
+<!-- ══ NOTEBOOK DOODLES (decorative, pointer-events:none) ══ -->
+<svg class="doodle-float" style="top:60px;left:2px;width:36px;height:120px" viewBox="0 0 36 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- spiral binding rings -->
+  <ellipse cx="18" cy="15"  rx="10" ry="6" fill="none" stroke="#7b52ab" stroke-width="2"/>
+  <ellipse cx="18" cy="35"  rx="10" ry="6" fill="none" stroke="#7b52ab" stroke-width="2"/>
+  <ellipse cx="18" cy="55"  rx="10" ry="6" fill="none" stroke="#7b52ab" stroke-width="2"/>
+  <ellipse cx="18" cy="75"  rx="10" ry="6" fill="none" stroke="#7b52ab" stroke-width="2"/>
+  <ellipse cx="18" cy="95"  rx="10" ry="6" fill="none" stroke="#7b52ab" stroke-width="2"/>
+  <ellipse cx="18" cy="115" rx="10" ry="6" fill="none" stroke="#7b52ab" stroke-width="2"/>
+</svg>
+
+<!-- floating doodles top-right -->
+<svg class="doodle-float" style="top:70px;right:6px;width:55px;height:140px;opacity:.13" viewBox="0 0 55 140" xmlns="http://www.w3.org/2000/svg">
+  <!-- tiny star -->
+  <path d="M27 5 L29 13 L37 13 L31 18 L33 26 L27 21 L21 26 L23 18 L17 13 L25 13Z" fill="#ffe082" stroke="#ffb300" stroke-width="1"/>
+  <!-- cloud -->
+  <circle cx="20" cy="50" r="7" fill="none" stroke="#b2dfdb" stroke-width="1.5"/>
+  <circle cx="30" cy="47" r="9" fill="none" stroke="#b2dfdb" stroke-width="1.5"/>
+  <circle cx="40" cy="50" r="7" fill="none" stroke="#b2dfdb" stroke-width="1.5"/>
+  <rect x="13" y="50" width="34" height="10" rx="2" fill="none" stroke="#b2dfdb" stroke-width="1.5"/>
+  <!-- music note -->
+  <path d="M28 80 L28 100 Q23 103 23 98 Q23 93 28 96" fill="none" stroke="#f48fb1" stroke-width="1.5"/>
+  <circle cx="23" cy="100" r="4" fill="#f48fb1" opacity=".7"/>
+  <line x1="34" y1="75" x2="34" y2="90" stroke="#f48fb1" stroke-width="1.5"/>
+  <circle cx="30" cy="92" r="4" fill="#f48fb1" opacity=".7"/>
+  <!-- arrow doodle -->
+  <path d="M20 118 Q30 112 40 118" fill="none" stroke="#d7c8f5" stroke-width="1.5"/>
+  <path d="M37 115 L40 118 L37 121" fill="none" stroke="#d7c8f5" stroke-width="1.5"/>
+</svg>
+
+<!-- bottom-left corner doodle -->
+<svg class="doodle-float" style="bottom:70px;left:50px;width:70px;height:70px;opacity:.1" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg">
+  <path d="M35 5 C55 5 65 20 65 35 C65 50 55 65 35 65 C15 65 5 50 5 35 C5 20 15 5 35 5Z" fill="none" stroke="#7b52ab" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <path d="M35 15 C48 15 55 24 55 35 C55 46 48 55 35 55 C22 55 15 46 15 35 C15 24 22 15 35 15Z" fill="none" stroke="#f48fb1" stroke-width="1"/>
+  <circle cx="35" cy="35" r="6" fill="#ffe082" opacity=".6"/>
+</svg>
 
 <!-- OFFLINE BAR -->
 <div class="offline-bar" id="offline-bar">📵 Offline — changes will sync when you're back online! 🔄</div>
@@ -1385,16 +1419,9 @@ function renderCalendar() {
   const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const DAY_LABELS = ['S','M','T','W','T','F','S'];
 
-  // Today's theme — drives calendar colour coherence
-  const calTheme = getDayTheme(today);
-  const calGrad = calTheme.grad;
-  const calAccent = calTheme.accent;
-  // Extract the two hex colours from the gradient for use in today's cell
-  const calCols = calGrad.match(/#[0-9a-f]{6}/gi) || ['#1a237e','#3949ab'];
-
   let html = `
   <!-- ── Hero banner ── -->
-  <div style="background:${calGrad};border-radius:20px;padding:18px 16px 16px;margin-bottom:14px;position:relative;overflow:hidden">
+  <div style="background:linear-gradient(135deg,#1a237e 0%,#283593 60%,#3949ab 100%);border-radius:20px;padding:18px 16px 16px;margin-bottom:14px;position:relative;overflow:hidden">
     <div style="position:absolute;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.05);top:-40px;right:-30px"></div>
     <div style="position:absolute;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.06);bottom:-20px;left:10px"></div>
 
@@ -1424,7 +1451,7 @@ function renderCalendar() {
 
     <!-- monthly progress bar -->
     <div style="height:5px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden;margin-bottom:6px">
-      <div style="height:100%;width:${monthPct}%;background:${calAccent};border-radius:3px;transition:width .6s ease"></div>
+      <div style="height:100%;width:${monthPct}%;background:#f9a825;border-radius:3px;transition:width .6s ease"></div>
     </div>
     <div style="display:flex;justify-content:space-between">
       ${[0,25,50,75,100].map(v=>`<span style="font-size:.55rem;color:rgba(255,255,255,.4)">${v}%</span>`).join('')}
@@ -1432,7 +1459,7 @@ function renderCalendar() {
   </div>
 
   <!-- ── Daily quote strip ── -->
-  <div style="background:#fff;border-radius:14px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 14px rgba(26,35,126,.08);border-left:4px solid ${calAccent}">
+  <div style="background:#fff;border-radius:14px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 14px rgba(26,35,126,.08);border-left:4px solid #f9a825">
     <span style="font-size:1.5rem;flex-shrink:0">${cq.e}</span>
     <span style="font-size:1rem;color:#444;font-style:italic;font-weight:500;line-height:1.5">${cq.t}</span>
   </div>
@@ -1461,9 +1488,8 @@ function renderCalendar() {
       const inProg = pct>0&&pct<100;
 
       // Pick background and border based on state
-      // Today's cell uses the daily theme gradient for full coherence
       let bg='#fff', border='#e8eaf6', numColor=isWeekend?'#e53935':'#1a237e', shadow='';
-      if (isToday) { bg=calGrad; border=calCols[0]; numColor='#fff'; shadow=`0 4px 14px rgba(0,0,0,.25)`; }
+      if (isToday) { bg='#1a237e'; border='#1a237e'; numColor='#fff'; shadow='0 4px 14px rgba(26,35,126,.35)'; }
       else if (allDone) { bg='linear-gradient(135deg,#e8f5e9,#f1f8e9)'; border='#81c784'; }
       else if (inProg) { bg='linear-gradient(135deg,#fff8e1,#fffde7)'; border='#ffd54f'; }
       else if (plan && pct===0) { bg='#f0f4ff'; border='#9fa8da'; }
@@ -1474,13 +1500,13 @@ function renderCalendar() {
       return `<div onclick="openDay('${ds}')"
         style="aspect-ratio:1;border-radius:12px;background:${bg};border:1.5px solid ${border};cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:3px;box-shadow:${shadow};transition:transform .12s,box-shadow .12s;position:relative"
         onmousedown="this.style.transform='scale(.93)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(.93)'" ontouchend="this.style.transform=''">
-        ${isToday?`<div style="position:absolute;top:-1px;right:-1px;width:8px;height:8px;background:${calAccent};border-radius:50%;border:1.5px solid #fff"></div>`:''}
+        ${isToday?`<div style="position:absolute;top:-1px;right:-1px;width:8px;height:8px;background:#f9a825;border-radius:50%;border:1.5px solid #fff"></div>`:''}
         <span style="font-weight:900;font-size:1.05rem;color:${numColor};line-height:1">${d}</span>
         ${emoji?`<span style="font-size:.65rem;line-height:1">${emoji}</span>`:''}
         ${plan&&!allDone&&keys.length?`<div style="width:70%;height:2.5px;background:#e0e4f4;border-radius:2px;overflow:hidden;margin-top:1px">
-          <div style="height:100%;width:${pct}%;background:${inProg?calAccent:'#9fa8da'};border-radius:2px"></div>
+          <div style="height:100%;width:${pct}%;background:${inProg?'#f9a825':'#9fa8da'};border-radius:2px"></div>
         </div>`:''}
-        ${plan&&keys.length?`<span style="font-size:.52rem;font-weight:700;color:${allDone?'#2e7d32':inProg?calAccent:'#9fa8da'};line-height:1">${pct}%</span>`:''}
+        ${plan&&keys.length?`<span style="font-size:.52rem;font-weight:700;color:${allDone?'#2e7d32':inProg?'#f57f17':'#9fa8da'};line-height:1">${pct}%</span>`:''}
         ${userRole==='creator'&&!plan?`<span style="font-size:.5rem;color:#d0d4e8;line-height:1">+add</span>`:''}
       </div>`;
     }).join('')}
@@ -1500,13 +1526,13 @@ function renderCalendar() {
   </div>
 
   <!-- ── Motivational bottom strip ── -->
-  <div style="background:${calGrad};border-radius:14px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+  <div style="background:linear-gradient(90deg,#1a237e,#283593);border-radius:14px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px">
     <div>
-      <div style="color:${calAccent};font-family:'Nunito',sans-serif;font-weight:900;font-size:1.05rem">🎯 ${isCurrentMonth?`Today is ${todayD.toLocaleDateString('en-IN',{weekday:'long'})}!`:`Keep going, ${userName}!`}</div>
+      <div style="color:#f9a825;font-family:'Nunito',sans-serif;font-weight:900;font-size:1.05rem">🎯 ${isCurrentMonth?`Today is ${todayD.toLocaleDateString('en-IN',{weekday:'long'})}!`:`Keep going, ${userName}!`}</div>
       <div style="color:rgba(255,255,255,.75);font-size:.7rem;margin-top:2px">${monthPct===100?'🏆 Perfect month! Legendary!':monthPct>=75?'💪 Almost a perfect month!':monthPct>=50?'⚡ Halfway there — keep pushing!':monthPct>0?'🚀 Good start — stay consistent!':'📅 Tap any day to start tracking'}</div>
     </div>
     <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:6px 12px;text-align:center;flex-shrink:0">
-      <div style="font-family:'Nunito',sans-serif;font-weight:900;color:${calAccent};font-size:1.2rem">${monthPct}%</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;color:#f9a825;font-size:1.2rem">${monthPct}%</div>
       <div style="font-size:.58rem;color:rgba(255,255,255,.6)">this month</div>
     </div>
   </div>`;
@@ -1623,6 +1649,7 @@ function renderDayView(date) {
     <button onclick="showScreen('calendar')">‹ Calendar</button>
     <div class="day-title">
       <h2>${fmtDisplay(date)}</h2>
+      <p>${plan?.examName||'Study Plan'}</p>
     </div>
     ${userRole==='creator' ? `<button class="edit-toggle" onclick="openEditor('${date}')">${plan?'✏️ Edit':'➕ Create'}</button>` : ''}
   </div>`;
@@ -1638,172 +1665,255 @@ function renderDayView(date) {
     return;
   }
 
-  // ── Hero progress ring card (peer-view style) ──
-  html += `<div class="ring-card" style="background:${theme.grad};margin-bottom:14px">
-    <div class="ring-wrap">
-      <svg width="110" height="110">
-        <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="7"/>
-        <circle cx="55" cy="55" r="46" fill="none" stroke="${pct===100?'#69f0ae':theme.accent}" stroke-width="7"
-          stroke-dasharray="${2*Math.PI*46}" stroke-dashoffset="${2*Math.PI*46*(1-pct/100)}"
-          stroke-linecap="round" style="transform:rotate(-90deg);transform-origin:55px 55px;transition:stroke-dashoffset .8s ease"/>
-        <text x="55" y="51" text-anchor="middle" fill="white" font-size="18" font-weight="900" font-family="Nunito,sans-serif">${pct}%</text>
-        <text x="55" y="65" text-anchor="middle" fill="rgba(255,255,255,.7)" font-size="9" font-family="Poppins,sans-serif">DONE</text>
-      </svg>
-    </div>
-    <div class="ring-info">
-      <div class="ring-name">${esc(plan.examName||'Study Plan')}</div>
-      ${plan.tagline?`<div class="ring-tagline">${esc(plan.tagline)}</div>`:''}
-      <div class="ring-stats">
-        <div class="ring-stat"><div class="ring-stat-n">${done}</div><div class="ring-stat-l">Done ✅</div></div>
-        <div class="ring-stat"><div class="ring-stat-n">${keys.length}</div><div class="ring-stat-l">Total 📋</div></div>
-        <div class="ring-stat"><div class="ring-stat-n">${streak}</div><div class="ring-stat-l">Streak 🔥</div></div>
+  // ── Hero progress card ──
+  const milestone = [...MILESTONES].reverse().find(m => pct >= m.at);
+  const sessionsDone = (plan.sessions||[]).filter(s=>(s.tasks||[]).every((_,ti)=>myProg[`${s.id}_${ti}`])).length;
+  html += `<div style="background:${theme.grad};border-radius:20px;padding:20px 18px;margin-bottom:14px;position:relative;overflow:hidden">
+    <!-- decorative circles -->
+    <div style="position:absolute;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.06);top:-30px;right:-30px"></div>
+    <div style="position:absolute;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.05);bottom:-20px;left:20px"></div>
+
+    <div style="display:flex;align-items:center;gap:16px;position:relative">
+      <!-- Ring -->
+      <div style="flex-shrink:0">
+        <svg width="100" height="100">
+          <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="7"/>
+          <circle cx="50" cy="50" r="42" fill="none" stroke="${theme.accent}" stroke-width="7"
+            stroke-dasharray="${2*Math.PI*42}" stroke-dashoffset="${2*Math.PI*42*(1-pct/100)}"
+            stroke-linecap="round" style="transform:rotate(-90deg);transform-origin:50px 50px;transition:stroke-dashoffset .8s ease"/>
+          <text x="50" y="45" text-anchor="middle" fill="white" font-size="17" font-weight="900" font-family="Nunito,sans-serif">${pct}%</text>
+          <text x="50" y="60" text-anchor="middle" fill="rgba(255,255,255,.6)" font-size="8.5" font-family="Poppins,sans-serif">${milestone?milestone.emoji:'📚'} ${milestone?milestone.msg:'Let\'s go!'}</text>
+        </svg>
       </div>
+      <!-- Info -->
+      <div style="flex:1;color:#fff">
+        <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1.05rem;line-height:1.2">${esc(plan.examName||'Study Plan')}</div>
+        ${plan.tagline?`<div style="font-size:.96rem;opacity:.75;font-style:italic;margin:3px 0 8px">${esc(plan.tagline)}</div>`:'<div style="margin-bottom:8px"></div>'}
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          ${[
+            [done, keys.length, '✅ Tasks'],
+            [sessionsDone, (plan.sessions||[]).length, '📚 Sessions'],
+            [streak, null, '🔥 Day Streak'],
+          ].map(([n,t,l])=>`<div style="text-align:center;background:rgba(255,255,255,.12);border-radius:8px;padding:5px 8px;min-width:48px">
+            <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem">${t!=null?n+'/'+t:n}</div>
+            <div style="font-size:.58rem;opacity:.8">${l}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div style="margin-top:14px;height:6px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden;position:relative">
+      <div style="height:100%;width:${pct}%;background:${theme.accent};border-radius:3px;transition:width .8s ease"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:4px">
+      ${[0,25,50,75,100].map(v=>`<span style="font-size:.58rem;color:rgba(255,255,255,.5)">${v}%</span>`).join('')}
     </div>
   </div>`;
 
   // ── Quote card ──
-  html += `<div class="motivation">
-    <span style="font-size:1.5rem;margin-right:8px">${quote.e}</span>
-    <span style="font-style:italic">"${quote.q}"</span>
-    <div style="font-size:1rem;color:#999;margin-top:4px;font-weight:600">— ${quote.a}</div>
+  html += `<div style="background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:flex-start;gap:12px;box-shadow:0 4px 18px rgba(26,35,126,.08);border-left:4px solid ${theme.accent.replace(')',',0.8)').replace('rgb','rgba')||'#f9a825'}">
+    <div style="font-size:1.8rem;flex-shrink:0;line-height:1">${quote.e}</div>
+    <div>
+      <div style="font-size:1.05rem;font-style:italic;color:#444;line-height:1.6;font-weight:500">"${quote.q}"</div>
+      <div style="font-size:.92rem;color:#aaa;margin-top:4px;font-weight:600">— ${quote.a}</div>
+    </div>
   </div>`;
 
-  // ── Milestone nudge ──
-  const milestone = [...MILESTONES].reverse().find(m => pct >= m.at);
+  // ── Milestone banner (shows when milestone just hit) ──
   if (pct > 0 && pct < 100 && milestone) {
     const nextM = MILESTONES.find(m => m.at > pct);
     if (nextM) {
       const remaining = keys.length - done;
-      html += `<div style="background:linear-gradient(90deg,rgba(255,255,255,.12),rgba(255,255,255,.06));border:1.5px solid ${theme.accent};border-radius:12px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;backdrop-filter:blur(4px)">
+      html += `<div style="background:linear-gradient(90deg,#fff8e1,#fff3cd);border:1.5px solid #ffe082;border-radius:12px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px">
         <span style="font-size:1.4rem">${nextM.emoji}</span>
         <div>
-          <div style="font-size:.8rem;font-weight:700;color:${theme.accent}">${nextM.msg} — only ${remaining} task${remaining>1?'s':''} to go!</div>
-          <div style="font-size:.7rem;color:${theme.accent};opacity:.75;margin-top:2px">Next milestone at ${nextM.at}% 🎯</div>
+          <div style="font-size:.8rem;font-weight:700;color:#e65100">${nextM.msg} — only ${remaining} task${remaining>1?'s':''} to go!</div>
+          <div style="font-size:.7rem;color:#f57f17;margin-top:2px">Next milestone at ${nextM.at}% 🎯</div>
         </div>
       </div>`;
     }
   }
 
-  // ── Sessions — notebook card style (matching peer view) ──
+  // ── Sessions — SBI PO style (3-column: time | tasks | goal) ──
+  const SESSION_ICONS_LEFT = ['🌅','⛅','🌆','🌙','📖','🔬'];
+  const SESSION_BG_LEFT    = ['#fff8e1','#e8f5e9','#e3f2fd','#f3e5f5','#fff3e0','#e0f7fa'];
+  const SESSION_TEXT_LEFT  = ['#f57f17','#2e7d32','#1565c0','#6a1b9a','#e65100','#006064'];
+
   (plan.sessions||[]).forEach((s,si) => {
     const tasks   = s.tasks||[];
     const sDone   = tasks.filter((_,ti)=>myProg[`${s.id}_${ti}`]).length;
     const sPct    = tasks.length ? Math.round(sDone/tasks.length*100) : 0;
-    const subCol  = s.subjectColor || COLORS[si%COLORS.length];
+    const subCol  = s.subjectColor || ['#1a237e','#2e7d32','#6a1b9a','#c62828','#006064','#e65100'][si%6];
+    const leftBg  = SESSION_BG_LEFT[si%SESSION_BG_LEFT.length];
+    const leftTxt = SESSION_TEXT_LEFT[si%SESSION_TEXT_LEFT.length];
+    const leftIco = SESSION_ICONS_LEFT[si%SESSION_ICONS_LEFT.length];
 
-    html += `<div class="session-card${sPct===100?' all-done':''}">
-      <div class="sess-header" onclick="toggleSessionBody('sb-${s.id}','sc-${s.id}')">
-        <span class="sess-icon">${SESS_ICONS[si%SESS_ICONS.length]}</span>
-        <div class="sess-info">
-          <div class="sess-label">${esc(s.label||'Session')}</div>
-          <div class="sess-sub">${esc(s.subject||'')}${s.duration?' · '+esc(s.duration):''}</div>
-          ${s.timeSlot?`<div style="font-size:.88rem;color:#aaa;margin-top:1px">🕐 ${esc(s.timeSlot)}</div>`:''}
+    html += `<div style="background:#fff;border-radius:16px;margin-bottom:12px;overflow:hidden;box-shadow:0 4px 18px rgba(26,35,126,.1);border:1.5px solid ${sPct===100?'#a5d6a7':'#e8eaf6'}">
+
+      <!-- coloured subject header -->
+      <div style="background:${subCol};padding:9px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer"
+           onclick="toggleSessionBody('sb-${s.id}','sc-${s.id}')">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:1.1rem">${SESS_ICONS[si%SESS_ICONS.length]}</span>
+          <span style="color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:.92rem">${esc(s.subject||s.label||'Session')}</span>
+          ${s.duration?`<span style="color:rgba(255,255,255,.7);font-size:.92rem">(${esc(s.duration)})</span>`:''}
         </div>
-        <div class="sess-right">
+        <div style="display:flex;align-items:center;gap:7px">
           ${sPct===100
-            ?`<span class="done-badge">✓ DONE</span>`
-            :`<span class="sess-pct" style="color:${subCol}">${sPct}%</span>`}
-          <span class="chevron open" id="sc-${s.id}">▼</span>
+            ?`<span style="background:rgba(255,255,255,.22);color:#fff;font-size:1.1rem;font-weight:800;padding:2px 8px;border-radius:8px">✓ DONE</span>`
+            :`<span style="color:rgba(255,255,255,.9);font-weight:800;font-size:1rem">${sPct}%</span>`}
+          <span id="sc-${s.id}" style="color:rgba(255,255,255,.7);font-size:.96rem;transition:transform .25s">▼</span>
         </div>
       </div>
-      <div class="sess-prog"><div class="sess-prog-fill" style="width:${sPct}%;background:${subCol}"></div></div>
-      <div class="sess-body" id="sb-${s.id}">
-        ${tasks.map((t,ti) => {
-          const k=`${s.id}_${ti}`, isDone=!!myProg[k];
-          return `<div class="tick-row${isDone?' done':''}" onclick="toggleTask('${date}','${k}',this)">
-            <div class="tick-box" style="${isDone?`background:${subCol};border-color:${subCol}`:'border-color:'+subCol}">${isDone?'✓':''}</div>
-            <span class="tick-label">${esc(t)}</span>
-            ${isDone?`<span style="font-size:1rem;opacity:.7">✨</span>`:''}
-          </div>`;
-        }).join('')}
-        ${!tasks.length?`<div style="font-size:1rem;color:#ccc;padding:10px;text-align:center">No tasks</div>`:''}
-        ${s.goal?`<div class="sess-goal">🎯 ${esc(s.goal)}</div>`:''}
-        ${sPct===100?`<div style="text-align:center;padding:6px 0 2px;font-size:1rem;font-weight:700;color:#2e7d32">🎉 Session Complete!</div>`:''}
+
+      <!-- progress bar -->
+      <div style="height:4px;background:#eef">
+        <div style="height:100%;width:${sPct}%;background:${subCol};opacity:.65;transition:width .55s"></div>
+      </div>
+
+      <!-- 3-column body -->
+      <div id="sb-${s.id}" style="display:flex">
+
+        <!-- LEFT: time panel -->
+        <div style="background:${leftBg};padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:70px;max-width:76px;border-right:1.5px solid #f0f2ff;flex-shrink:0">
+          <span style="font-size:1.5rem">${leftIco}</span>
+          <div style="color:${leftTxt};font-family:'Nunito',sans-serif;font-weight:900;font-size:.96rem;text-align:center;line-height:1.3">${esc(s.label||'Session')}</div>
+          ${s.duration?`<div style="background:${subCol};color:#fff;font-size:.58rem;font-weight:800;padding:2px 6px;border-radius:6px;text-align:center">${esc(s.duration)}</div>`:''}
+          ${s.timeSlot?`<div style="margin-top:3px;display:flex;flex-direction:column;align-items:center;gap:1px">
+            <span style="font-size:1rem">🕐</span>
+            <span style="font-size:1rem;color:#888;font-weight:600;text-align:center;line-height:1.4">${esc(s.timeSlot)}</span>
+          </div>`:''}
+        </div>
+
+        <!-- CENTER: tasks -->
+        <div style="flex:1;padding:10px 10px;min-width:0">
+          ${tasks.map((t,ti)=>{
+            const k=`${s.id}_${ti}`, isDone=!!myProg[k];
+            return `<div onclick="toggleTask('${date}','${k}',this)"
+              style="display:flex;align-items:flex-start;gap:7px;padding:6px 7px;border-radius:8px;cursor:pointer;margin-bottom:3px;background:${isDone?'#f0fff4':'#fafbff'};border:1.5px solid ${isDone?'#c8e6c9':'transparent'};transition:.12s">
+              <div style="width:18px;height:18px;border-radius:5px;border:2px solid ${isDone?subCol:'#bdbdbd'};background:${isDone?subCol:'#fff'};display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:.92rem;margin-top:2px">${isDone?'✓':''}</div>
+              <span style="font-size:.77rem;font-weight:${isDone?'400':'500'};flex:1;line-height:1.45;text-decoration:${isDone?'line-through':'none'};color:${isDone?'#bbb':'#222'}">${esc(t)}</span>
+              ${isDone?`<span style="font-size:1rem">✨</span>`:''}
+            </div>`;
+          }).join('')}
+          ${!tasks.length?`<div style="font-size:.96rem;color:#ccc;padding:10px;text-align:center">No tasks</div>`:''}
+          ${sPct===100?`<div style="text-align:center;padding:5px 0 1px;font-size:1rem;font-weight:700;color:#2e7d32">🎉 Session Complete!</div>`:''}
+        </div>
+
+        <!-- RIGHT: goal box -->
+        ${s.goal?`<div style="background:#f8f9ff;border-left:1.5px solid #e8eaf6;padding:10px 8px;width:82px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px">
+          <div style="width:30px;height:30px;border-radius:50%;background:${subCol};display:flex;align-items:center;justify-content:center;font-size:1.1rem">🎯</div>
+          <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:.65rem;color:${subCol};text-transform:uppercase;letter-spacing:.5px">Goal</div>
+          <div style="font-size:.65rem;color:#555;text-align:center;line-height:1.5">${esc(s.goal)}</div>
+        </div>`:''}
+
       </div>
     </div>`;
   });
 
-  // ── Mini segments — notebook mini-card style (theme-coherent colours) ──
+  // ── Mini segments — SBI PO news/bank style ──
   if ((plan.miniSegments||[]).length) {
-    // Derive 6 tinted variants from the theme's gradient endpoints
-    const THEME_MINI_COLS = [
-      theme.grad.match(/#[0-9a-f]{6}/gi)?.[0] || '#1a237e',
-      theme.grad.match(/#[0-9a-f]{6}/gi)?.[1] || '#3949ab',
-      theme.accent,
-      theme.grad.match(/#[0-9a-f]{6}/gi)?.[0] || '#1a237e',
-      theme.grad.match(/#[0-9a-f]{6}/gi)?.[1] || '#3949ab',
-      theme.accent,
-    ];
-    html += `<div class="mini-grid">`;
+    html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">`;
     (plan.miniSegments||[]).forEach((m,mi)=>{
       const tasks = m.tasks||[];
       const mDone = tasks.filter((_,ti)=>myProg[`${m.id}_${ti}`]).length;
       const mPct  = tasks.length ? Math.round(mDone/tasks.length*100) : 0;
-      // Use creator-set colour if present, else derive from theme
-      const col   = m.subjectColor || THEME_MINI_COLS[mi % THEME_MINI_COLS.length];
-      html += `<div class="mini-card">
-        <div class="mini-header" style="background:${col}">
-          <span class="mini-title-text">${esc(m.title||'Segment')}</span>
-          <span class="mini-dur">${esc(m.duration||'')}${mPct===100?' ✅':` ${mPct}%`}</span>
+      const col   = m.subjectColor || ['#c62828','#1565c0','#e65100','#2e7d32','#6a1b9a','#006064'][mi%6];
+      html += `<div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 14px rgba(26,35,126,.09);border:1.5px solid ${mPct===100?'#a5d6a7':'#e8eaf6'}">
+        <!-- header -->
+        <div style="background:${col};padding:7px 10px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem">${esc(m.title||'Segment')}</span>
+            ${mPct===100?`<span style="font-size:.7rem">✅</span>`:`<span style="color:rgba(255,255,255,.8);font-size:.65rem;font-weight:700">${mPct}%</span>`}
+          </div>
+          ${m.duration||m.timeSlot?`<div style="display:flex;align-items:center;gap:4px;margin-top:3px">
+            ${m.duration?`<span style="background:rgba(255,255,255,.2);color:#fff;font-size:.58rem;font-weight:700;padding:1px 6px;border-radius:5px">${esc(m.duration)}</span>`:''}
+            ${m.timeSlot?`<span style="color:rgba(255,255,255,.75);font-size:.58rem">🕐 ${esc(m.timeSlot)}</span>`:''}
+          </div>`:''}
         </div>
-        ${m.timeSlot?`<div style="font-size:.8rem;color:#aaa;padding:3px 11px">🕐 ${esc(m.timeSlot)}</div>`:''}
-        <div class="mini-prog"><div class="mini-prog-fill" style="width:${mPct}%;background:${col}"></div></div>
-        <div class="mini-body">
+        <!-- prog -->
+        <div style="height:3px;background:#f0f2ff"><div style="height:100%;width:${mPct}%;background:${col};transition:width .4s"></div></div>
+        <!-- tasks -->
+        <div style="padding:8px 10px">
           ${tasks.map((t,ti)=>{
             const k=`${m.id}_${ti}`, isDone=!!myProg[k];
-            return `<div class="mini-tick${isDone?' done':''}" onclick="toggleTask('${date}','${k}',null)" style="cursor:pointer">
-              <div class="mini-tick-box" style="${isDone?`background:${col};border-color:${col}`:'border-color:'+col}">${isDone?'✓':''}</div>
-              <span class="mini-tick-label">${esc(t)}</span>
+            return `<div onclick="toggleTask('${date}','${k}',this)"
+              style="display:flex;align-items:flex-start;gap:6px;padding:5px 6px;border-radius:7px;cursor:pointer;margin-bottom:2px;background:${isDone?'#f0fff4':'#fafbff'};border:1px solid ${isDone?'#c8e6c9':'transparent'}">
+              <div style="width:15px;height:15px;border-radius:4px;border:2px solid ${isDone?col:'#bdbdbd'};background:${isDone?col:'#fff'};flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.6rem;margin-top:2px">${isDone?'✓':''}</div>
+              <span style="font-size:.96rem;flex:1;line-height:1.4;text-decoration:${isDone?'line-through':'none'};color:${isDone?'#bbb':'#333'}">${esc(t)}</span>
             </div>`;
           }).join('')}
           ${!tasks.length?`<p style="font-size:.92rem;color:#ccc;text-align:center;padding:5px">No tasks</p>`:''}
-          ${mPct===100?`<div style="text-align:center;font-size:.8rem;color:#2e7d32;font-weight:700;padding-top:4px">✅ Done!</div>`:''}
+          ${mPct===100?`<div style="text-align:center;font-size:.7rem;color:#2e7d32;font-weight:700;padding-top:3px">✅ Done!</div>`:''}
         </div>
       </div>`;
     });
     html += `</div>`;
   }
 
-  // ── Daily targets — notebook targets-card style ──
+  // ── Daily targets — SBI PO bottom banner style ──
   if ((plan.dailyTargets||[]).length) {
     const tDone = (plan.dailyTargets||[]).filter((_,ti)=>myProg[`daily_${ti}`]).length;
     const tTotal = plan.dailyTargets.length;
-    html += `<div class="targets-card" style="background:${theme.grad}">
-      <div class="targets-title">🎯 Daily Targets${plan.totalTime?` <span style="float:right;font-size:.85rem;opacity:.8">⏱️ ${esc(plan.totalTime)}</span>`:''}
+    html += `<div style="background:#fff;border-radius:16px;margin-bottom:12px;overflow:hidden;box-shadow:0 4px 18px rgba(26,35,126,.1);border:1.5px solid #e8eaf6">
+      <!-- header -->
+      <div style="background:linear-gradient(90deg,#c62828,#e53935);padding:10px 14px;display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:1.1rem">🎯</span>
+          <span style="color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem">Daily Target${plan.dailyTargets.length>1?'s':''} (${fmtDisplay(date).split(',')[0]})</span>
+        </div>
+        <span style="color:rgba(255,255,255,.85);font-size:.96rem;font-weight:700">${tDone}/${tTotal} ✓</span>
       </div>
-      <div style="height:4px;background:rgba(255,255,255,.2);border-radius:3px;margin-bottom:10px;overflow:hidden">
-        <div style="height:100%;width:${tTotal?Math.round(tDone/tTotal*100):0}%;background:${theme.accent};border-radius:3px;transition:width .5s"></div>
-      </div>
-      <div class="targets-pills">
+      <!-- progress -->
+      <div style="height:4px;background:#ffebee"><div style="height:100%;width:${tTotal?Math.round(tDone/tTotal*100):0}%;background:#c62828;transition:width .5s"></div></div>
+      <!-- targets grid -->
+      <div style="padding:10px 12px;display:flex;flex-wrap:wrap;gap:7px">
         ${(plan.dailyTargets||[]).map((t,ti)=>{
           const k=`daily_${ti}`, isDone=!!myProg[k];
-          return `<button onclick="toggleTask('${date}','${k}',null)" class="target-pill${isDone?' done':''}">
-            ${isDone?'✅ ':'☑️ '}${esc(t)}
+          return `<button onclick="toggleTask('${date}','${k}',null)"
+            style="display:flex;align-items:center;gap:5px;background:${isDone?'#e8f5e9':'#f8f9ff'};border:1.5px solid ${isDone?'#a5d6a7':'#e0e4f4'};border-radius:9px;padding:6px 11px;cursor:pointer;font-family:Poppins,sans-serif;transition:.15s">
+            <span style="font-size:.8rem">${isDone?'✅':'☑️'}</span>
+            <span style="font-size:1rem;font-weight:600;color:${isDone?'#888':'#1a237e'};text-decoration:${isDone?'line-through':'none'}">${esc(t)}</span>
           </button>`;
         }).join('')}
       </div>
-      <div style="margin-top:10px;font-size:.9rem;color:rgba(255,255,255,.7);text-align:center">
-        ${tDone}/${tTotal} targets done 🏆
+      <!-- bottom: motivational + total time -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px 10px;border-top:1px solid #f5f5f5">
+        <div style="font-size:.96rem;color:#555;font-style:italic;font-weight:500">🏆 Consistency + Hard Work = Success</div>
+        ${plan.totalTime?`<div style="display:flex;align-items:center;gap:5px;background:#1a237e;border-radius:8px;padding:4px 10px">
+          <span style="font-size:1rem">⏱️</span>
+          <div>
+            <div style="font-size:.55rem;color:rgba(255,255,255,.7);font-weight:600;text-transform:uppercase">Total Study</div>
+            <div style="font-size:.96rem;color:#fff;font-weight:800">${esc(plan.totalTime)}</div>
+          </div>
+        </div>`:''}
       </div>
     </div>`;
   }
 
-  // ── Completion / kick-start banner ──
+  // ── Completion banner ──
   if (pct === 100) {
     const h = dateHash(date);
     const celebEmojis = ['🎉','🏆','🌟','🎊','👑','🥇','💯','🔥'];
     const celebMsg = [
-      `Incredible work, ${esc(userName)}! You crushed it today! 💪`,
-      `${esc(userName)}, you are unstoppable! 100% complete! 🚀`,
-      `Outstanding, ${esc(userName)}! This is what champions look like! 🏅`,
-      `${esc(userName)} — another day, another victory! Keep going! 🌟`,
+      `Incredible work, ${esc(userName)}! You crushed it today!`,
+      `${esc(userName)}, you are unstoppable! 100% complete!`,
+      `Outstanding, ${esc(userName)}! This is what champions look like!`,
+      `${esc(userName)} — another day, another victory! Keep going!`,
     ][h % 4];
-    html += `<div class="complete-banner">
-      <div class="emoji">${celebEmojis[h%celebEmojis.length]}</div>
-      <h3>All Tasks Complete!</h3>
-      <p>${celebMsg}</p>
+    html += `<div style="background:linear-gradient(135deg,#1b5e20,#2e7d32);border-radius:18px;padding:22px;text-align:center;margin-top:4px;position:relative;overflow:hidden">
+      <div style="position:absolute;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.07);top:-30px;left:-20px"></div>
+      <div style="position:absolute;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.07);bottom:-20px;right:-10px"></div>
+      <div style="font-size:2.5rem;margin-bottom:6px">${celebEmojis[h%celebEmojis.length]}</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;color:#fff;font-size:1.2rem;margin-bottom:4px">All Tasks Complete!</div>
+      <div style="color:rgba(255,255,255,.85);font-size:1.05rem;line-height:1.5">${celebMsg}</div>
+      <div style="display:flex;justify-content:center;gap:6px;margin-top:12px">
+        ${celebEmojis.slice(0,6).map(e=>`<span style="font-size:1.1rem">${e}</span>`).join('')}
+      </div>
     </div>`;
   } else if (pct === 0 && keys.length > 0) {
+    // Kick-start banner for 0%
     html += `<div style="background:#fff;border:2px dashed #c5cae9;border-radius:14px;padding:16px;text-align:center;margin-top:4px">
       <div style="font-size:2rem;margin-bottom:6px">🚀</div>
       <div style="font-weight:700;color:#1a237e;font-size:1.1rem">Ready to start your day?</div>
@@ -1819,8 +1929,8 @@ function toggleSessionBody(bodyId, chevId) {
   const chev = document.getElementById(chevId);
   if (!body) return;
   const hidden = body.style.display === 'none';
-  body.style.display = hidden ? 'block' : 'none';
-  if (chev) chev.style.transform = hidden ? 'rotate(180deg)' : 'rotate(0deg)';
+  body.style.display = hidden ? 'flex' : 'none';
+  if (chev) chev.style.transform = hidden ? 'rotate(0deg)' : 'rotate(-90deg)';
 }
 
 function toggleSection(header) {
@@ -2570,7 +2680,6 @@ self.addEventListener('fetch',e=>{
 /* ═══════════════════════════════════════════
    NOTEBOOK DOODLE ENHANCER
    Adds washi tape + sticker accents to dynamic cards
-   AND generates random floating doodles on each page open
 ═══════════════════════════════════════════ */
 (function notebookDoodles() {
   const tapeColors = [
@@ -2584,144 +2693,6 @@ self.addEventListener('fetch',e=>{
   const cornerEmojis  = ['📌','🔖','📎','🖊️','✏️'];
 
   function pickRandom(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
-  function rnd(min,max) { return min + Math.random()*(max-min); }
-
-  // ── Generate random floating doodles every page open ──
-  const DOODLE_PALETTES = [
-    { stroke:'#7b52ab', fill:'#ffe082', accent:'#f48fb1' },
-    { stroke:'#f48fb1', fill:'#b2dfdb', accent:'#ffb300' },
-    { stroke:'#00897b', fill:'#f9a825', accent:'#ce93d8' },
-    { stroke:'#5c6bc0', fill:'#f48fb1', accent:'#ffe082' },
-    { stroke:'#e91e63', fill:'#b2dfdb', accent:'#ffe082' },
-    { stroke:'#9c27b0', fill:'#a5d6a7', accent:'#ffcc80' },
-  ];
-
-  // Pool of SVG doodle shapes — each returns an SVG string placed in a viewBox
-  const DOODLE_SHAPES = [
-    // Spiral rings (binding)
-    (p) => `<ellipse cx="18" cy="15" rx="10" ry="6" fill="none" stroke="${p.stroke}" stroke-width="2"/>
-    <ellipse cx="18" cy="35" rx="10" ry="6" fill="none" stroke="${p.stroke}" stroke-width="2"/>
-    <ellipse cx="18" cy="55" rx="10" ry="6" fill="none" stroke="${p.stroke}" stroke-width="2"/>
-    <ellipse cx="18" cy="75" rx="10" ry="6" fill="none" stroke="${p.stroke}" stroke-width="2"/>
-    <ellipse cx="18" cy="95" rx="10" ry="6" fill="none" stroke="${p.stroke}" stroke-width="2"/>
-    <ellipse cx="18" cy="115" rx="10" ry="6" fill="none" stroke="${p.stroke}" stroke-width="2"/>`,
-    // Star + flower + lightning
-    (p) => `<path d="M27 5 L29 13 L37 13 L31 18 L33 26 L27 21 L21 26 L23 18 L17 13 L25 13Z" fill="${p.fill}" stroke="${p.accent}" stroke-width="1"/>
-    <circle cx="27" cy="55" r="7" fill="${p.accent}" opacity=".6"/>
-    <circle cx="27" cy="42" r="5" fill="${p.fill}" opacity=".5"/>
-    <circle cx="38" cy="48" r="5" fill="${p.fill}" opacity=".5"/>
-    <circle cx="38" cy="62" r="5" fill="${p.fill}" opacity=".5"/>
-    <circle cx="27" cy="68" r="5" fill="${p.fill}" opacity=".5"/>
-    <circle cx="16" cy="62" r="5" fill="${p.fill}" opacity=".5"/>
-    <circle cx="16" cy="48" r="5" fill="${p.fill}" opacity=".5"/>
-    <path d="M30 95 L20 113 L27 113 L18 133 L35 111 L28 111Z" fill="${p.fill}" stroke="${p.accent}" stroke-width="1"/>`,
-    // Cloud + music note + arrow
-    (p) => `<circle cx="20" cy="30" r="7" fill="none" stroke="${p.stroke}" stroke-width="1.5"/>
-    <circle cx="30" cy="27" r="9" fill="none" stroke="${p.stroke}" stroke-width="1.5"/>
-    <circle cx="40" cy="30" r="7" fill="none" stroke="${p.stroke}" stroke-width="1.5"/>
-    <rect x="13" y="30" width="34" height="10" rx="2" fill="none" stroke="${p.stroke}" stroke-width="1.5"/>
-    <path d="M28 60 L28 80 Q23 83 23 78 Q23 73 28 76" fill="none" stroke="${p.accent}" stroke-width="1.5"/>
-    <circle cx="23" cy="80" r="4" fill="${p.accent}" opacity=".7"/>
-    <line x1="34" y1="55" x2="34" y2="70" stroke="${p.accent}" stroke-width="1.5"/>
-    <circle cx="30" cy="72" r="4" fill="${p.accent}" opacity=".7"/>
-    <path d="M15 105 Q27 99 39 105" fill="none" stroke="${p.stroke}" stroke-width="1.5"/>
-    <path d="M36 102 L39 105 L36 108" fill="none" stroke="${p.stroke}" stroke-width="1.5"/>`,
-    // Heart + spiral + diamond
-    (p) => `<path d="M27 20 C27 20 12 7 12 -3 C12 -10 19 -14 27 -5 C35 -14 42 -10 42 -3 C42 7 27 20 27 20Z" fill="${p.fill}" stroke="${p.accent}" stroke-width="1" transform="translate(0,20)"/>
-    <path d="M27 65 Q34 65 34 72 Q34 79 27 79 Q20 79 20 72 Q20 66 25 65" fill="none" stroke="${p.stroke}" stroke-width="1.5"/>
-    <path d="M27 95 L37 110 L27 125 L17 110 Z" fill="none" stroke="${p.accent}" stroke-width="1.5" stroke-dasharray="3 2"/>`,
-    // Bubbles + zigzag
-    (p) => `<circle cx="15" cy="20" r="8" fill="none" stroke="${p.stroke}" stroke-width="1.5"/>
-    <circle cx="35" cy="15" r="5" fill="none" stroke="${p.accent}" stroke-width="1.5"/>
-    <circle cx="25" cy="38" r="11" fill="none" stroke="${p.fill.replace(')',',.4)')||p.stroke}" stroke-width="1" stroke-dasharray="3 2"/>
-    <path d="M10 65 L18 58 L26 65 L34 58 L42 65" fill="none" stroke="${p.stroke}" stroke-width="1.5"/>
-    <path d="M10 80 L18 73 L26 80 L34 73 L42 80" fill="none" stroke="${p.accent}" stroke-width="1.5"/>
-    <path d="M20 100 Q27 108 20 116 Q13 108 20 100Z" fill="${p.fill}" stroke="${p.accent}" stroke-width="1"/>
-    <path d="M32 100 Q39 108 32 116 Q25 108 32 100Z" fill="${p.fill}" stroke="${p.accent}" stroke-width="1"/>`,
-    // Sun + rainbow arc + dots
-    (p) => `<circle cx="27" cy="25" r="9" fill="${p.fill}" stroke="${p.accent}" stroke-width="1.5"/>
-    <line x1="27" y1="10" x2="27" y2="4"  stroke="${p.fill}" stroke-width="1.5" stroke-linecap="round"/>
-    <line x1="27" y1="40" x2="27" y2="46" stroke="${p.fill}" stroke-width="1.5" stroke-linecap="round"/>
-    <line x1="12" y1="25" x2="6"  y2="25" stroke="${p.fill}" stroke-width="1.5" stroke-linecap="round"/>
-    <line x1="42" y1="25" x2="48" y2="25" stroke="${p.fill}" stroke-width="1.5" stroke-linecap="round"/>
-    <path d="M10 70 Q27 52 44 70" fill="none" stroke="${p.stroke}" stroke-width="2"/>
-    <path d="M14 75 Q27 60 40 75" fill="none" stroke="${p.accent}" stroke-width="1.5"/>
-    <path d="M18 80 Q27 68 36 80" fill="none" stroke="${p.fill}" stroke-width="1.5"/>
-    <circle cx="15" cy="105" r="3" fill="${p.accent}" opacity=".7"/>
-    <circle cx="27" cy="100" r="4" fill="${p.fill}" opacity=".7"/>
-    <circle cx="39" cy="105" r="3" fill="${p.accent}" opacity=".7"/>`,
-    // Concentric circles + crosshatch
-    (p) => `<circle cx="27" cy="30" r="22" fill="none" stroke="${p.stroke}" stroke-width="1.5" stroke-dasharray="4 3"/>
-    <circle cx="27" cy="30" r="14" fill="none" stroke="${p.accent}" stroke-width="1"/>
-    <circle cx="27" cy="30" r="6"  fill="${p.fill}" opacity=".6"/>
-    <line x1="10" y1="70" x2="44" y2="110" stroke="${p.stroke}" stroke-width="1" opacity=".5"/>
-    <line x1="15" y1="70" x2="49" y2="110" stroke="${p.stroke}" stroke-width="1" opacity=".5"/>
-    <line x1="5"  y1="70" x2="39" y2="110" stroke="${p.stroke}" stroke-width="1" opacity=".5"/>
-    <line x1="10" y1="110" x2="44" y2="70"  stroke="${p.accent}" stroke-width="1" opacity=".4"/>
-    <line x1="5"  y1="110" x2="39" y2="70"  stroke="${p.accent}" stroke-width="1" opacity=".4"/>`,
-    // Butterfly + petals
-    (p) => `<path d="M27 60 C15 45 5 50 8 62 C11 74 22 70 27 60Z"  fill="${p.fill}" stroke="${p.accent}" stroke-width="1"/>
-    <path d="M27 60 C39 45 49 50 46 62 C43 74 32 70 27 60Z"  fill="${p.fill}" stroke="${p.accent}" stroke-width="1"/>
-    <path d="M27 60 C15 75 5 70 8 58 C11 46 22 50 27 60Z"  fill="${p.accent}" stroke="${p.stroke}" stroke-width="1"/>
-    <path d="M27 60 C39 75 49 70 46 58 C43 46 32 50 27 60Z" fill="${p.accent}" stroke="${p.stroke}" stroke-width="1"/>
-    <circle cx="27" cy="60" r="3" fill="${p.stroke}"/>
-    <path d="M14 15 Q20 8 27 15 Q34 8 40 15 Q34 22 27 29 Q20 22 14 15Z" fill="${p.fill}" stroke="${p.stroke}" stroke-width="1" opacity=".7"/>
-    <circle cx="27" cy="15" r="3" fill="${p.accent}" opacity=".8"/>`,
-  ];
-
-  // Configurations for the 3 floating doodle positions
-  const DOODLE_CONFIGS = [
-    // Left binding
-    { pos:'position:fixed;top:60px;left:2px;width:36px;height:120px;pointer-events:none;z-index:1', vb:'0 0 36 120', opa:'.35' },
-    // Top-right
-    { pos:'position:fixed;top:70px;right:6px;width:55px;height:140px;pointer-events:none;z-index:1', vb:'0 0 55 140', opa:'.13' },
-    // Bottom-left
-    { pos:'position:fixed;bottom:70px;left:45px;width:70px;height:130px;pointer-events:none;z-index:1', vb:'0 0 55 140', opa:'.10' },
-  ];
-
-  function injectRandomDoodles() {
-    const host = document.getElementById('doodle-host');
-    if (!host) return;
-    host.innerHTML = '';
-    DOODLE_CONFIGS.forEach(cfg => {
-      const pal = pickRandom(DOODLE_PALETTES);
-      const shapeFn = pickRandom(DOODLE_SHAPES);
-      const inner = shapeFn(pal);
-      const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
-      svg.setAttribute('class','doodle-float');
-      svg.setAttribute('viewBox', cfg.vb);
-      svg.setAttribute('xmlns','http://www.w3.org/2000/svg');
-      svg.setAttribute('style', cfg.pos + ';opacity:' + cfg.opa);
-      svg.innerHTML = inner;
-      host.appendChild(svg);
-    });
-  }
-
-  // Inject on load
-  injectRandomDoodles();
-
-  // Also re-inject when user opens plan (day view becomes active)
-  const screenObserver = new MutationObserver((mutations) => {
-    for (const m of mutations) {
-      if (m.type === 'attributes' && m.attributeName === 'class') {
-        const el = m.target;
-        if (el.id === 'screen-day' && el.classList.contains('active')) {
-          injectRandomDoodles();
-        }
-      }
-    }
-  });
-  document.querySelectorAll('.screen').forEach(s => {
-    screenObserver.observe(s, { attributes: true });
-  });
-  // Also observe dynamically added screens
-  const bodyObs2 = new MutationObserver(() => {
-    document.querySelectorAll('.screen:not([data-doodle-watched])').forEach(s => {
-      s.setAttribute('data-doodle-watched','1');
-      screenObserver.observe(s, { attributes: true });
-    });
-  });
-  bodyObs2.observe(document.body, { childList:true, subtree:true });
 
   // Observe DOM for session cards and add tape + sticker decorations
   const observer = new MutationObserver(() => {
