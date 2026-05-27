@@ -108,7 +108,7 @@ body {
   /* Ruled lines */
   background-image:
     /* red margin line — moved closer to left edge */
-    linear-gradient(90deg, transparent 38px, var(--margin) 38px, var(--margin) 40px, transparent 40px),
+    linear-gradient(90deg, transparent 20px, var(--margin) 20px, var(--margin) 22px, transparent 22px),
     /* horizontal ruled lines every 32px */
     repeating-linear-gradient(
       180deg,
@@ -335,7 +335,7 @@ body {
 .tab-bar {
   border-top: 3px solid var(--margin) !important;
   background: var(--paper) !important;
-  background-image: linear-gradient(90deg, transparent 38px, var(--margin) 38px, var(--margin) 40px, transparent 40px) !important;
+  background-image: linear-gradient(90deg, transparent 20px, var(--margin) 20px, var(--margin) 22px, transparent 22px) !important;
 }
 .tab-btn.active {
   color: var(--navy) !important;
@@ -429,15 +429,15 @@ body::before {
   content: '';
   position: fixed;
   left: 0; top: 0;
-  width: 40px; height: 100vh;
+  width: 22px; height: 100vh;
   background:
-    radial-gradient(circle 7px at 19px 80px,  #fff 5px, var(--ruled) 6px, transparent 7px),
-    radial-gradient(circle 7px at 19px 200px, #fff 5px, var(--ruled) 6px, transparent 7px),
-    radial-gradient(circle 7px at 19px 320px, #fff 5px, var(--ruled) 6px, transparent 7px),
-    radial-gradient(circle 7px at 19px 440px, #fff 5px, var(--ruled) 6px, transparent 7px),
-    radial-gradient(circle 7px at 19px 560px, #fff 5px, var(--ruled) 6px, transparent 7px),
-    radial-gradient(circle 7px at 19px 680px, #fff 5px, var(--ruled) 6px, transparent 7px),
-    radial-gradient(circle 7px at 19px 800px, #fff 5px, var(--ruled) 6px, transparent 7px);
+    radial-gradient(circle 4px at 11px 80px,  #fff 3px, var(--ruled) 4px, transparent 4px),
+    radial-gradient(circle 4px at 11px 200px, #fff 3px, var(--ruled) 4px, transparent 4px),
+    radial-gradient(circle 4px at 11px 320px, #fff 3px, var(--ruled) 4px, transparent 4px),
+    radial-gradient(circle 4px at 11px 440px, #fff 3px, var(--ruled) 4px, transparent 4px),
+    radial-gradient(circle 4px at 11px 560px, #fff 3px, var(--ruled) 4px, transparent 4px),
+    radial-gradient(circle 4px at 11px 680px, #fff 3px, var(--ruled) 4px, transparent 4px),
+    radial-gradient(circle 4px at 11px 800px, #fff 3px, var(--ruled) 4px, transparent 4px);
   pointer-events: none;
   z-index: 1000;
 }
@@ -445,11 +445,11 @@ body::before {
 /* ensure content clears margin line — reduced side margins */
 .cal-wrap, .day-wrap, .editor-wrap, .lb-wrap,
 .um-wrap, .fb-screen, .login-wrap {
-  padding-left: 50px !important;
+  padding-left: 28px !important;
   padding-right: 6px !important;
 }
 /* nav stays full width */
-.nav { padding-left: 50px !important; }
+.nav { padding-left: 28px !important; }
 
 /* ── tighter card/wrap padding to maximise content width ── */
 .cal-wrap { padding-right: 4px !important; }
@@ -546,7 +546,7 @@ body{font-family:'Caveat',cursive;font-size:19px;background:var(--bg);color:var(
 
 /* NAV */
 .nav{background:linear-gradient(135deg,#3d2c8d,#7b52ab);position:sticky;top:0;z-index:200;display:flex;align-items:center;padding:0 14px;height:52px;gap:10px;box-shadow:0 2px 16px rgba(90,50,150,.3)}
-.nav-title{font-family:'Caveat',cursive;font-weight:700;color:#fff;font-size:1.3rem;flex:1;letter-spacing:.5px}
+.nav-title{font-family:'Caveat',cursive;font-weight:700;color:#fff;font-size:1.6rem;flex:1;letter-spacing:.5px}
 .nav-badge{font-size:.85rem;font-weight:700;padding:3px 9px;border-radius:10px}
 .nav-btn{background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:.95rem;padding:6px 0;font-family:'Caveat',cursive}
 .sync-dot{width:8px;height:8px;border-radius:50%;background:#69f0ae;flex-shrink:0}
@@ -608,8 +608,8 @@ body{font-family:'Caveat',cursive;font-size:19px;background:var(--bg);color:var(
 .day-back button{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:7px 14px;cursor:pointer;font-weight:700;color:var(--navy);font-size:.88rem;font-family:Poppins,sans-serif}
 .day-back button:active{transform:scale(.97)}
 .day-title{flex:1}
-.day-title h2{font-family:'Caveat',cursive;font-weight:700;font-size:1.2rem;color:var(--navy);line-height:1.2}
-.day-title p{font-size:.72rem;color:#888;margin-top:2px}
+.day-title h2{font-family:'Caveat',cursive;font-weight:700;font-size:1.5rem;color:var(--navy);line-height:1.2}
+.day-title p{font-size:.88rem;color:#888;margin-top:2px}
 .edit-toggle{background:var(--navy);color:#fff;border:none;border-radius:9px;padding:7px 12px;cursor:pointer;font-weight:700;font-size:.78rem;font-family:Poppins,sans-serif}
 .edit-toggle:active{transform:scale(.97)}
 
@@ -617,15 +617,15 @@ body{font-family:'Caveat',cursive;font-size:19px;background:var(--bg);color:var(
 .ring-card{background:linear-gradient(135deg,#3d2c8d,#7b52ab);border-radius:18px;padding:18px 20px;margin-bottom:14px;display:flex;align-items:center;gap:16px;box-shadow:0 6px 24px rgba(90,50,150,.25)}
 .ring-wrap{flex-shrink:0}
 .ring-info{flex:1;color:#fff}
-.ring-name{font-family:'Caveat',cursive;font-weight:700;font-size:1.2rem;line-height:1.2}
-.ring-tagline{font-size:.85rem;opacity:.85;font-style:italic;margin:4px 0 10px;font-family:'Caveat',cursive}
+.ring-name{font-family:'Caveat',cursive;font-weight:700;font-size:1.5rem;line-height:1.2}
+.ring-tagline{font-size:1.05rem;opacity:.85;font-style:italic;margin:4px 0 10px;font-family:'Caveat',cursive}
 .ring-stats{display:flex;gap:14px}
 .ring-stat{text-align:center}
 .ring-stat-n{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.3rem;line-height:1}
 .ring-stat-l{font-size:.62rem;opacity:.7}
 
 /* MOTIVATION */
-.motivation{background:linear-gradient(135deg,#fff8e1,#fff3e0);border-radius:14px;padding:12px 16px;margin-bottom:12px;border-left:4px solid var(--gold);font-size:1.1rem;font-style:italic;color:#5d4037;font-family:'Caveat',cursive;font-weight:600;box-shadow:0 2px 10px rgba(255,179,0,.15)}
+.motivation{background:linear-gradient(135deg,#fff8e1,#fff3e0);border-radius:14px;padding:12px 16px;margin-bottom:12px;border-left:4px solid var(--gold);font-size:1.3rem;font-style:italic;color:#5d4037;font-family:'Caveat',cursive;font-weight:600;box-shadow:0 2px 10px rgba(255,179,0,.15)}
 
 /* SESSIONS */
 .session-card{background:#fff;border-radius:16px;margin-bottom:10px;overflow:hidden;box-shadow:0 3px 14px rgba(90,50,150,.1);border:1.5px solid #ede0ff}
@@ -634,11 +634,11 @@ body{font-family:'Caveat',cursive;font-size:19px;background:var(--bg);color:var(
 .sess-header:active{background:#fafbff}
 .sess-icon{font-size:1.3rem;flex-shrink:0}
 .sess-info{flex:1}
-.sess-label{font-weight:700;font-size:1rem;color:var(--navy);font-family:'Caveat',cursive}
-.sess-sub{font-size:.88rem;color:#888;margin-top:1px}
+.sess-label{font-weight:700;font-size:1.2rem;color:var(--navy);font-family:'Caveat',cursive}
+.sess-sub{font-size:1rem;color:#888;margin-top:1px}
 .sess-right{display:flex;align-items:center;gap:6px}
-.sess-pct{font-size:.9rem;font-weight:700;color:var(--green)}
-.done-badge{background:var(--green);color:#fff;font-size:.62rem;font-weight:800;padding:2px 8px;border-radius:8px}
+.sess-pct{font-size:1.05rem;font-weight:700;color:var(--green)}
+.done-badge{background:var(--green);color:#fff;font-size:.78rem;font-weight:800;padding:2px 8px;border-radius:8px}
 .chevron{font-size:.75rem;color:#bbb;transition:transform .2s}
 .chevron.open{transform:rotate(180deg)}
 .sess-prog{height:3px;background:#f0f2ff}
@@ -651,9 +651,9 @@ body{font-family:'Caveat',cursive;font-size:19px;background:var(--bg);color:var(
 .tick-row.done{background:linear-gradient(135deg,#f0fff4,#e8f5e9);border-color:#c8e6c9}
 .tick-box{width:22px;height:22px;border-radius:6px;border:2px solid #ce93d8;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s;font-size:.85rem;color:#fff}
 .tick-row.done .tick-box{background:#66bb6a;border-color:#66bb6a}
-.tick-label{font-size:1rem;font-weight:600;flex:1}
+.tick-label{font-size:1.2rem;font-weight:600;flex:1}
 .tick-row.done .tick-label{text-decoration:line-through;color:#bbb}
-.sess-goal{font-size:.72rem;color:#666;background:#f0f4ff;border-radius:8px;padding:6px 10px;margin-top:6px}
+.sess-goal{font-size:.88rem;color:#666;background:#f0f4ff;border-radius:8px;padding:6px 10px;margin-top:6px}
 
 /* MINI GRID */
 .mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
@@ -673,23 +673,23 @@ body{font-family:'Caveat',cursive;font-size:19px;background:var(--bg);color:var(
 
 /* DAILY TARGETS */
 .targets-card{background:linear-gradient(135deg,#3d2c8d,#7b52ab);border-radius:16px;padding:14px 16px;margin-bottom:12px;box-shadow:0 4px 18px rgba(90,50,150,.2)}
-.targets-title{color:var(--gold);font-weight:800;font-size:.78rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.targets-title{color:var(--gold);font-weight:800;font-size:1rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
 .targets-pills{display:flex;flex-wrap:wrap;gap:7px}
-.target-pill{background:rgba(255,255,255,.15);border:none;border-radius:8px;padding:6px 12px;color:#fff;font-size:.74rem;font-weight:600;cursor:pointer;font-family:Poppins,sans-serif;transition:.12s}
+.target-pill{background:rgba(255,255,255,.15);border:none;border-radius:8px;padding:6px 12px;color:#fff;font-size:.9rem;font-weight:600;cursor:pointer;font-family:Poppins,sans-serif;transition:.12s}
 .target-pill:active{transform:scale(.95)}
 .target-pill.done{background:rgba(46,125,50,.55);text-decoration:line-through;opacity:.8}
 
 /* COMPLETE BANNER */
 .complete-banner{background:linear-gradient(135deg,#e8f5e9,#f0fff4);border:2px solid #a5d6a7;border-radius:16px;padding:20px;text-align:center;margin-top:8px;box-shadow:0 4px 16px rgba(46,125,50,.15)}
-.complete-banner .emoji{font-size:3rem}
-.complete-banner h3{font-family:'Caveat',cursive;font-weight:700;color:var(--green);font-size:1.5rem;margin:4px 0 2px}
-.complete-banner p{color:#388e3c;font-size:.9rem;font-family:'Caveat',cursive}
+.complete-banner .emoji{font-size:3.5rem}
+.complete-banner h3{font-family:'Caveat',cursive;font-weight:700;color:var(--green);font-size:2rem;margin:4px 0 2px}
+.complete-banner p{color:#388e3c;font-size:1.15rem;font-family:'Caveat',cursive}
 
 /* NO PLAN */
 .no-plan{text-align:center;padding:60px 20px;background:#fff;border-radius:18px;border:2px dashed #d7c8f5}
 .no-plan .emoji{font-size:3rem;margin-bottom:10px}
-.no-plan h3{color:#888;font-weight:700;margin-bottom:8px;font-family:'Caveat',cursive;font-size:1.3rem}
-.no-plan p{color:#aaa;font-size:.82rem;margin-bottom:16px}
+.no-plan h3{color:#888;font-weight:700;margin-bottom:8px;font-family:'Caveat',cursive;font-size:1.6rem}
+.no-plan p{color:#aaa;font-size:1rem;margin-bottom:16px}
 
 /* EDITOR */
 .editor-wrap{padding:14px 12px 80px}
