@@ -461,6 +461,11 @@ code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color
   <div class="day-wrap" id="day-content"></div>
 </div>
 
+<!-- ══ SCREEN: EDITOR (completely separate from day view) ══ -->
+<div class="screen" id="screen-editor">
+  <div class="day-wrap" style="padding-bottom:80px" id="editor-content"></div>
+</div>
+
 <!-- ══ SCREEN: LEADERBOARD ══ -->
 <div class="screen" id="screen-leaderboard">
   <div class="lb-wrap" id="lb-content"></div>
@@ -1457,7 +1462,7 @@ async function toggleTask(date, key, el) {
 }
 
 /* ═══════════════════════════════════════════
-   EDITOR
+   EDITOR — runs in its own dedicated screen
 ═══════════════════════════════════════════ */
 function openEditor(date) {
   selectedDate = date;
@@ -1467,16 +1472,15 @@ function openEditor(date) {
     totalTime:'', sessions:[], miniSegments:[], dailyTargets:[], date
   };
   renderEditor();
-  // Show day screen without triggering renderDayView
+  // Switch to editor screen — completely separate from day screen
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-day').classList.add('active');
+  document.getElementById('screen-editor').classList.add('active');
   document.getElementById('nav').style.display = 'flex';
   document.getElementById('tab-bar').className = 'tab-bar show';
-  document.getElementById('tab-users').style.display = userRole==='creator' ? 'flex' : 'none';
+  document.getElementById('tab-users').style.display = 'flex';
 }
 
 function syncMetaToEditingPlan() {
-  // Pull current values from DOM into editingPlan before any re-render
   const examEl = document.getElementById('e-examName');
   const tagEl  = document.getElementById('e-tagline');
   const timeEl = document.getElementById('e-totalTime');
@@ -1489,7 +1493,7 @@ function renderEditor() {
   const plan = editingPlan;
   const inp = 'class="e-inp"';
   let html = `<div class="day-back">
-    <button onclick="cancelEditor()">‹ Back</button>
+    <button onclick="cancelEditor()">‹ Back to Plan</button>
     <div class="day-title"><h2>${fmtDisplay(selectedDate)}</h2><p>Edit Plan</p></div>
   </div>`;
 
@@ -1510,7 +1514,7 @@ function renderEditor() {
     <div id="sessions-editor">`;
   (plan.sessions||[]).forEach((s,si) => { html += renderSessionEditor(s,si); });
   html += `</div>
-    <button class="add-section-btn" onclick="addEditorSession()">＋ Add Session</button>
+    <button class="add-section-btn" id="add-session-btn">＋ Add Session</button>
   </div>`;
 
   // Mini segments
@@ -1519,7 +1523,7 @@ function renderEditor() {
     <div id="mini-editor" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">`;
   (plan.miniSegments||[]).forEach((m,mi) => { html += renderMiniEditor(m,mi); });
   html += `</div>
-    <button class="add-section-btn" onclick="addEditorMini()">＋ Add Short Segment</button>
+    <button class="add-section-btn" id="add-mini-btn">＋ Add Short Segment</button>
   </div>`;
 
   // Targets
@@ -1528,105 +1532,172 @@ function renderEditor() {
     <div id="targets-editor">`;
   (plan.dailyTargets||[]).forEach((t,ti) => { html += renderTargetEditor(t,ti); });
   html += `</div>
-    <button class="add-section-btn" onclick="addEditorTarget()">＋ Add Target</button>
+    <button class="add-section-btn" id="add-target-btn">＋ Add Target</button>
   </div>`;
 
-  html += `<button class="publish-btn" id="publish-btn" onclick="publishPlan()">💾 Publish Plan</button>`;
+  html += `<button class="publish-btn" id="publish-btn">💾 Publish Plan</button>`;
 
-  document.getElementById('day-content').innerHTML = html;
+  document.getElementById('editor-content').innerHTML = html;
+  attachEditorEvents();
+}
+
+// Session ops
+function updateSess(id,k,v){ if(!editingPlan)return; const s=editingPlan.sessions.find(s=>s.id===id); if(s) s[k]=v; }
+function updateTask(id,ti,v){ if(!editingPlan)return; const s=editingPlan.sessions.find(s=>s.id===id); if(s)s.tasks[ti]=v; }
+function updateMini(id,k,v){ if(!editingPlan)return; const m=editingPlan.miniSegments.find(m=>m.id===id); if(m) m[k]=v; }
+function updateMiniTask(id,ti,v){ if(!editingPlan)return; const m=editingPlan.miniSegments.find(m=>m.id===id); if(m)m.tasks[ti]=v; }
+function updateTarget(ti,v){ if(!editingPlan)return; editingPlan.dailyTargets[ti]=v; }
+
+function addEditorSession(){
+  if(!editingPlan)return;
+  syncMetaToEditingPlan();
+  editingPlan.sessions.push({id:'s_'+Date.now(),label:'',duration:'',timeSlot:'',subjectColor:'#1a237e',subject:'',goal:'',tasks:[]});
+  renderEditor();
+  attachEditorEvents();
+}
+function addEditorMini(){
+  if(!editingPlan)return;
+  syncMetaToEditingPlan();
+  editingPlan.miniSegments.push({id:'m_'+Date.now(),title:'',duration:'',timeSlot:'',subjectColor:'#c62828',tasks:[]});
+  renderEditor();
+  attachEditorEvents();
+}
+function addEditorTarget(){
+  if(!editingPlan)return;
+  syncMetaToEditingPlan();
+  editingPlan.dailyTargets.push('');
+  renderEditor();
+  attachEditorEvents();
 }
 
 function renderSessionEditor(s,si) {
   const colorOptions = ['#1a237e','#2e7d32','#6a1b9a','#c62828','#00695c','#e65100','#0277bd','#558b2f'];
-  return `<div class="sess-editor" id="sess-ed-${s.id}">
-    <button class="remove-sess-btn" onclick="removeEditorSession('${s.id}')">🗑 Remove</button>
+  return `<div class="sess-editor" id="sess-ed-${s.id}" data-sessid="${s.id}">
+    <button class="remove-sess-btn sess-remove" data-id="${s.id}">🗑 Remove</button>
     <div class="e-grid2">
-      <div><label class="e-label">Label (e.g. Morning)</label><input class="e-inp" placeholder="Morning" value="${esc(s.label||'')}" oninput="updateSess('${s.id}','label',this.value)"></div>
-      <div><label class="e-label">Duration (e.g. 2 Hours)</label><input class="e-inp" placeholder="2 Hours" value="${esc(s.duration||'')}" oninput="updateSess('${s.id}','duration',this.value)"></div>
+      <div><label class="e-label">Label (e.g. Morning)</label><input class="e-inp" placeholder="Morning" value="${esc(s.label||'')}" data-sessid="${s.id}" data-key="label" oninput="updateSess(this.dataset.sessid,'label',this.value)"></div>
+      <div><label class="e-label">Duration (e.g. 2 Hours)</label><input class="e-inp" placeholder="2 Hours" value="${esc(s.duration||'')}" data-sessid="${s.id}" data-key="duration" oninput="updateSess(this.dataset.sessid,'duration',this.value)"></div>
     </div>
     <div class="e-grid2">
-      <div><label class="e-label">Time Slot (e.g. 7:00 AM – 9:00 AM)</label><input class="e-inp" placeholder="7:00 AM – 9:00 AM" value="${esc(s.timeSlot||'')}" oninput="updateSess('${s.id}','timeSlot',this.value)"></div>
+      <div><label class="e-label">Time Slot</label><input class="e-inp" placeholder="7:00 AM – 9:00 AM" value="${esc(s.timeSlot||'')}" data-sessid="${s.id}" oninput="updateSess(this.dataset.sessid,'timeSlot',this.value)"></div>
       <div><label class="e-label">Subject Header Color</label>
-        <select class="e-inp" onchange="updateSess('${s.id}','subjectColor',this.value)">
-          ${colorOptions.map(c=>`<option value="${c}" ${(s.subjectColor||'#1a237e')===c?'selected':''} style="background:${c};color:#fff">${c}</option>`).join('')}
+        <select class="e-inp" data-sessid="${s.id}" onchange="updateSess(this.dataset.sessid,'subjectColor',this.value)">
+          ${colorOptions.map(c=>`<option value="${c}" ${(s.subjectColor||'#1a237e')===c?'selected':''}>${c}</option>`).join('')}
         </select>
       </div>
     </div>
-    <label class="e-label">Subject (e.g. Reasoning (Pre + Mains))</label>
-    <input class="e-inp" placeholder="Reasoning (Pre + Mains)" value="${esc(s.subject||'')}" oninput="updateSess('${s.id}','subject',this.value)">
+    <label class="e-label">Subject</label>
+    <input class="e-inp" placeholder="Reasoning (Pre + Mains)" value="${esc(s.subject||'')}" data-sessid="${s.id}" oninput="updateSess(this.dataset.sessid,'subject',this.value)">
     <label class="e-label">Goal</label>
-    <input class="e-inp" placeholder="Accuracy + puzzle solving speed" value="${esc(s.goal||'')}" oninput="updateSess('${s.id}','goal',this.value)">
+    <input class="e-inp" placeholder="Accuracy + speed" value="${esc(s.goal||'')}" data-sessid="${s.id}" oninput="updateSess(this.dataset.sessid,'goal',this.value)">
     <label class="e-label">Tasks</label>
-    <div id="tasks-ed-${s.id}">
-      ${(s.tasks||[]).map((t,ti)=>`<div class="task-row"><input class="e-inp" value="${esc(t)}" oninput="updateTask('${s.id}',${ti},this.value)"><button class="del-btn" onclick="removeTask('${s.id}',${ti})">✕</button></div>`).join('')}
+    <div class="tasks-container" data-sessid="${s.id}">
+      ${(s.tasks||[]).map((t,ti)=>`<div class="task-row">
+        <input class="e-inp" value="${esc(t)}" data-sessid="${s.id}" data-ti="${ti}" oninput="updateTask(this.dataset.sessid,+this.dataset.ti,this.value)">
+        <button class="del-btn task-del" data-sessid="${s.id}" data-ti="${ti}">✕</button>
+      </div>`).join('')}
     </div>
-    <button class="add-task-btn" onclick="addTaskToSess('${s.id}')">＋ Task</button>
+    <button class="add-task-btn sess-add-task" data-id="${s.id}">＋ Task</button>
   </div>`;
 }
 
 function renderMiniEditor(m,mi) {
   const colorOptions = ['#1a237e','#2e7d32','#6a1b9a','#c62828','#00695c','#e65100','#0277bd','#558b2f'];
-  return `<div class="sess-editor" id="mini-ed-${m.id}" style="padding:12px">
-    <button class="del-btn" style="position:absolute;top:8px;right:8px" onclick="removeEditorMini('${m.id}')">✕</button>
-    <label class="e-label">Title</label><input class="e-inp" value="${esc(m.title||'')}" placeholder="Current Affairs" oninput="updateMini('${m.id}','title',this.value)">
-    <label class="e-label">Duration</label><input class="e-inp" value="${esc(m.duration||'')}" placeholder="40 min" oninput="updateMini('${m.id}','duration',this.value)">
-    <label class="e-label">Time Slot</label><input class="e-inp" value="${esc(m.timeSlot||'')}" placeholder="6:00 PM – 6:40 PM" oninput="updateMini('${m.id}','timeSlot',this.value)">
+  return `<div class="sess-editor" id="mini-ed-${m.id}" style="padding:12px;position:relative" data-miniid="${m.id}">
+    <button class="del-btn mini-remove" style="position:absolute;top:8px;right:8px" data-id="${m.id}">✕</button>
+    <label class="e-label">Title</label><input class="e-inp" value="${esc(m.title||'')}" placeholder="Current Affairs" data-miniid="${m.id}" oninput="updateMini(this.dataset.miniid,'title',this.value)">
+    <label class="e-label">Duration</label><input class="e-inp" value="${esc(m.duration||'')}" placeholder="40 min" data-miniid="${m.id}" oninput="updateMini(this.dataset.miniid,'duration',this.value)">
+    <label class="e-label">Time Slot</label><input class="e-inp" value="${esc(m.timeSlot||'')}" placeholder="6:00 PM – 6:40 PM" data-miniid="${m.id}" oninput="updateMini(this.dataset.miniid,'timeSlot',this.value)">
     <label class="e-label">Header Color</label>
-    <select class="e-inp" onchange="updateMini('${m.id}','subjectColor',this.value)">
+    <select class="e-inp" data-miniid="${m.id}" onchange="updateMini(this.dataset.miniid,'subjectColor',this.value)">
       ${colorOptions.map(c=>`<option value="${c}" ${(m.subjectColor||'#c62828')===c?'selected':''}>${c}</option>`).join('')}
     </select>
     <label class="e-label">Tasks</label>
-    <div id="minitasks-ed-${m.id}">
-      ${(m.tasks||[]).map((t,ti)=>`<div class="task-row"><input class="e-inp" value="${esc(t)}" oninput="updateMiniTask('${m.id}',${ti},this.value)"><button class="del-btn" onclick="removeMiniTask('${m.id}',${ti})">✕</button></div>`).join('')}
+    <div class="minitasks-container" data-miniid="${m.id}">
+      ${(m.tasks||[]).map((t,ti)=>`<div class="task-row">
+        <input class="e-inp" value="${esc(t)}" data-miniid="${m.id}" data-ti="${ti}" oninput="updateMiniTask(this.dataset.miniid,+this.dataset.ti,this.value)">
+        <button class="del-btn minitask-del" data-miniid="${m.id}" data-ti="${ti}">✕</button>
+      </div>`).join('')}
     </div>
-    <button class="add-task-btn" onclick="addMiniTask('${m.id}')">＋ Task</button>
+    <button class="add-task-btn mini-add-task" data-id="${m.id}">＋ Task</button>
   </div>`;
 }
 
 function renderTargetEditor(t,ti) {
-  return `<div class="task-row" id="target-ed-${ti}"><input class="e-inp" value="${esc(t)}" placeholder="Target…" oninput="updateTarget(${ti},this.value)"><button class="del-btn" onclick="removeTarget(${ti})">✕</button></div>`;
+  return `<div class="task-row">
+    <input class="e-inp" value="${esc(t)}" placeholder="Target…" data-ti="${ti}" oninput="updateTarget(+this.dataset.ti,this.value)">
+    <button class="del-btn target-del" data-ti="${ti}">✕</button>
+  </div>`;
 }
 
-// Session ops
-function updateSess(id,k,v){ if(!editingPlan)return; const s=editingPlan.sessions.find(s=>s.id===id); if(s) s[k]=v; }
-function removeEditorSession(id){ if(!editingPlan)return; syncMetaToEditingPlan(); editingPlan.sessions=editingPlan.sessions.filter(s=>s.id!==id); renderEditor(); }
-function addEditorSession(){ if(!editingPlan)return; syncMetaToEditingPlan(); editingPlan.sessions.push({id:'s_'+Date.now(),label:'',duration:'',timeSlot:'',subjectColor:'#1a237e',subject:'',goal:'',tasks:[]}); renderEditor(); }
-function addTaskToSess(id){ if(!editingPlan)return; syncMetaToEditingPlan(); const s=editingPlan.sessions.find(s=>s.id===id); if(s){s.tasks.push(''); renderEditor();} }
-function updateTask(id,ti,v){ if(!editingPlan)return; const s=editingPlan.sessions.find(s=>s.id===id); if(s)s.tasks[ti]=v; }
-function removeTask(id,ti){ if(!editingPlan)return; syncMetaToEditingPlan(); const s=editingPlan.sessions.find(s=>s.id===id); if(s){s.tasks.splice(ti,1); renderEditor();} }
+function attachEditorEvents() {
+  const ec = document.getElementById('editor-content');
+  if (!ec) return;
 
-// Mini ops
-function updateMini(id,k,v){ if(!editingPlan)return; const m=editingPlan.miniSegments.find(m=>m.id===id); if(m) m[k]=v; }
-function removeEditorMini(id){ if(!editingPlan)return; syncMetaToEditingPlan(); editingPlan.miniSegments=editingPlan.miniSegments.filter(m=>m.id!==id); renderEditor(); }
-function addEditorMini(){ if(!editingPlan)return; syncMetaToEditingPlan(); editingPlan.miniSegments.push({id:'m_'+Date.now(),title:'',duration:'',timeSlot:'',subjectColor:'#c62828',tasks:[]}); renderEditor(); }
-function addMiniTask(id){ if(!editingPlan)return; syncMetaToEditingPlan(); const m=editingPlan.miniSegments.find(m=>m.id===id); if(m){m.tasks.push(''); renderEditor();} }
-function updateMiniTask(id,ti,v){ if(!editingPlan)return; const m=editingPlan.miniSegments.find(m=>m.id===id); if(m)m.tasks[ti]=v; }
-function removeMiniTask(id,ti){ if(!editingPlan)return; syncMetaToEditingPlan(); const m=editingPlan.miniSegments.find(m=>m.id===id); if(m){m.tasks.splice(ti,1); renderEditor();} }
+  // Session remove
+  ec.querySelectorAll('.sess-remove').forEach(btn =>
+    btn.addEventListener('click', () => { syncMetaToEditingPlan(); editingPlan.sessions=editingPlan.sessions.filter(s=>s.id!==btn.dataset.id); renderEditor(); attachEditorEvents(); })
+  );
+  // Session add task
+  ec.querySelectorAll('.sess-add-task').forEach(btn =>
+    btn.addEventListener('click', () => { syncMetaToEditingPlan(); const s=editingPlan.sessions.find(s=>s.id===btn.dataset.id); if(s){s.tasks.push('');} renderEditor(); attachEditorEvents(); })
+  );
+  // Task delete
+  ec.querySelectorAll('.task-del').forEach(btn =>
+    btn.addEventListener('click', () => { syncMetaToEditingPlan(); const s=editingPlan.sessions.find(s=>s.id===btn.dataset.sessid); if(s){s.tasks.splice(+btn.dataset.ti,1);} renderEditor(); attachEditorEvents(); })
+  );
+  // Mini remove
+  ec.querySelectorAll('.mini-remove').forEach(btn =>
+    btn.addEventListener('click', () => { syncMetaToEditingPlan(); editingPlan.miniSegments=editingPlan.miniSegments.filter(m=>m.id!==btn.dataset.id); renderEditor(); attachEditorEvents(); })
+  );
+  // Mini add task
+  ec.querySelectorAll('.mini-add-task').forEach(btn =>
+    btn.addEventListener('click', () => { syncMetaToEditingPlan(); const m=editingPlan.miniSegments.find(m=>m.id===btn.dataset.id); if(m){m.tasks.push('');} renderEditor(); attachEditorEvents(); })
+  );
+  // Mini task delete
+  ec.querySelectorAll('.minitask-del').forEach(btn =>
+    btn.addEventListener('click', () => { syncMetaToEditingPlan(); const m=editingPlan.miniSegments.find(m=>m.id===btn.dataset.miniid); if(m){m.tasks.splice(+btn.dataset.ti,1);} renderEditor(); attachEditorEvents(); })
+  );
+  // Target delete
+  ec.querySelectorAll('.target-del').forEach(btn =>
+    btn.addEventListener('click', () => { syncMetaToEditingPlan(); editingPlan.dailyTargets.splice(+btn.dataset.ti,1); renderEditor(); attachEditorEvents(); })
+  );
+  // Main buttons
+  const addSess = document.getElementById('add-session-btn');
+  const addMini = document.getElementById('add-mini-btn');
+  const addTgt  = document.getElementById('add-target-btn');
+  const pub     = document.getElementById('publish-btn');
+  if (addSess) addSess.addEventListener('click', addEditorSession);
+  if (addMini) addMini.addEventListener('click', addEditorMini);
+  if (addTgt)  addTgt.addEventListener('click', addEditorTarget);
+  if (pub)     pub.addEventListener('click', publishPlan);
+}
 
-// Target ops
-function updateTarget(ti,v){ if(!editingPlan)return; editingPlan.dailyTargets[ti]=v; }
-function removeTarget(ti){ if(!editingPlan)return; syncMetaToEditingPlan(); editingPlan.dailyTargets.splice(ti,1); renderEditor(); }
-function addEditorTarget(){ if(!editingPlan)return; syncMetaToEditingPlan(); editingPlan.dailyTargets.push(''); renderEditor(); }
-
-function cancelEditor() { isEditing = false; renderDayView(selectedDate); }
+function cancelEditor() {
+  isEditing = false;
+  editingPlan = null;
+  renderDayView(selectedDate);
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-day').classList.add('active');
+}
 
 async function publishPlan() {
-  // Sync meta fields
-  editingPlan.examName = document.getElementById('e-examName')?.value||editingPlan.examName;
-  editingPlan.tagline  = document.getElementById('e-tagline')?.value||editingPlan.tagline;
-  editingPlan.totalTime= document.getElementById('e-totalTime')?.value||editingPlan.totalTime;
-
+  if (!editingPlan) return;
+  syncMetaToEditingPlan();
   const btn = document.getElementById('publish-btn');
-  btn.disabled = true; btn.textContent = '💾 Publishing…';
+  if (btn) { btn.disabled = true; btn.textContent = '💾 Publishing…'; }
   try {
     await db.ref(`plans/${selectedDate}`).set(editingPlan);
-    allPlans[selectedDate] = editingPlan;
+    allPlans[selectedDate] = JSON.parse(JSON.stringify(editingPlan));
     isEditing = false;
+    editingPlan = null;
     showToast('✅ Plan published!');
     renderDayView(selectedDate);
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-day').classList.add('active');
   } catch(e) {
     showToast('❌ Failed to publish — check connection');
-    btn.disabled=false; btn.textContent='💾 Publish Plan';
+    if (btn) { btn.disabled = false; btn.textContent = '💾 Publish Plan'; }
   }
 }
 
