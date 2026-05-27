@@ -250,6 +250,20 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min
 .publish-btn{background:var(--navy);color:#fff;border:none;border-radius:12px;padding:13px 40px;font-weight:700;font-size:1rem;cursor:pointer;font-family:Poppins,sans-serif;display:block;margin:0 auto;transition:.15s}
 .publish-btn:active{transform:scale(.97)}
 .publish-btn:disabled{background:#aaa;cursor:not-allowed}
+.discard-btn{background:none;color:#e53935;border:1.5px solid #e53935;border-radius:12px;padding:11px 28px;font-weight:700;font-size:.88rem;cursor:pointer;font-family:Poppins,sans-serif;display:block;margin:10px auto 0;transition:.15s}
+.discard-btn:active{transform:scale(.97)}
+.draft-banner{background:linear-gradient(90deg,#fff3e0,#fff8e1);border:2px solid #ffb74d;border-radius:14px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.draft-banner-icon{font-size:1.6rem;flex-shrink:0}
+.draft-banner-info{flex:1}
+.draft-banner-title{font-weight:800;font-size:.88rem;color:#e65100;font-family:'Nunito',sans-serif}
+.draft-banner-sub{font-size:.74rem;color:#f57f17;margin-top:2px}
+.draft-banner-btns{display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.draft-pub-btn{background:#e65100;color:#fff;border:none;border-radius:9px;padding:7px 13px;font-weight:700;font-size:.76rem;cursor:pointer;font-family:Poppins,sans-serif;white-space:nowrap}
+.draft-pub-btn:active{transform:scale(.96)}
+.draft-edit-btn{background:rgba(230,81,0,.12);color:#e65100;border:1.5px solid #ffb74d;border-radius:9px;padding:6px 13px;font-weight:700;font-size:.76rem;cursor:pointer;font-family:Poppins,sans-serif;white-space:nowrap}
+.draft-edit-btn:active{transform:scale(.96)}
+.draft-discard-btn{background:none;color:#aaa;border:none;font-size:.7rem;cursor:pointer;font-family:Poppins,sans-serif;padding:2px 0;text-decoration:underline}
+.editor-draft-notice{background:#fff3e0;border:1.5px solid #ffb74d;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.78rem;color:#e65100;font-weight:600;display:flex;align-items:center;gap:8px}
 
 /* FIREBASE CONFIG SCREEN */
 .fb-screen{padding:20px 14px 80px}
@@ -461,11 +475,6 @@ code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color
   <div class="day-wrap" id="day-content"></div>
 </div>
 
-<!-- ══ SCREEN: EDITOR (isolated — Firebase listeners never touch this) ══ -->
-<div class="screen" id="screen-editor">
-  <div class="editor-wrap" id="editor-content"></div>
-</div>
-
 <!-- ══ SCREEN: LEADERBOARD ══ -->
 <div class="screen" id="screen-leaderboard">
   <div class="lb-wrap" id="lb-content"></div>
@@ -495,10 +504,6 @@ code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color
   <button class="tab-btn" id="tab-lb" onclick="switchTab('lb')">
     <span class="tab-icon">🏆</span>
     <span class="tab-label">Leaderboard</span>
-  </button>
-  <button class="tab-btn" id="tab-edit" style="display:none" onclick="switchTab('edit')">
-    <span class="tab-icon">✏️</span>
-    <span class="tab-label">Edit Plan</span>
   </button>
   <button class="tab-btn" id="tab-users" style="display:none" onclick="switchTab('users')">
     <span class="tab-icon">👥</span>
@@ -530,8 +535,8 @@ let calMonth = new Date().getMonth();
 let selectedDate = todayStr();
 let allPlans = {};      // date → plan
 let allProgress = {};   // date → {userName → {taskKey: bool}}
+let allDrafts = {};     // date → draft plan (today only, creator only)
 let editingPlan = null;
-let isEditing = false;
 let planListeners = {};
 let progListeners = {};
 let isOnline = navigator.onLine;
@@ -656,15 +661,11 @@ function showScreen(name) {
   const noNav = name==='setup'||name==='login';
   document.getElementById('nav').style.display = noNav ? 'none' : 'flex';
   document.getElementById('tab-bar').className = 'tab-bar' + (noNav ? '' : ' show');
-  // Show users tab only for creator; show edit tab only for creator
-  const isCreator = userRole==='creator';
-  document.getElementById('tab-users').style.display = (!noNav && isCreator) ? 'flex' : 'none';
-  document.getElementById('tab-edit').style.display  = (!noNav && isCreator) ? 'flex' : 'none';
+  // Show users tab only for creator
+  document.getElementById('tab-users').style.display = (!noNav && userRole==='creator') ? 'flex' : 'none';
   if (name === 'calendar') { activeTab='my'; updateTabBar(); renderCalendar(); }
   if (name === 'leaderboard') { activeTab='lb'; updateTabBar(); renderLeaderboard(); }
   if (name === 'users') { activeTab='users'; updateTabBar(); renderUserManagement(); }
-  if (name === 'editor') { activeTab='edit'; updateTabBar(); }
-  if (name === 'day') { activeTab='my'; updateTabBar(); }
 }
 
 function updateTabBar() {
@@ -682,8 +683,6 @@ function switchTab(tab) {
     renderDayView(selectedDate);
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('screen-day').classList.add('active');
-  } else if (tab === 'edit') {
-    openEditor(selectedDate || todayStr());
   } else if (tab === 'lb') {
     showScreen('leaderboard');
   } else if (tab === 'users') {
@@ -757,7 +756,8 @@ function finishLogin(name, role) {
 async function openDayAfterLoad() {
   // Small delay to let Firebase load today's plan first
   await new Promise(r => setTimeout(r, 800));
-  if (!isEditing) { renderDayView(todayStr()); showScreen('day'); }
+  renderDayView(todayStr());
+  showScreen('day');
 }
 
 function updateNavBadge() {
@@ -841,10 +841,6 @@ function signOut() {
   Object.values(planListeners).forEach(off => off && off());
   Object.values(progListeners).forEach(off => off && off());
   planListeners = {}; progListeners = {};
-  if (editingStatusListener && db) { db.ref('editingStatus').off('value', editingStatusListener); editingStatusListener = null; }
-  if (isEditing && selectedDate === todayStr()) setEditingStatus(selectedDate, false);
-  isEditing = false;
-  resumeListeners();
   allPlans = {}; allProgress = {}; allUsersData = {};
   userName = ''; userRole = ''; pendingRole = 'user';
   localStorage.removeItem('session');
@@ -856,24 +852,24 @@ function signOut() {
 /* ═══════════════════════════════════════════
    REALTIME LISTENERS
 ═══════════════════════════════════════════ */
-let _listenersPaused = false;
-
 function startListeners() {
   if (!db) return;
-  startEditingStatusListener();
   db.ref('plans').on('value', snap => {
     allPlans = snap.val() || {};
-    if (_listenersPaused) return; // editor is active — never touch its DOM
     if (document.getElementById('screen-calendar').classList.contains('active')) renderCalendar();
-    if (document.getElementById('screen-day').classList.contains('active')) {
-      renderDayView(selectedDate);
-    }
+    if (document.getElementById('screen-day').classList.contains('active')) renderDayView(selectedDate);
     if (document.getElementById('screen-leaderboard').classList.contains('active')) renderLeaderboard();
     if (document.getElementById('screen-peer').classList.contains('active')) renderPeerView();
   });
+  db.ref('plans_draft').on('value', snap => {
+    allDrafts = snap.val() || {};
+    // Only re-render day view for creator — users never see drafts
+    if (userRole === 'creator' && document.getElementById('screen-day').classList.contains('active')) {
+      renderDayView(selectedDate);
+    }
+  });
   db.ref('progress').on('value', snap => {
     allProgress = snap.val() || {};
-    if (_listenersPaused) return; // editor is active — never touch its DOM
     if (document.getElementById('screen-calendar').classList.contains('active')) renderCalendar();
     if (document.getElementById('screen-day').classList.contains('active')) renderDayView(selectedDate);
     if (document.getElementById('screen-leaderboard').classList.contains('active')) renderLeaderboard();
@@ -885,9 +881,6 @@ function startListeners() {
     if (document.getElementById('screen-users').classList.contains('active')) renderUserManagement();
   });
 }
-
-function pauseListeners()  { _listenersPaused = true;  }
-function resumeListeners() { _listenersPaused = false; }
 
 /* ═══════════════════════════════════════════
    CALENDAR
@@ -1065,7 +1058,6 @@ function renderCalendar() {
 }
 
 function openDay(ds) {
-  if (isEditing) return;
   selectedDate = ds;
   renderDayView(ds);
   showScreen('day');
@@ -1176,35 +1168,15 @@ function renderDayView(date) {
       <h2>${fmtDisplay(date)}</h2>
       <p>${plan?.examName||'Study Plan'}</p>
     </div>
-    ${userRole==='creator' ? `` : ''}
+    ${userRole==='creator' ? `<button class="edit-toggle" onclick="openEditor('${date}')">${plan?'✏️ Edit':'➕ Create'}</button>` : ''}
   </div>`;
 
   if (!plan) {
-    if (userRole !== 'creator' && date === todayStr()) {
-      // Check if creator is currently editing today
-      if (db) {
-        db.ref('editingStatus').get().then(snap => {
-          const status = snap.val();
-          if (status && status.date === todayStr()) {
-            renderCreatingBanner();
-          } else {
-            html += `<div class="no-plan">
-              <div style="font-size:4rem;margin-bottom:8px">📭</div>
-              <h3>No plan yet</h3>
-              <p>The creator hasn't published a plan for this day yet.</p>
-            </div>`;
-            container.innerHTML = html;
-          }
-        });
-        container.innerHTML = html + `<div style="text-align:center;padding:40px;color:#aaa;font-size:.85rem">Loading…</div>`;
-        return;
-      }
-    }
     html += `<div class="no-plan">
       <div style="font-size:4rem;margin-bottom:8px">📭</div>
       <h3>No plan yet</h3>
       <p>${userRole==='creator' ? 'Create a plan for this day.' : 'The creator hasn\'t published a plan for this day yet.'}</p>
-      ${userRole==='creator' ? `` : ''}
+      ${userRole==='creator' ? `<button class="btn btn-navy" style="padding:10px 24px;margin-top:8px" onclick="openEditor('${date}')">➕ Create Plan</button>` : ''}
     </div>`;
     container.innerHTML = html;
     return;
@@ -1506,372 +1478,159 @@ async function toggleTask(date, key, el) {
 /* ═══════════════════════════════════════════
    EDITOR
 ═══════════════════════════════════════════ */
-
-// ── Firebase editing-status helpers ──────────────────────────────────────────
-function setEditingStatus(dateStr, active) {
-  if (!db) return;
-  if (active) {
-    db.ref('editingStatus').set({ date: dateStr, by: userName, ts: Date.now() });
-  } else {
-    db.ref('editingStatus').remove();
-  }
-}
-
-let editingStatusListener = null;
-function startEditingStatusListener() {
-  if (!db || editingStatusListener) return;
-  editingStatusListener = db.ref('editingStatus').on('value', snap => {
-    const status = snap.val();
-    // Only affects non-creators viewing the day screen
-    if (userRole === 'creator') return;
-    if (!document.getElementById('screen-day').classList.contains('active')) return;
-    if (status && status.date === todayStr() && selectedDate === todayStr()) {
-      renderCreatingBanner();
-    } else {
-      // Re-render normally if banner was showing
-      const banner = document.getElementById('creating-banner');
-      if (banner) renderDayView(selectedDate);
-    }
-  });
-}
-
-function renderCreatingBanner() {
-  const container = document.getElementById('day-content');
-  if (document.getElementById('creating-banner')) return; // already showing
-  container.innerHTML = `<div id="creating-banner" style="text-align:center;padding:60px 24px">
-    <div style="font-size:3.5rem;margin-bottom:14px">✏️</div>
-    <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1.2rem;color:var(--navy);margin-bottom:8px">Plan Being Created</div>
-    <div style="color:#888;font-size:.85rem;line-height:1.6;max-width:280px;margin:0 auto">The creator is building today's plan. It'll appear here as soon as it's published!</div>
-    <div style="margin-top:24px;display:flex;justify-content:center;gap:6px">
-      <div style="width:8px;height:8px;border-radius:50%;background:var(--navy);animation:dot-pulse 1.4s ease-in-out infinite"></div>
-      <div style="width:8px;height:8px;border-radius:50%;background:var(--navy);animation:dot-pulse 1.4s ease-in-out .2s infinite"></div>
-      <div style="width:8px;height:8px;border-radius:50%;background:var(--navy);animation:dot-pulse 1.4s ease-in-out .4s infinite"></div>
-    </div>
-  </div>
-  <style>@keyframes dot-pulse{0%,80%,100%{transform:scale(0);opacity:.3}40%{transform:scale(1);opacity:1}}</style>`;
-}
-
 function openEditor(date) {
-  // If already editing this date, don't rebuild — just show the screen
-  if (isEditing && selectedDate === date) {
-    showScreen('editor');
-    return;
-  }
-  isEditing = true;
   selectedDate = date;
-  pauseListeners(); // stop Firebase from touching any DOM while editor is open
   editingPlan = allPlans[date] ? JSON.parse(JSON.stringify(allPlans[date])) : {
     examName:'Study Plan', tagline:'Plan Your Day, Ace Your Exam!',
     totalTime:'', sessions:[], miniSegments:[], dailyTargets:[], date
   };
-  // Broadcast editing status to users only when editing today
-  if (date === todayStr()) setEditingStatus(date, true);
-  buildEditorDOM();
-  showScreen('editor');
+  renderEditor();
+  showScreen('day'); // editor renders inside day screen
 }
 
-// ── Build editor entirely via DOM (no innerHTML re-render on add/remove) ──────
-function buildEditorDOM() {
+function renderEditor() {
   const plan = editingPlan;
-  const wrap = document.getElementById('editor-content');
+  const inp = 'class="e-inp"';
+  let html = `<div class="day-back">
+    <button onclick="cancelEditor()">‹ Back</button>
+    <div class="day-title"><h2>${fmtDisplay(selectedDate)}</h2><p>Edit Plan</p></div>
+  </div>`;
 
-  wrap.innerHTML = `
-    <div class="day-back">
-      <button onclick="cancelEditor()">‹ Back</button>
-      <div class="day-title"><h2>${fmtDisplay(selectedDate)}</h2><p>Edit Plan</p></div>
+  // Meta
+  html += `<div class="e-card">
+    <div class="e-card-title" style="color:var(--navy)">🏷️ Plan Details</div>
+    <div class="e-grid2">
+      <div><label class="e-label">Exam / Course</label><input ${inp} id="e-examName" value="${esc(plan.examName||'')}" placeholder="SBI PO 2026"></div>
+      <div><label class="e-label">Total Study Time</label><input ${inp} id="e-totalTime" value="${esc(plan.totalTime||'')}" placeholder="7–8 Hrs"></div>
     </div>
-    <div class="e-card">
-      <div class="e-card-title" style="color:var(--navy)">🏷️ Plan Details</div>
-      <div class="e-grid2">
-        <div><label class="e-label">Exam / Course</label><input class="e-inp" id="e-examName" value="${esc(plan.examName||'')}" placeholder="SBI PO 2026" oninput="editingPlan.examName=this.value"></div>
-        <div><label class="e-label">Total Study Time</label><input class="e-inp" id="e-totalTime" value="${esc(plan.totalTime||'')}" placeholder="7–8 Hrs" oninput="editingPlan.totalTime=this.value"></div>
-      </div>
-      <label class="e-label">Tagline</label>
-      <input class="e-inp" id="e-tagline" value="${esc(plan.tagline||'')}" placeholder="Plan Your Day, Ace Your Exam!" oninput="editingPlan.tagline=this.value">
-    </div>
-    <div class="e-card">
-      <div class="e-card-title" style="color:var(--blue)">📚 Study Sessions</div>
-      <div id="sessions-editor"></div>
-      <button class="add-section-btn" onclick="addEditorSession()">＋ Add Session</button>
-    </div>
-    <div class="e-card">
-      <div class="e-card-title" style="color:var(--orange)">📰 Short Segments</div>
-      <div id="mini-editor" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
-      <button class="add-section-btn" onclick="addEditorMini()">＋ Add Short Segment</button>
-    </div>
-    <div class="e-card">
-      <div class="e-card-title" style="color:var(--green)">🎯 Daily Targets</div>
-      <div id="targets-editor"></div>
-      <button class="add-section-btn" onclick="addEditorTarget()">＋ Add Target</button>
-    </div>
-    <button class="publish-btn" id="publish-btn" onclick="publishPlan()">💾 Publish Plan</button>`;
+    <label class="e-label">Tagline</label>
+    <input ${inp} id="e-tagline" value="${esc(plan.tagline||'')}" placeholder="Plan Your Day, Ace Your Exam!">
+  </div>`;
 
-  // Populate dynamic sections via DOM (not innerHTML)
-  (plan.sessions||[]).forEach(s => appendSessionNode(s));
-  (plan.miniSegments||[]).forEach(m => appendMiniNode(m));
-  (plan.dailyTargets||[]).forEach((t,ti) => appendTargetNode(t, ti));
+  // Sessions
+  html += `<div class="e-card">
+    <div class="e-card-title" style="color:var(--blue)">📚 Study Sessions</div>
+    <div id="sessions-editor">`;
+  (plan.sessions||[]).forEach((s,si) => { html += renderSessionEditor(s,si); });
+  html += `</div>
+    <button class="add-section-btn" onclick="addEditorSession()">＋ Add Session</button>
+  </div>`;
+
+  // Mini segments
+  html += `<div class="e-card">
+    <div class="e-card-title" style="color:var(--orange)">📰 Short Segments</div>
+    <div id="mini-editor" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">`;
+  (plan.miniSegments||[]).forEach((m,mi) => { html += renderMiniEditor(m,mi); });
+  html += `</div>
+    <button class="add-section-btn" onclick="addEditorMini()">＋ Add Short Segment</button>
+  </div>`;
+
+  // Targets
+  html += `<div class="e-card">
+    <div class="e-card-title" style="color:var(--green)">🎯 Daily Targets</div>
+    <div id="targets-editor">`;
+  (plan.dailyTargets||[]).forEach((t,ti) => { html += renderTargetEditor(t,ti); });
+  html += `</div>
+    <button class="add-section-btn" onclick="addEditorTarget()">＋ Add Target</button>
+  </div>`;
+
+  html += `<button class="publish-btn" id="publish-btn" onclick="publishPlan()">💾 Publish Plan</button>`;
+
+  document.getElementById('day-content').innerHTML = html;
 }
 
-// ── Session DOM node ──────────────────────────────────────────────────────────
-function appendSessionNode(s) {
+function renderSessionEditor(s,si) {
   const colorOptions = ['#1a237e','#2e7d32','#6a1b9a','#c62828','#00695c','#e65100','#0277bd','#558b2f'];
-  const div = document.createElement('div');
-  div.className = 'sess-editor';
-  div.id = 'sess-ed-' + s.id;
-  div.innerHTML = `
+  return `<div class="sess-editor" id="sess-ed-${s.id}">
     <button class="remove-sess-btn" onclick="removeEditorSession('${s.id}')">🗑 Remove</button>
     <div class="e-grid2">
-      <div><label class="e-label">Label (e.g. Morning)</label>
-        <input class="e-inp" placeholder="Morning" value="${esc(s.label||'')}"></div>
-      <div><label class="e-label">Duration (e.g. 2 Hours)</label>
-        <input class="e-inp" placeholder="2 Hours" value="${esc(s.duration||'')}"></div>
+      <div><label class="e-label">Label (e.g. Morning)</label><input class="e-inp" placeholder="Morning" value="${esc(s.label||'')}" onchange="updateSess('${s.id}','label',this.value)"></div>
+      <div><label class="e-label">Duration (e.g. 2 Hours)</label><input class="e-inp" placeholder="2 Hours" value="${esc(s.duration||'')}" onchange="updateSess('${s.id}','duration',this.value)"></div>
     </div>
     <div class="e-grid2">
-      <div><label class="e-label">Time Slot</label>
-        <input class="e-inp" placeholder="7:00 AM – 9:00 AM" value="${esc(s.timeSlot||'')}"></div>
+      <div><label class="e-label">Time Slot (e.g. 7:00 AM – 9:00 AM)</label><input class="e-inp" placeholder="7:00 AM – 9:00 AM" value="${esc(s.timeSlot||'')}" onchange="updateSess('${s.id}','timeSlot',this.value)"></div>
       <div><label class="e-label">Subject Header Color</label>
-        <select class="e-inp">
-          ${colorOptions.map(c=>`<option value="${c}" ${(s.subjectColor||'#1a237e')===c?'selected':''}>${c}</option>`).join('')}
-        </select></div>
+        <select class="e-inp" onchange="updateSess('${s.id}','subjectColor',this.value)">
+          ${colorOptions.map(c=>`<option value="${c}" ${(s.subjectColor||'#1a237e')===c?'selected':''} style="background:${c};color:#fff">${c}</option>`).join('')}
+        </select>
+      </div>
     </div>
-    <label class="e-label">Subject</label>
-    <input class="e-inp" placeholder="Reasoning (Pre + Mains)" value="${esc(s.subject||'')}">
+    <label class="e-label">Subject (e.g. Reasoning (Pre + Mains))</label>
+    <input class="e-inp" placeholder="Reasoning (Pre + Mains)" value="${esc(s.subject||'')}" onchange="updateSess('${s.id}','subject',this.value)">
     <label class="e-label">Goal</label>
-    <input class="e-inp" placeholder="Accuracy + puzzle solving speed" value="${esc(s.goal||'')}">
+    <input class="e-inp" placeholder="Accuracy + puzzle solving speed" value="${esc(s.goal||'')}" onchange="updateSess('${s.id}','goal',this.value)">
     <label class="e-label">Tasks</label>
-    <div class="tasks-list"></div>
-    <button class="add-task-btn" onclick="addTaskToSess('${s.id}')">＋ Task</button>`;
-
-  // Wire inputs directly to editingPlan object
-  const inputs = div.querySelectorAll('input.e-inp');
-  inputs[0].oninput = e => { s.label = e.target.value; };
-  inputs[1].oninput = e => { s.duration = e.target.value; };
-  inputs[2].oninput = e => { s.timeSlot = e.target.value; };
-  inputs[3].oninput = e => { s.subject = e.target.value; };
-  inputs[4].oninput = e => { s.goal = e.target.value; };
-  div.querySelector('select').onchange = e => { s.subjectColor = e.target.value; };
-
-  // Populate tasks
-  const tasksList = div.querySelector('.tasks-list');
-  (s.tasks||[]).forEach((t, ti) => appendTaskNode(tasksList, s, ti, t));
-
-  document.getElementById('sessions-editor').appendChild(div);
+    <div id="tasks-ed-${s.id}">
+      ${(s.tasks||[]).map((t,ti)=>`<div class="task-row"><input class="e-inp" value="${esc(t)}" onchange="updateTask('${s.id}',${ti},this.value)"><button class="del-btn" onclick="removeTask('${s.id}',${ti})">✕</button></div>`).join('')}
+    </div>
+    <button class="add-task-btn" onclick="addTaskToSess('${s.id}')">＋ Task</button>
+  </div>`;
 }
 
-function appendTaskNode(container, s, ti, value) {
-  const row = document.createElement('div');
-  row.className = 'task-row';
-  row.dataset.ti = ti;
-  const inp = document.createElement('input');
-  inp.className = 'e-inp';
-  inp.value = value || '';
-  inp.oninput = e => { s.tasks[ti] = e.target.value; };
-  const btn = document.createElement('button');
-  btn.className = 'del-btn';
-  btn.textContent = '✕';
-  btn.onclick = () => removeTask(s.id, ti);
-  row.appendChild(inp);
-  row.appendChild(btn);
-  container.appendChild(row);
-  return row;
-}
-
-// ── Mini DOM node ─────────────────────────────────────────────────────────────
-function appendMiniNode(m) {
+function renderMiniEditor(m,mi) {
   const colorOptions = ['#1a237e','#2e7d32','#6a1b9a','#c62828','#00695c','#e65100','#0277bd','#558b2f'];
-  const div = document.createElement('div');
-  div.className = 'sess-editor';
-  div.id = 'mini-ed-' + m.id;
-  div.style.padding = '12px';
-  div.innerHTML = `
+  return `<div class="sess-editor" id="mini-ed-${m.id}" style="padding:12px">
     <button class="del-btn" style="position:absolute;top:8px;right:8px" onclick="removeEditorMini('${m.id}')">✕</button>
-    <label class="e-label">Title</label><input class="e-inp" value="${esc(m.title||'')}" placeholder="Current Affairs">
-    <label class="e-label">Duration</label><input class="e-inp" value="${esc(m.duration||'')}" placeholder="40 min">
-    <label class="e-label">Time Slot</label><input class="e-inp" value="${esc(m.timeSlot||'')}" placeholder="6:00 PM – 6:40 PM">
+    <label class="e-label">Title</label><input class="e-inp" value="${esc(m.title||'')}" placeholder="Current Affairs" onchange="updateMini('${m.id}','title',this.value)">
+    <label class="e-label">Duration</label><input class="e-inp" value="${esc(m.duration||'')}" placeholder="40 min" onchange="updateMini('${m.id}','duration',this.value)">
+    <label class="e-label">Time Slot</label><input class="e-inp" value="${esc(m.timeSlot||'')}" placeholder="6:00 PM – 6:40 PM" onchange="updateMini('${m.id}','timeSlot',this.value)">
     <label class="e-label">Header Color</label>
-    <select class="e-inp">${colorOptions.map(c=>`<option value="${c}" ${(m.subjectColor||'#c62828')===c?'selected':''}>${c}</option>`).join('')}</select>
+    <select class="e-inp" onchange="updateMini('${m.id}','subjectColor',this.value)">
+      ${colorOptions.map(c=>`<option value="${c}" ${(m.subjectColor||'#c62828')===c?'selected':''}>${c}</option>`).join('')}
+    </select>
     <label class="e-label">Tasks</label>
-    <div class="tasks-list"></div>
-    <button class="add-task-btn" onclick="addMiniTask('${m.id}')">＋ Task</button>`;
-
-  const inputs = div.querySelectorAll('input.e-inp');
-  inputs[0].oninput = e => { m.title = e.target.value; };
-  inputs[1].oninput = e => { m.duration = e.target.value; };
-  inputs[2].oninput = e => { m.timeSlot = e.target.value; };
-  div.querySelector('select').onchange = e => { m.subjectColor = e.target.value; };
-
-  const tasksList = div.querySelector('.tasks-list');
-  (m.tasks||[]).forEach((t, ti) => appendMiniTaskNode(tasksList, m, ti, t));
-
-  document.getElementById('mini-editor').appendChild(div);
+    <div id="minitasks-ed-${m.id}">
+      ${(m.tasks||[]).map((t,ti)=>`<div class="task-row"><input class="e-inp" value="${esc(t)}" onchange="updateMiniTask('${m.id}',${ti},this.value)"><button class="del-btn" onclick="removeMiniTask('${m.id}',${ti})">✕</button></div>`).join('')}
+    </div>
+    <button class="add-task-btn" onclick="addMiniTask('${m.id}')">＋ Task</button>
+  </div>`;
 }
 
-function appendMiniTaskNode(container, m, ti, value) {
-  const row = document.createElement('div');
-  row.className = 'task-row';
-  const inp = document.createElement('input');
-  inp.className = 'e-inp';
-  inp.value = value || '';
-  inp.oninput = e => { m.tasks[ti] = e.target.value; };
-  const btn = document.createElement('button');
-  btn.className = 'del-btn';
-  btn.textContent = '✕';
-  btn.onclick = () => removeMiniTask(m.id, ti);
-  row.appendChild(inp);
-  row.appendChild(btn);
-  container.appendChild(row);
+function renderTargetEditor(t,ti) {
+  return `<div class="task-row" id="target-ed-${ti}"><input class="e-inp" value="${esc(t)}" placeholder="Target…" onchange="updateTarget(${ti},this.value)"><button class="del-btn" onclick="removeTarget(${ti})">✕</button></div>`;
 }
 
-// ── Target DOM node ───────────────────────────────────────────────────────────
-function appendTargetNode(value, ti) {
-  const container = document.getElementById('targets-editor');
-  const row = document.createElement('div');
-  row.className = 'task-row';
-  row.id = 'target-ed-' + ti;
-  const inp = document.createElement('input');
-  inp.className = 'e-inp';
-  inp.value = value || '';
-  inp.placeholder = 'Target…';
-  inp.oninput = e => { editingPlan.dailyTargets[ti] = e.target.value; };
-  const btn = document.createElement('button');
-  btn.className = 'del-btn';
-  btn.textContent = '✕';
-  btn.onclick = () => removeTarget(ti);
-  row.appendChild(inp);
-  row.appendChild(btn);
-  container.appendChild(row);
-}
-
-// ── Session ops (DOM-only, no full re-render) ─────────────────────────────────
+// Session ops
 function updateSess(id,k,v){ const s=editingPlan.sessions.find(s=>s.id===id); if(s) s[k]=v; }
-
-function addEditorSession() {
-  const s = {id:'s_'+Date.now(),label:'',duration:'',timeSlot:'',subjectColor:'#1a237e',subject:'',goal:'',tasks:[]};
-  editingPlan.sessions.push(s);
-  appendSessionNode(s);
-  // Scroll new session into view
-  const el = document.getElementById('sess-ed-' + s.id);
-  if (el) el.scrollIntoView({behavior:'smooth', block:'nearest'});
-}
-
-function removeEditorSession(id) {
-  editingPlan.sessions = editingPlan.sessions.filter(s => s.id !== id);
-  const el = document.getElementById('sess-ed-' + id);
-  if (el) el.remove();
-}
-
-function addTaskToSess(sessId) {
-  const s = editingPlan.sessions.find(s => s.id === sessId);
-  if (!s) return;
-  const ti = s.tasks.length;
-  s.tasks.push('');
-  const sessEl = document.getElementById('sess-ed-' + sessId);
-  if (!sessEl) return;
-  const tasksList = sessEl.querySelector('.tasks-list');
-  const newRow = appendTaskNode(tasksList, s, ti, '');
-  if (newRow) { const inp = newRow.querySelector('input'); if(inp) inp.focus(); }
-}
-
+function removeEditorSession(id){ editingPlan.sessions=editingPlan.sessions.filter(s=>s.id!==id); renderEditor(); }
+function addEditorSession(){ editingPlan.sessions.push({id:'s_'+Date.now(),label:'',duration:'',timeSlot:'',subjectColor:'#1a237e',subject:'',goal:'',tasks:[]}); renderEditor(); }
+function addTaskToSess(id){ const s=editingPlan.sessions.find(s=>s.id===id); if(s){s.tasks.push(''); renderEditor();} }
 function updateTask(id,ti,v){ const s=editingPlan.sessions.find(s=>s.id===id); if(s)s.tasks[ti]=v; }
+function removeTask(id,ti){ const s=editingPlan.sessions.find(s=>s.id===id); if(s){s.tasks.splice(ti,1); renderEditor();} }
 
-function removeTask(sessId, ti) {
-  const s = editingPlan.sessions.find(s => s.id === sessId);
-  if (!s) return;
-  s.tasks.splice(ti, 1);
-  // Rebuild just that session's task list
-  const sessEl = document.getElementById('sess-ed-' + sessId);
-  if (!sessEl) return;
-  const tasksList = sessEl.querySelector('.tasks-list');
-  tasksList.innerHTML = '';
-  s.tasks.forEach((t, newTi) => appendTaskNode(tasksList, s, newTi, t));
-}
-
-// ── Mini ops ─────────────────────────────────────────────────────────────────
+// Mini ops
 function updateMini(id,k,v){ const m=editingPlan.miniSegments.find(m=>m.id===id); if(m) m[k]=v; }
-
-function addEditorMini() {
-  const m = {id:'m_'+Date.now(),title:'',duration:'',timeSlot:'',subjectColor:'#c62828',tasks:[]};
-  editingPlan.miniSegments.push(m);
-  appendMiniNode(m);
-}
-
-function removeEditorMini(id) {
-  editingPlan.miniSegments = editingPlan.miniSegments.filter(m => m.id !== id);
-  const el = document.getElementById('mini-ed-' + id);
-  if (el) el.remove();
-}
-
-function addMiniTask(miniId) {
-  const m = editingPlan.miniSegments.find(m => m.id === miniId);
-  if (!m) return;
-  const ti = m.tasks.length;
-  m.tasks.push('');
-  const miniEl = document.getElementById('mini-ed-' + miniId);
-  if (!miniEl) return;
-  const tasksList = miniEl.querySelector('.tasks-list');
-  appendMiniTaskNode(tasksList, m, ti, '');
-}
-
+function removeEditorMini(id){ editingPlan.miniSegments=editingPlan.miniSegments.filter(m=>m.id!==id); renderEditor(); }
+function addEditorMini(){ editingPlan.miniSegments.push({id:'m_'+Date.now(),title:'',duration:'',timeSlot:'',subjectColor:'#c62828',tasks:[]}); renderEditor(); }
+function addMiniTask(id){ const m=editingPlan.miniSegments.find(m=>m.id===id); if(m){m.tasks.push(''); renderEditor();} }
 function updateMiniTask(id,ti,v){ const m=editingPlan.miniSegments.find(m=>m.id===id); if(m)m.tasks[ti]=v; }
+function removeMiniTask(id,ti){ const m=editingPlan.miniSegments.find(m=>m.id===id); if(m){m.tasks.splice(ti,1); renderEditor();} }
 
-function removeMiniTask(miniId, ti) {
-  const m = editingPlan.miniSegments.find(m => m.id === miniId);
-  if (!m) return;
-  m.tasks.splice(ti, 1);
-  const miniEl = document.getElementById('mini-ed-' + miniId);
-  if (!miniEl) return;
-  const tasksList = miniEl.querySelector('.tasks-list');
-  tasksList.innerHTML = '';
-  m.tasks.forEach((t, newTi) => appendMiniTaskNode(tasksList, m, newTi, t));
-}
-
-// ── Target ops ────────────────────────────────────────────────────────────────
+// Target ops
 function updateTarget(ti,v){ editingPlan.dailyTargets[ti]=v; }
+function removeTarget(ti){ editingPlan.dailyTargets.splice(ti,1); renderEditor(); }
+function addEditorTarget(){ editingPlan.dailyTargets.push(''); renderEditor(); }
 
-function addEditorTarget() {
-  const ti = editingPlan.dailyTargets.length;
-  editingPlan.dailyTargets.push('');
-  appendTargetNode('', ti);
-}
-
-function removeTarget(ti) {
-  editingPlan.dailyTargets.splice(ti, 1);
-  // Rebuild target list
-  const container = document.getElementById('targets-editor');
-  container.innerHTML = '';
-  editingPlan.dailyTargets.forEach((t, newTi) => appendTargetNode(t, newTi));
-}
-
-function cancelEditor() {
-  isEditing = false;
-  resumeListeners();
-  if (selectedDate === todayStr()) setEditingStatus(selectedDate, false);
-  renderDayView(selectedDate);
-  showScreen('day');
-}
+function cancelEditor() { renderDayView(selectedDate); }
 
 async function publishPlan() {
+  // Sync meta fields
+  editingPlan.examName = document.getElementById('e-examName')?.value||editingPlan.examName;
+  editingPlan.tagline  = document.getElementById('e-tagline')?.value||editingPlan.tagline;
+  editingPlan.totalTime= document.getElementById('e-totalTime')?.value||editingPlan.totalTime;
+
   const btn = document.getElementById('publish-btn');
   btn.disabled = true; btn.textContent = '💾 Publishing…';
   try {
-    await db.ref('plans/' + selectedDate).set(editingPlan);
+    await db.ref(`plans/${selectedDate}`).set(editingPlan);
     allPlans[selectedDate] = editingPlan;
-    isEditing = false;
-    resumeListeners(); // re-enable Firebase → DOM updates
-    // Clear editing status so users see the new plan
-    if (selectedDate === todayStr()) setEditingStatus(selectedDate, false);
     showToast('✅ Plan published!');
     renderDayView(selectedDate);
-    showScreen('day');
   } catch(e) {
     showToast('❌ Failed to publish — check connection');
     btn.disabled=false; btn.textContent='💾 Publish Plan';
   }
 }
-
-// Keep old renderEditor as no-op (safety); editor now lives on screen-editor
-function renderEditor() { if(isEditing) buildEditorDOM(); }
-function saveEditorState() {}
 
 /* ═══════════════════════════════════════════
    LEADERBOARD
