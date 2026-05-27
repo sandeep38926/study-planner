@@ -665,6 +665,7 @@ function switchTab(tab) {
   updateTabBar();
   if (tab === 'my') {
     // Go to today's plan directly
+    if (isEditing) return;
     selectedDate = todayStr();
     renderDayView(selectedDate);
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -742,8 +743,7 @@ function finishLogin(name, role) {
 async function openDayAfterLoad() {
   // Small delay to let Firebase load today's plan first
   await new Promise(r => setTimeout(r, 800));
-  renderDayView(todayStr());
-  showScreen('day');
+  if (!isEditing) { renderDayView(todayStr()); showScreen('day'); }
 }
 
 function updateNavBadge() {
@@ -1037,6 +1037,7 @@ function renderCalendar() {
 }
 
 function openDay(ds) {
+  if (isEditing) return;
   selectedDate = ds;
   renderDayView(ds);
   showScreen('day');
@@ -1465,7 +1466,8 @@ function openEditor(date) {
     totalTime:'', sessions:[], miniSegments:[], dailyTargets:[], date
   };
   renderEditor();
-  showScreen('day'); // editor renders inside day screen
+  // Only switch screen if not already on the day screen
+  if (!document.getElementById('screen-day').classList.contains('active')) showScreen('day');
 }
 
 function renderEditor() {
