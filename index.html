@@ -614,80 +614,79 @@ body{font-family:'Patrick Hand',cursive;font-size:22px;background:var(--bg);colo
 .edit-toggle:active{transform:scale(.97)}
 
 /* PROGRESS RING CARD */
-.ring-card{background:linear-gradient(135deg,#3d2c8d,#7b52ab);border-radius:14px;padding:11px 14px;margin-bottom:10px;display:flex;align-items:center;gap:11px;box-shadow:0 4px 16px rgba(90,50,150,.22)}
+.ring-card{background:linear-gradient(135deg,#3d2c8d,#7b52ab);border-radius:14px;padding:11px 13px;margin-bottom:10px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 16px rgba(90,50,150,.22)}
 .ring-wrap{flex-shrink:0}
 .ring-info{flex:1;color:#fff}
 .ring-name{font-family:'Patrick Hand',cursive;font-weight:700;font-size:1.05rem;line-height:1.2}
-.ring-tagline{font-size:.75rem;opacity:.85;font-style:italic;margin:2px 0 6px;font-family:'Patrick Hand',cursive}
-.ring-stats{display:flex;gap:9px}
+.ring-tagline{font-size:.78rem;opacity:.85;font-style:italic;margin:2px 0 6px;font-family:'Patrick Hand',cursive}
+.ring-stats{display:flex;gap:8px}
 .ring-stat{text-align:center}
 .ring-stat-n{font-family:'Patrick Hand',cursive;font-weight:900;font-size:1.1rem;line-height:1}
 .ring-stat-l{font-size:.62rem;opacity:.7}
 
 /* MOTIVATION */
-.motivation{background:linear-gradient(135deg,#fff8e1,#fff3e0);border-radius:10px;padding:7px 11px;margin-bottom:9px;border-left:3px solid var(--gold);font-size:.8rem;font-style:italic;color:#5d4037;font-family:'Patrick Hand',cursive;font-weight:600;box-shadow:0 2px 8px rgba(255,179,0,.12)}
+.motivation{background:linear-gradient(135deg,#fff8e1,#fff3e0);border-radius:10px;padding:7px 11px;margin-bottom:9px;border-left:3px solid var(--gold);font-size:.82rem;font-style:italic;color:#5d4037;font-family:'Patrick Hand',cursive;font-weight:600;box-shadow:0 1px 6px rgba(255,179,0,.12)}
 
 /* SESSIONS */
-.session-card{background:#fff;border-radius:12px;margin-bottom:8px;overflow:hidden;box-shadow:0 2px 10px rgba(90,50,150,.09);border:1.5px solid #ede0ff}
+.session-card{background:#fff;border-radius:12px;margin-bottom:8px;overflow:hidden;box-shadow:0 2px 10px rgba(90,50,150,.08);border:1.5px solid #ede0ff}
 .session-card.all-done{border:1.5px solid #a5d6a7;background:linear-gradient(135deg,#f0fff4,#fff)}
 .sess-header{display:flex;align-items:center;gap:7px;padding:8px 11px;cursor:pointer;user-select:none}
 .sess-header:active{background:#fafbff}
 .sess-icon{font-size:.95rem;flex-shrink:0}
 .sess-info{flex:1}
-.sess-label{font-weight:700;font-size:.85rem;color:var(--navy);font-family:'Patrick Hand',cursive}
-.sess-sub{font-size:.68rem;color:#888;margin-top:1px}
+.sess-label{font-weight:700;font-size:.88rem;color:var(--navy);font-family:'Patrick Hand',cursive}
+.sess-sub{font-size:.72rem;color:#888;margin-top:1px}
 .sess-right{display:flex;align-items:center;gap:5px}
-.sess-pct{font-size:.75rem;font-weight:700;color:var(--green)}
-.done-badge{background:var(--green);color:#fff;font-size:.62rem;font-weight:800;padding:2px 6px;border-radius:6px}
+.sess-pct{font-size:.78rem;font-weight:700;color:var(--green)}
+.done-badge{background:var(--green);color:#fff;font-size:.68rem;font-weight:800;padding:1px 6px;border-radius:6px}
 .chevron{font-size:.75rem;color:#bbb;transition:transform .2s}
 .chevron.open{transform:rotate(180deg)}
 .sess-prog{height:2px;background:#f0f2ff}
 .sess-prog-fill{height:100%;transition:width .4s}
-/* sess-body uses flex so goal floats right */
-.sess-body{display:flex;gap:8px;padding:7px 11px 9px;border-top:1px solid #f0f2ff}
-.sess-tasks{flex:1;min-width:0}
-.sess-goal-box{width:72px;flex-shrink:0;background:#f5f0ff;border-radius:8px;padding:6px 7px;display:flex;flex-direction:column;align-items:center;gap:3px;align-self:flex-start}
-.sess-goal-icon{font-size:.85rem}
-.sess-goal-lbl{font-size:.52rem;font-weight:800;color:#7b52ab;text-transform:uppercase;letter-spacing:.4px}
-.sess-goal-txt{font-size:.6rem;color:#555;text-align:center;line-height:1.4}
+.sess-body{padding:7px 10px 9px;border-top:1px solid #f0f2ff}
 
 /* TICK ROWS */
-.tick-row{display:flex;align-items:center;gap:6px;padding:5px 6px;border-radius:7px;cursor:pointer;margin-bottom:2px;border:1px solid transparent;transition:.12s}
+.tick-row{display:flex;align-items:center;gap:6px;padding:5px 7px;border-radius:7px;cursor:pointer;margin-bottom:2px;border:1px solid transparent;transition:.12s}
 .tick-row:active{transform:scale(.98)}
 .tick-row.done{background:linear-gradient(135deg,#f0fff4,#e8f5e9);border-color:#c8e6c9}
-.tick-box{width:18px;height:18px;border-radius:5px;border:2px solid #ce93d8;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s;font-size:.7rem;color:#fff}
+.tick-box{width:18px;height:18px;border-radius:5px;border:2px solid #ce93d8;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s;font-size:.72rem;color:#fff}
 .tick-row.done .tick-box{background:#66bb6a;border-color:#66bb6a}
-.tick-label{font-size:.75rem;font-weight:500;flex:1;line-height:1.35}
+.tick-label{font-size:.78rem;font-weight:600;flex:1;line-height:1.35}
 .tick-row.done .tick-label{text-decoration:line-through;color:#bbb}
+.sess-goal{font-size:.62rem;color:#7b52ab;background:linear-gradient(135deg,#f3eaff,#ede0ff);border-radius:10px;padding:8px 9px;text-align:center;width:72px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;box-shadow:0 2px 8px rgba(123,82,171,.12);border:1px solid #e4d4ff;align-self:flex-start;margin-top:2px}
+.sess-goal-icon{font-size:1.3rem;line-height:1}
+.sess-goal-label{font-size:.52rem;font-weight:800;color:#9c6dd8;text-transform:uppercase;letter-spacing:.6px}
+.sess-goal-text{font-size:.6rem;color:#6a3fa0;font-weight:600;line-height:1.3;word-break:break-word}
+.sess-body-inner{display:flex;gap:8px;align-items:flex-start}
 
 /* MINI GRID */
 .mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px}
-.mini-card{background:#fff;border-radius:10px;overflow:hidden;box-shadow:var(--shadow)}
+.mini-card{background:#fff;border-radius:9px;overflow:hidden;box-shadow:var(--shadow)}
 .mini-header{padding:5px 8px;display:flex;align-items:center;justify-content:space-between}
 .mini-title-text{color:#fff;font-weight:800;font-size:.72rem}
 .mini-dur{color:rgba(255,255,255,.75);font-size:.62rem}
 .mini-prog{height:2px;background:rgba(255,255,255,.3)}
 .mini-prog-fill{height:100%;background:rgba(255,255,255,.8);transition:width .3s}
-.mini-body{padding:6px 8px}
+.mini-body{padding:5px 8px}
 .mini-tick{display:flex;align-items:center;gap:5px;padding:3px 5px;border-radius:5px;cursor:pointer;margin-bottom:1px}
 .mini-tick:active{transform:scale(.97)}
-.mini-tick-box{width:14px;height:14px;border-radius:3px;border:1.5px solid #bdbdbd;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.58rem;color:#fff}
+.mini-tick-box{width:14px;height:14px;border-radius:3px;border:1.5px solid #bdbdbd;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.6rem;color:#fff}
 .mini-tick.done .mini-tick-box{background:var(--green);border-color:var(--green)}
-.mini-tick-label{font-size:.68rem;flex:1;line-height:1.3}
+.mini-tick-label{font-size:.7rem;flex:1;line-height:1.3}
 .mini-tick.done .mini-tick-label{text-decoration:line-through;color:#bbb}
 
 /* DAILY TARGETS */
-.targets-card{background:linear-gradient(135deg,#3d2c8d,#7b52ab);border-radius:12px;padding:9px 12px;margin-bottom:10px;box-shadow:0 3px 12px rgba(90,50,150,.18)}
+.targets-card{background:linear-gradient(135deg,#3d2c8d,#7b52ab);border-radius:12px;padding:9px 11px;margin-bottom:9px;box-shadow:0 3px 12px rgba(90,50,150,.18)}
 .targets-title{color:var(--gold);font-weight:800;font-size:.72rem;text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px}
 .targets-pills{display:flex;flex-wrap:wrap;gap:5px}
-.target-pill{background:rgba(255,255,255,.15);border:none;border-radius:6px;padding:4px 9px;color:#fff;font-size:.7rem;font-weight:600;cursor:pointer;font-family:Poppins,sans-serif;transition:.12s}
+.target-pill{background:rgba(255,255,255,.15);border:none;border-radius:6px;padding:4px 9px;color:#fff;font-size:.72rem;font-weight:600;cursor:pointer;font-family:Poppins,sans-serif;transition:.12s}
 .target-pill:active{transform:scale(.95)}
 .target-pill.done{background:rgba(46,125,50,.55);text-decoration:line-through;opacity:.8}
 
 /* COMPLETE BANNER */
-.complete-banner{background:linear-gradient(135deg,#e8f5e9,#f0fff4);border:1.5px solid #a5d6a7;border-radius:12px;padding:13px;text-align:center;margin-top:6px;box-shadow:0 3px 10px rgba(46,125,50,.12)}
+.complete-banner{background:linear-gradient(135deg,#e8f5e9,#f0fff4);border:1.5px solid #a5d6a7;border-radius:12px;padding:12px;text-align:center;margin-top:6px;box-shadow:0 3px 10px rgba(46,125,50,.12)}
 .complete-banner .emoji{font-size:2rem}
-.complete-banner h3{font-family:'Patrick Hand',cursive;font-weight:700;color:var(--green);font-size:1.2rem;margin:3px 0 2px}
+.complete-banner h3{font-family:'Patrick Hand',cursive;font-weight:700;color:var(--green);font-size:1.15rem;margin:3px 0 2px}
 .complete-banner p{color:#388e3c;font-size:.78rem;font-family:'Patrick Hand',cursive}
 
 /* NO PLAN */
@@ -1004,6 +1003,41 @@ let isOnline = navigator.onLine;
 
 function todayStr() { return new Date().toISOString().split('T')[0]; }
 function dateStr(y,m,d) { return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
+
+/* ── Midnight date rollover ────────────────────────────────────
+   Schedules a refresh at exactly 00:00:00 local time each night.
+   Re-renders whichever screen is currently visible so "today"
+   highlights jump to the new date without a page reload.
+─────────────────────────────────────────────────────────────── */
+function scheduleMidnightRefresh() {
+  const now  = new Date();
+  // ms remaining until next local midnight
+  const msToMidnight = new Date(
+    now.getFullYear(), now.getMonth(), now.getDate() + 1,
+    0, 0, 0, 0
+  ) - now;
+
+  setTimeout(function onMidnight() {
+    const fresh = new Date();
+    // Sync the calendar month/year in case the month just rolled
+    calYear  = fresh.getFullYear();
+    calMonth = fresh.getMonth();
+
+    // Re-render whichever screen is active
+    const activeScreen = document.querySelector('.screen.active');
+    if (activeScreen) {
+      const id = activeScreen.id;
+      if (id === 'screen-calendar')    renderCalendar();
+      else if (id === 'screen-day')    renderDayView(selectedDate);
+      else if (id === 'screen-lb')     renderLeaderboard();
+    }
+
+    // Re-schedule for the NEXT midnight (handles multi-night stays)
+    scheduleMidnightRefresh();
+  }, msToMidnight);
+}
+// Kick off on app load
+scheduleMidnightRefresh();
 function daysInMonth(y,m) { return new Date(y,m+1,0).getDate(); }
 function firstDay(y,m) { return new Date(y,m,1).getDay(); }
 function fmtDisplay(ds) {
@@ -1646,13 +1680,13 @@ function renderDayView(date) {
   // ── Hero progress ring card (peer-view style) ──
   html += `<div class="ring-card" style="background:${theme.grad};margin-bottom:10px">
     <div class="ring-wrap">
-      <svg width="72" height="72">
-        <circle cx="36" cy="36" r="30" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="5"/>
-        <circle cx="36" cy="36" r="30" fill="none" stroke="${pct===100?'#69f0ae':theme.accent}" stroke-width="5"
-          stroke-dasharray="${2*Math.PI*30}" stroke-dashoffset="${2*Math.PI*30*(1-pct/100)}"
-          stroke-linecap="round" style="transform:rotate(-90deg);transform-origin:36px 36px;transition:stroke-dashoffset .8s ease"/>
-        <text x="36" y="33" text-anchor="middle" fill="white" font-size="12" font-weight="900" font-family="Nunito,sans-serif">${pct}%</text>
-        <text x="36" y="43" text-anchor="middle" fill="rgba(255,255,255,.7)" font-size="6.5" font-family="Poppins,sans-serif">DONE</text>
+      <svg width="76" height="76">
+        <circle cx="38" cy="38" r="31" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="5"/>
+        <circle cx="38" cy="38" r="31" fill="none" stroke="${pct===100?'#69f0ae':theme.accent}" stroke-width="5"
+          stroke-dasharray="${2*Math.PI*31}" stroke-dashoffset="${2*Math.PI*31*(1-pct/100)}"
+          stroke-linecap="round" style="transform:rotate(-90deg);transform-origin:38px 38px;transition:stroke-dashoffset .8s ease"/>
+        <text x="38" y="35" text-anchor="middle" fill="white" font-size="13" font-weight="900" font-family="Nunito,sans-serif">${pct}%</text>
+        <text x="38" y="47" text-anchor="middle" fill="rgba(255,255,255,.7)" font-size="7" font-family="Poppins,sans-serif">DONE</text>
       </svg>
     </div>
     <div class="ring-info">
@@ -1670,7 +1704,7 @@ function renderDayView(date) {
   html += `<div class="motivation">
     <span style="font-size:1rem;margin-right:6px">${quote.e}</span>
     <span style="font-style:italic;font-size:.8rem">"${quote.q}"</span>
-    <div style="font-size:.65rem;color:#999;margin-top:3px;font-weight:600">— ${quote.a}</div>
+    <div style="font-size:.68rem;color:#9e7c60;margin-top:2px;font-weight:600">— ${quote.a}</div>
   </div>`;
 
   // ── Milestone nudge ──
@@ -1679,11 +1713,11 @@ function renderDayView(date) {
     const nextM = MILESTONES.find(m => m.at > pct);
     if (nextM) {
       const remaining = keys.length - done;
-      html += `<div style="background:linear-gradient(90deg,rgba(255,255,255,.12),rgba(255,255,255,.06));border:1.5px solid ${theme.accent};border-radius:12px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;backdrop-filter:blur(4px)">
-        <span style="font-size:1.4rem">${nextM.emoji}</span>
+      html += `<div style="background:linear-gradient(90deg,rgba(255,255,255,.12),rgba(255,255,255,.06));border:1px solid ${theme.accent};border-radius:8px;padding:6px 10px;margin-bottom:9px;display:flex;align-items:center;gap:7px;backdrop-filter:blur(4px)">
+        <span style="font-size:.9rem">${nextM.emoji}</span>
         <div>
-          <div style="font-size:.8rem;font-weight:700;color:${theme.accent}">${nextM.msg} — only ${remaining} task${remaining>1?'s':''} to go!</div>
-          <div style="font-size:.7rem;color:${theme.accent};opacity:.75;margin-top:2px">Next milestone at ${nextM.at}% 🎯</div>
+          <div style="font-size:.65rem;font-weight:700;color:${theme.accent}">${nextM.msg} — only ${remaining} task${remaining>1?'s':''} to go!</div>
+          <div style="font-size:.58rem;color:${theme.accent};opacity:.75;margin-top:1px">Next milestone at ${nextM.at}% 🎯</div>
         </div>
       </div>`;
     }
@@ -1702,7 +1736,7 @@ function renderDayView(date) {
         <div class="sess-info">
           <div class="sess-label">${esc(s.label||'Session')}</div>
           <div class="sess-sub">${esc(s.subject||'')}${s.duration?' · '+esc(s.duration):''}</div>
-          ${s.timeSlot?`<div style="font-size:.62rem;color:#aaa;margin-top:1px">🕐 ${esc(s.timeSlot)}</div>`:''}
+          ${s.timeSlot?`<div style="font-size:.65rem;color:#aaa;margin-top:1px">🕐 ${esc(s.timeSlot)}</div>`:''}
         </div>
         <div class="sess-right">
           ${sPct===100
@@ -1713,23 +1747,25 @@ function renderDayView(date) {
       </div>
       <div class="sess-prog"><div class="sess-prog-fill" style="width:${sPct}%;background:${subCol}"></div></div>
       <div class="sess-body" id="sb-${s.id}">
-        <div class="sess-tasks">
-          ${tasks.map((t,ti) => {
-            const k=`${s.id}_${ti}`, isDone=!!myProg[k];
-            return `<div class="tick-row${isDone?' done':''}" onclick="toggleTask('${date}','${k}',this)">
-              <div class="tick-box" style="${isDone?`background:${subCol};border-color:${subCol}`:'border-color:'+subCol}">${isDone?'✓':''}</div>
-              <span class="tick-label">${esc(t)}</span>
-              ${isDone?`<span style="font-size:.7rem;opacity:.65">✨</span>`:''}
-            </div>`;
-          }).join('')}
-          ${!tasks.length?`<div style="font-size:.7rem;color:#ccc;padding:6px;text-align:center">No tasks</div>`:''}
-          ${sPct===100?`<div style="text-align:center;padding:4px 0 1px;font-size:.7rem;font-weight:700;color:#2e7d32">🎉 Complete!</div>`:''}
+        <div class="sess-body-inner">
+          <div style="flex:1;min-width:0">
+            ${tasks.map((t,ti) => {
+              const k=`${s.id}_${ti}`, isDone=!!myProg[k];
+              return `<div class="tick-row${isDone?' done':''}" onclick="toggleTask('${date}','${k}',this)">
+                <div class="tick-box" style="${isDone?`background:${subCol};border-color:${subCol}`:'border-color:'+subCol}">${isDone?'✓':''}</div>
+                <span class="tick-label">${esc(t)}</span>
+                ${isDone?`<span style="font-size:.7rem;opacity:.6">✨</span>`:''}
+              </div>`;
+            }).join('')}
+            ${!tasks.length?`<div style="font-size:.72rem;color:#ccc;padding:6px;text-align:center">No tasks</div>`:''}
+            ${sPct===100?`<div style="text-align:center;padding:4px 0 1px;font-size:.72rem;font-weight:700;color:#2e7d32">🎉 Session Complete!</div>`:''}
+          </div>
+          ${s.goal?`<div class="sess-goal">
+            <span class="sess-goal-icon">🎯</span>
+            <span class="sess-goal-label">Goal</span>
+            <span class="sess-goal-text">${esc(s.goal)}</span>
+          </div>`:''}
         </div>
-        ${s.goal?`<div class="sess-goal-box">
-          <span class="sess-goal-icon">🎯</span>
-          <span class="sess-goal-lbl">Goal</span>
-          <span class="sess-goal-txt">${esc(s.goal)}</span>
-        </div>`:''}
       </div>
     </div>`;
   });
@@ -1757,7 +1793,7 @@ function renderDayView(date) {
           <span class="mini-title-text">${esc(m.title||'Segment')}</span>
           <span class="mini-dur">${esc(m.duration||'')}${mPct===100?' ✅':` ${mPct}%`}</span>
         </div>
-        ${m.timeSlot?`<div style="font-size:.6rem;color:#aaa;padding:2px 8px">🕐 ${esc(m.timeSlot)}</div>`:''}
+        ${m.timeSlot?`<div style="font-size:.62rem;color:#aaa;padding:2px 8px">🕐 ${esc(m.timeSlot)}</div>`:''}
         <div class="mini-prog"><div class="mini-prog-fill" style="width:${mPct}%;background:${col}"></div></div>
         <div class="mini-body">
           ${tasks.map((t,ti)=>{
@@ -1767,8 +1803,8 @@ function renderDayView(date) {
               <span class="mini-tick-label">${esc(t)}</span>
             </div>`;
           }).join('')}
-          ${!tasks.length?`<p style="font-size:.92rem;color:#ccc;text-align:center;padding:5px">No tasks</p>`:''}
-          ${mPct===100?`<div style="text-align:center;font-size:.8rem;color:#2e7d32;font-weight:700;padding-top:4px">✅ Done!</div>`:''}
+          ${!tasks.length?`<p style="font-size:.65rem;color:#ccc;text-align:center;padding:3px">No tasks</p>`:''}
+          ${mPct===100?`<div style="text-align:center;font-size:.65rem;color:#2e7d32;font-weight:700;padding-top:3px">✅ Done!</div>`:''}
         </div>
       </div>`;
     });
@@ -1780,10 +1816,10 @@ function renderDayView(date) {
     const tDone = (plan.dailyTargets||[]).filter((_,ti)=>myProg[`daily_${ti}`]).length;
     const tTotal = plan.dailyTargets.length;
     html += `<div class="targets-card" style="background:${theme.grad}">
-      <div class="targets-title">🎯 Daily Targets${plan.totalTime?` <span style="float:right;font-size:.85rem;opacity:.8">⏱️ ${esc(plan.totalTime)}</span>`:''}
+      <div class="targets-title">🎯 Daily Targets${plan.totalTime?` <span style="float:right;font-size:.65rem;opacity:.8">⏱️ ${esc(plan.totalTime)}</span>`:''}
       </div>
-      <div style="height:4px;background:rgba(255,255,255,.2);border-radius:3px;margin-bottom:10px;overflow:hidden">
-        <div style="height:100%;width:${tTotal?Math.round(tDone/tTotal*100):0}%;background:${theme.accent};border-radius:3px;transition:width .5s"></div>
+      <div style="height:3px;background:rgba(255,255,255,.2);border-radius:2px;margin-bottom:7px;overflow:hidden">
+        <div style="height:100%;width:${tTotal?Math.round(tDone/tTotal*100):0}%;background:${theme.accent};border-radius:2px;transition:width .5s"></div>
       </div>
       <div class="targets-pills">
         ${(plan.dailyTargets||[]).map((t,ti)=>{
@@ -1815,10 +1851,2840 @@ function renderDayView(date) {
       <p>${celebMsg}</p>
     </div>`;
   } else if (pct === 0 && keys.length > 0) {
-    html += `<div style="background:#fff;border:2px dashed #c5cae9;border-radius:14px;padding:16px;text-align:center;margin-top:4px">
-      <div style="font-size:2rem;margin-bottom:6px">🚀</div>
-      <div style="font-weight:700;color:#1a237e;font-size:1.1rem">Ready to start your day?</div>
-      <div style="color:#888;font-size:1rem;margin-top:4px">Tap any task above to begin. You've got this, ${esc(userName)}!</div>
+    html += `<div style="background:#fff;border:1.5px dashed #c5cae9;border-radius:10px;padding:10px;text-align:center;margin-top:3px">
+      <div style="font-size:1.3rem;margin-bottom:3px">🚀</div>
+      <div style="font-weight:700;color:#1a237e;font-size:.82rem">Ready to start your day?</div>
+      <div style="color:#888;font-size:.72rem;margin-top:2px">Tap any task above to begin. You've got this, ${esc(userName)}!</div>
+    </div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+function toggleSessionBody(bodyId, chevId) {
+  const body = document.getElementById(bodyId);
+  const chev = document.getElementById(chevId);
+  if (!body) return;
+  const hidden = body.style.display === 'none';
+  body.style.display = hidden ? 'block' : 'none';
+  if (chev) chev.style.transform = hidden ? 'rotate(180deg)' : 'rotate(0deg)';
+}
+
+function toggleSection(header) {
+  const body = header.nextElementSibling?.nextElementSibling;
+  if (!body) return;
+  const chevron = header.querySelector('.chevron');
+  if (body.style.display === 'none') { body.style.display='block'; chevron&&chevron.classList.add('open'); }
+  else { body.style.display='none'; chevron&&chevron.classList.remove('open'); }
+}
+
+async function toggleTask(date, key, el) {
+  if (!db) return;
+  const myProg = getMyProgress(date);
+  const newVal = !myProg[key];
+  // Optimistic local update
+  if (!allProgress[date]) allProgress[date] = {};
+  if (!allProgress[date][userName]) allProgress[date][userName] = {};
+  allProgress[date][userName][key] = newVal;
+  renderDayView(date);
+  // Write to Firebase
+  try {
+    await db.ref(`progress/${date}/${userName}/${key}`).set(newVal);
+  } catch(e) {
+    showToast('⚠️ Sync failed — check connection');
+  }
+}
+
+/* ═══════════════════════════════════════════
+   EDITOR
+═══════════════════════════════════════════ */
+function openEditor(date) {
+  selectedDate = date;
+  editingPlan = allPlans[date] ? JSON.parse(JSON.stringify(allPlans[date])) : {
+    examName:'Study Plan', tagline:'Plan Your Day, Ace Your Exam!',
+    totalTime:'', sessions:[], miniSegments:[], dailyTargets:[], date
+  };
+  renderEditor();
+  showScreen('day'); // editor renders inside day screen
+}
+
+function renderEditor() {
+  const plan = editingPlan;
+  const inp = 'class="e-inp"';
+  let html = `<div class="day-back">
+    <button onclick="cancelEditor()">‹ Back</button>
+    <div class="day-title"><h2>${fmtDisplay(selectedDate)}</h2><p>Edit Plan</p></div>
+  </div>`;
+
+  // Meta
+  html += `<div class="e-card">
+    <div class="e-card-title" style="color:var(--navy)">🏷️ Plan Details</div>
+    <div class="e-grid2">
+      <div><label class="e-label">Exam / Course</label><input ${inp} id="e-examName" value="${esc(plan.examName||'')}" placeholder="SBI PO 2026"></div>
+      <div><label class="e-label">Total Study Time</label><input ${inp} id="e-totalTime" value="${esc(plan.totalTime||'')}" placeholder="7–8 Hrs"></div>
+    </div>
+    <label class="e-label">Tagline</label>
+    <input ${inp} id="e-tagline" value="${esc(plan.tagline||'')}" placeholder="Plan Your Day, Ace Your Exam!">
+  </div>`;
+
+  // Sessions
+  html += `<div class="e-card">
+    <div class="e-card-title" style="color:var(--blue)">📚 Study Sessions</div>
+    <div id="sessions-editor">`;
+  (plan.sessions||[]).forEach((s,si) => { html += renderSessionEditor(s,si); });
+  html += `</div>
+    <button class="add-section-btn" onclick="addEditorSession()">＋ Add Session</button>
+  </div>`;
+
+  // Mini segments
+  html += `<div class="e-card">
+    <div class="e-card-title" style="color:var(--orange)">📰 Short Segments</div>
+    <div id="mini-editor" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">`;
+  (plan.miniSegments||[]).forEach((m,mi) => { html += renderMiniEditor(m,mi); });
+  html += `</div>
+    <button class="add-section-btn" onclick="addEditorMini()">＋ Add Short Segment</button>
+  </div>`;
+
+  // Targets
+  html += `<div class="e-card">
+    <div class="e-card-title" style="color:var(--green)">🎯 Daily Targets</div>
+    <div id="targets-editor">`;
+  (plan.dailyTargets||[]).forEach((t,ti) => { html += renderTargetEditor(t,ti); });
+  html += `</div>
+    <button class="add-section-btn" onclick="addEditorTarget()">＋ Add Target</button>
+  </div>`;
+
+  html += `<button class="publish-btn" id="publish-btn" onclick="publishPlan()">💾 Publish Plan</button>`;
+
+  document.getElementById('day-content').innerHTML = html;
+}
+
+function renderSessionEditor(s,si) {
+  const colorOptions = ['#1a237e','#2e7d32','#6a1b9a','#c62828','#00695c','#e65100','#0277bd','#558b2f'];
+  return `<div class="sess-editor" id="sess-ed-${s.id}">
+    <button class="remove-sess-btn" onclick="removeEditorSession('${s.id}')">🗑 Remove</button>
+    <div class="e-grid2">
+      <div><label class="e-label">Label (e.g. Morning)</label><input class="e-inp" placeholder="Morning" value="${esc(s.label||'')}" onchange="updateSess('${s.id}','label',this.value)"></div>
+      <div><label class="e-label">Duration (e.g. 2 Hours)</label><input class="e-inp" placeholder="2 Hours" value="${esc(s.duration||'')}" onchange="updateSess('${s.id}','duration',this.value)"></div>
+    </div>
+    <div class="e-grid2">
+      <div><label class="e-label">Time Slot (e.g. 7:00 AM – 9:00 AM)</label><input class="e-inp" placeholder="7:00 AM – 9:00 AM" value="${esc(s.timeSlot||'')}" onchange="updateSess('${s.id}','timeSlot',this.value)"></div>
+      <div><label class="e-label">Subject Header Color</label>
+        <select class="e-inp" onchange="updateSess('${s.id}','subjectColor',this.value)">
+          ${colorOptions.map(c=>`<option value="${c}" ${(s.subjectColor||'#1a237e')===c?'selected':''} style="background:${c};color:#fff">${c}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <label class="e-label">Subject (e.g. Reasoning (Pre + Mains))</label>
+    <input class="e-inp" placeholder="Reasoning (Pre + Mains)" value="${esc(s.subject||'')}" onchange="updateSess('${s.id}','subject',this.value)">
+    <label class="e-label">Goal</label>
+    <input class="e-inp" placeholder="Accuracy + puzzle solving speed" value="${esc(s.goal||'')}" onchange="updateSess('${s.id}','goal',this.value)">
+    <label class="e-label">Tasks</label>
+    <div id="tasks-ed-${s.id}">
+      ${(s.tasks||[]).map((t,ti)=>`<div class="task-row"><input class="e-inp" value="${esc(t)}" onchange="updateTask('${s.id}',${ti},this.value)"><button class="del-btn" onclick="removeTask('${s.id}',${ti})">✕</button></div>`).join('')}
+    </div>
+    <button class="add-task-btn" onclick="addTaskToSess('${s.id}')">＋ Task</button>
+  </div>`;
+}
+
+function renderMiniEditor(m,mi) {
+  const colorOptions = ['#1a237e','#2e7d32','#6a1b9a','#c62828','#00695c','#e65100','#0277bd','#558b2f'];
+  return `<div class="sess-editor" id="mini-ed-${m.id}" style="padding:12px">
+    <button class="del-btn" style="position:absolute;top:8px;right:8px" onclick="removeEditorMini('${m.id}')">✕</button>
+    <label class="e-label">Title</label><input class="e-inp" value="${esc(m.title||'')}" placeholder="Current Affairs" onchange="updateMini('${m.id}','title',this.value)">
+    <label class="e-label">Duration</label><input class="e-inp" value="${esc(m.duration||'')}" placeholder="40 min" onchange="updateMini('${m.id}','duration',this.value)">
+    <label class="e-label">Time Slot</label><input class="e-inp" value="${esc(m.timeSlot||'')}" placeholder="6:00 PM – 6:40 PM" onchange="updateMini('${m.id}','timeSlot',this.value)">
+    <label class="e-label">Header Color</label>
+    <select class="e-inp" onchange="updateMini('${m.id}','subjectColor',this.value)">
+      ${colorOptions.map(c=>`<option value="${c}" ${(m.subjectColor||'#c62828')===c?'selected':''}>${c}</option>`).join('')}
+    </select>
+    <label class="e-label">Tasks</label>
+    <div id="minitasks-ed-${m.id}">
+      ${(m.tasks||[]).map((t,ti)=>`<div class="task-row"><input class="e-inp" value="${esc(t)}" onchange="updateMiniTask('${m.id}',${ti},this.value)"><button class="del-btn" onclick="removeMiniTask('${m.id}',${ti})">✕</button></div>`).join('')}
+    </div>
+    <button class="add-task-btn" onclick="addMiniTask('${m.id}')">＋ Task</button>
+  </div>`;
+}
+
+function renderTargetEditor(t,ti) {
+  return `<div class="task-row" id="target-ed-${ti}"><input class="e-inp" value="${esc(t)}" placeholder="Target…" onchange="updateTarget(${ti},this.value)"><button class="del-btn" onclick="removeTarget(${ti})">✕</button></div>`;
+}
+
+// Session ops
+function updateSess(id,k,v){ const s=editingPlan.sessions.find(s=>s.id===id); if(s) s[k]=v; }
+function removeEditorSession(id){ editingPlan.sessions=editingPlan.sessions.filter(s=>s.id!==id); renderEditor(); }
+function addEditorSession(){ editingPlan.sessions.push({id:'s_'+Date.now(),label:'',duration:'',timeSlot:'',subjectColor:'#1a237e',subject:'',goal:'',tasks:[]}); renderEditor(); }
+function addTaskToSess(id){ const s=editingPlan.sessions.find(s=>s.id===id); if(s){s.tasks.push(''); renderEditor();} }
+function updateTask(id,ti,v){ const s=editingPlan.sessions.find(s=>s.id===id); if(s)s.tasks[ti]=v; }
+function removeTask(id,ti){ const s=editingPlan.sessions.find(s=>s.id===id); if(s){s.tasks.splice(ti,1); renderEditor();} }
+
+// Mini ops
+function updateMini(id,k,v){ const m=editingPlan.miniSegments.find(m=>m.id===id); if(m) m[k]=v; }
+function removeEditorMini(id){ editingPlan.miniSegments=editingPlan.miniSegments.filter(m=>m.id!==id); renderEditor(); }
+function addEditorMini(){ editingPlan.miniSegments.push({id:'m_'+Date.now(),title:'',duration:'',timeSlot:'',subjectColor:'#c62828',tasks:[]}); renderEditor(); }
+function addMiniTask(id){ const m=editingPlan.miniSegments.find(m=>m.id===id); if(m){m.tasks.push(''); renderEditor();} }
+function updateMiniTask(id,ti,v){ const m=editingPlan.miniSegments.find(m=>m.id===id); if(m)m.tasks[ti]=v; }
+function removeMiniTask(id,ti){ const m=editingPlan.miniSegments.find(m=>m.id===id); if(m){m.tasks.splice(ti,1); renderEditor();} }
+
+// Target ops
+function updateTarget(ti,v){ editingPlan.dailyTargets[ti]=v; }
+function removeTarget(ti){ editingPlan.dailyTargets.splice(ti,1); renderEditor(); }
+function addEditorTarget(){ editingPlan.dailyTargets.push(''); renderEditor(); }
+
+function cancelEditor() { renderDayView(selectedDate); }
+
+async function publishPlan() {
+  // Sync meta fields
+  editingPlan.examName = document.getElementById('e-examName')?.value||editingPlan.examName;
+  editingPlan.tagline  = document.getElementById('e-tagline')?.value||editingPlan.tagline;
+  editingPlan.totalTime= document.getElementById('e-totalTime')?.value||editingPlan.totalTime;
+
+  const btn = document.getElementById('publish-btn');
+  btn.disabled = true; btn.textContent = '💾 Publishing…';
+  try {
+    await db.ref(`plans/${selectedDate}`).set(editingPlan);
+    allPlans[selectedDate] = editingPlan;
+    showToast('✅ Plan published!');
+    renderDayView(selectedDate);
+  } catch(e) {
+    showToast('❌ Failed to publish — check connection');
+    btn.disabled=false; btn.textContent='💾 Publish Plan';
+  }
+}
+
+/* ═══════════════════════════════════════════
+   LEADERBOARD
+═══════════════════════════════════════════ */
+const AVATAR_COLORS = ['#1a237e','#2e7d32','#6a1b9a','#e65100','#00695c','#c62828','#0277bd','#558b2f','#4527a0','#ad1457'];
+let lbDate = todayStr();
+let lbViewMonth = new Date().getMonth();
+let lbViewYear  = new Date().getFullYear();
+
+function avatarColor(name) {
+  let h = 0; for(let i=0;i<name.length;i++) h = (h*31+name.charCodeAt(i))&0xffffffff;
+  return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+}
+function avatarInitial(name) { return name.trim().charAt(0).toUpperCase(); }
+
+function getUserPct(uname, date) {
+  const plan = allPlans[date];
+  if (!plan) return null;
+  const keys = getPlanTaskKeys(plan);
+  if (!keys.length) return null;
+  const prog = (allProgress[date] && allProgress[date][uname]) || {};
+  return Math.round(keys.filter(k=>prog[k]).length / keys.length * 100);
+}
+
+function getStreak(uname) {
+  // Count consecutive days up to today where user completed ≥1 task
+  let streak = 0;
+  const today = new Date();
+  for (let i=0; i<60; i++) {
+    const d = new Date(today); d.setDate(today.getDate() - i);
+    const ds = d.toISOString().split('T')[0];
+    const plan = allPlans[ds];
+    if (!plan) continue;
+    const keys = getPlanTaskKeys(plan);
+    const prog = (allProgress[ds] && allProgress[ds][uname]) || {};
+    const done = keys.filter(k=>prog[k]).length;
+    if (done > 0) streak++;
+    else if (i > 0) break; // gap in streak
+  }
+  return streak;
+}
+
+function getAllUsers() {
+  // Gather all users from allProgress and allPlans
+  const names = new Set();
+  Object.values(allProgress).forEach(dayProg => {
+    Object.keys(dayProg||{}).forEach(n => names.add(n));
+  });
+  return [...names];
+}
+
+function renderLeaderboard() {
+  const container = document.getElementById('lb-content');
+  const users = getAllUsers();
+  const plan = allPlans[lbDate];
+
+  // Build sorted list by pct for lbDate
+  let ranked = users.map(u => ({
+    name: u,
+    pct: getUserPct(u, lbDate) ?? 0,
+    hasPlan: !!plan,
+    streak: getStreak(u),
+    color: avatarColor(u),
+  })).sort((a,b) => b.pct - a.pct || a.name.localeCompare(b.name));
+
+  const fmtLbDate = (ds) => {
+    const d = new Date(ds+'T12:00:00');
+    return d.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+  };
+
+  let html = `<div class="lb-header">
+    <h2>🏆 Leaderboard</h2>
+    <p>See how everyone is doing · tap a name to view their plan</p>
+  </div>
+  <div class="lb-date-row">
+    <button class="lb-date-btn" onclick="lbChangeDate(-1)">‹</button>
+    <span class="lb-date-label">${fmtLbDate(lbDate)}</span>
+    <button class="lb-date-btn" onclick="lbChangeDate(1)">›</button>
+  </div>`;
+
+  if (!plan) {
+    html += `<div class="lb-no-data">📭 No plan published for this day yet.<br><span style="font-size:1rem">Navigate to a day with a plan.</span></div>`;
+  } else if (!ranked.length) {
+    html += `<div class="lb-no-data">👥 No users have logged in yet.</div>`;
+  } else {
+    // Podium (top 3)
+    if (ranked.length >= 2) {
+      const podiumOrder = ranked.length >= 3
+        ? [ranked[1], ranked[0], ranked[2]]
+        : [ranked[1], ranked[0]];
+      const podiumRanks = ranked.length >= 3 ? ['rank2','rank1','rank3'] : ['rank2','rank1'];
+      const podiumLabels = ranked.length >= 3 ? ['2nd','1st','3rd'] : ['2nd','1st'];
+
+      html += `<div class="lb-top3">`;
+      podiumOrder.forEach((u, pi) => {
+        const r = podiumRanks[pi];
+        html += `<div class="lb-podium ${r}" onclick="openPeerView('${esc(u.name)}')">
+          <div class="lb-avatar" style="background:${u.color}">
+            ${r==='rank1'?'<span class="lb-crown">👑</span>':''}
+            ${avatarInitial(u.name)}
+          </div>
+          <span class="lb-pname">${esc(u.name)}</span>
+          <span class="lb-ppct" style="color:${u.pct===100?'var(--green)':'var(--navy)'}">${u.pct}%</span>
+          <div class="lb-block">${podiumLabels[pi]}</div>
+        </div>`;
+      });
+      html += `</div>`;
+    }
+
+    // Full list
+    html += `<div class="lb-list">`;
+    ranked.forEach((u, i) => {
+      const rankClass = i===0?'rank1-row':i===1?'rank2-row':i===2?'rank3-row':'';
+      const rankEmoji = i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1;
+      const isMe = u.name === userName;
+      html += `<div class="lb-row ${rankClass}${isMe?' me':''}" onclick="openPeerView('${esc(u.name)}')">
+        <span class="lb-rank">${rankEmoji}</span>
+        <div class="lb-uavatar" style="background:${u.color}">${avatarInitial(u.name)}</div>
+        <div class="lb-uinfo">
+          <div class="lb-uname">${esc(u.name)}${isMe?'<span class="me-tag">YOU</span>':''}</div>
+          <div class="lb-ubar-wrap">
+            <div class="lb-ubar" style="width:${u.pct}%;background:${u.pct===100?'var(--green)':'var(--blue)'}"></div>
+          </div>
+          ${u.streak>1?`<div class="lb-streak">🔥 ${u.streak}-day streak</div>`:''}
+        </div>
+        <span class="lb-upct" style="color:${u.pct===100?'var(--green)':u.pct>0?'var(--navy)':'#bbb'}">${u.pct}%</span>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+function lbChangeDate(dir) {
+  const d = new Date(lbDate+'T12:00:00');
+  d.setDate(d.getDate() + dir);
+  lbDate = d.toISOString().split('T')[0];
+  renderLeaderboard();
+}
+
+/* ═══════════════════════════════════════════
+   PEER VIEW (read-only)
+═══════════════════════════════════════════ */
+let peerName = '';
+let peerTab = 'today'; // 'today' | 'calendar'
+let peerCalYear = new Date().getFullYear();
+let peerCalMonth = new Date().getMonth();
+let peerSelectedDate = todayStr();
+
+function openPeerView(name) {
+  peerName = name;
+  peerTab = 'today';
+  peerSelectedDate = lbDate;
+  peerCalYear = new Date().getFullYear();
+  peerCalMonth = new Date().getMonth();
+  renderPeerView();
+  document.getElementById('screen-peer').classList.remove('active');
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-peer').classList.add('active');
+}
+
+function renderPeerView() {
+  const container = document.getElementById('peer-content');
+  const color = avatarColor(peerName);
+  const isMe = peerName === userName;
+
+  // Overall stats
+  const allDates = Object.keys(allPlans);
+  const daysWithPlan = allDates.length;
+  const daysCompleted = allDates.filter(ds => {
+    const keys = getPlanTaskKeys(allPlans[ds]);
+    const prog = (allProgress[ds]&&allProgress[ds][peerName])||{};
+    return keys.length && keys.every(k=>prog[k]);
+  }).length;
+  const streak = getStreak(peerName);
+
+  let html = `<div class="peer-back">
+    <button onclick="showScreen('leaderboard')">‹ Leaderboard</button>
+    <div style="flex:1"></div>
+  </div>
+  <div class="peer-banner">
+    <div class="peer-big-avatar" style="background:${color}">${avatarInitial(peerName)}</div>
+    <div class="peer-banner-info">
+      <div class="peer-banner-name">${esc(peerName)}${isMe?' (You)':''}</div>
+      <div class="peer-banner-sub">${daysCompleted}/${daysWithPlan} days completed · ${streak>0?`🔥 ${streak}-day streak`:'No streak yet'}</div>
+    </div>
+  </div>
+  ${!isMe?`<div class="readonly-note">👁️ View only — you cannot edit ${esc(peerName)}'s progress</div>`:''}
+  <div class="peer-tabs">
+    <button class="peer-tab${peerTab==='today'?' active':''}" onclick="peerTab='today';renderPeerView()">📋 Today's Plan</button>
+    <button class="peer-tab${peerTab==='calendar'?' active':''}" onclick="peerTab='calendar';renderPeerView()">📅 Calendar</button>
+  </div>`;
+
+  if (peerTab === 'today') {
+    html += renderPeerDay(peerSelectedDate);
+  } else {
+    html += renderPeerCalendar();
+  }
+
+  container.innerHTML = html;
+}
+
+function renderPeerDay(date) {
+  const plan = allPlans[date];
+  const prog = (allProgress[date] && allProgress[date][peerName]) || {};
+  const keys = getPlanTaskKeys(plan);
+  const done = keys.filter(k=>prog[k]).length;
+  const pct = keys.length ? Math.round(done/keys.length*100) : 0;
+
+  if (!plan) {
+    return `<div class="no-plan"><div class="emoji">📭</div><h3>No plan for ${fmtDisplay(date)}</h3><p>The creator hasn't published a plan for this day.</p></div>`;
+  }
+
+  let html = `<div style="font-size:.8rem;color:#888;font-weight:600;margin-bottom:10px;text-align:center">${fmtDisplay(date)}</div>`;
+
+  // Ring
+  html += `<div class="ring-card" style="margin-bottom:14px">
+    <div class="ring-wrap">
+      <svg width="110" height="110">
+        <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="7"/>
+        <circle cx="55" cy="55" r="46" fill="none" stroke="${pct===100?'#69f0ae':'#f9a825'}" stroke-width="7"
+          stroke-dasharray="${2*Math.PI*46}" stroke-dashoffset="${2*Math.PI*46*(1-pct/100)}"
+          stroke-linecap="round" style="transform:rotate(-90deg);transform-origin:55px 55px"/>
+        <text x="55" y="51" text-anchor="middle" fill="white" font-size="18" font-weight="900" font-family="Nunito,sans-serif">${pct}%</text>
+        <text x="55" y="65" text-anchor="middle" fill="rgba(255,255,255,.7)" font-size="9" font-family="Poppins,sans-serif">DONE</text>
+      </svg>
+    </div>
+    <div class="ring-info">
+      <div class="ring-name">${esc(plan.examName||'Study Plan')}</div>
+      <div class="ring-tagline">${esc(plan.tagline||'')}</div>
+      <div class="ring-stats">
+        <div class="ring-stat"><div class="ring-stat-n">${done}</div><div class="ring-stat-l">Done</div></div>
+        <div class="ring-stat"><div class="ring-stat-n">${keys.length}</div><div class="ring-stat-l">Total</div></div>
+      </div>
+    </div>
+  </div>`;
+
+  // Sessions — read-only
+  const wrap = (inner) => `<div class="readonly-overlay">${inner}</div>`;
+
+  (plan.sessions||[]).forEach((s,si) => {
+    const tasks = s.tasks||[];
+    const sDone = tasks.filter((_,ti)=>prog[`${s.id}_${ti}`]).length;
+    const sPct = tasks.length ? Math.round(sDone/tasks.length*100) : 0;
+    const col = COLORS[si%COLORS.length];
+    html += `<div class="session-card${sPct===100?' all-done':''}">
+      <div class="sess-header" onclick="toggleSection(this)">
+        <span class="sess-icon">${ICONS[si%ICONS.length]}</span>
+        <div class="sess-info">
+          <div class="sess-label">${esc(s.label||'Session')}</div>
+          <div class="sess-sub">${esc(s.subject||'')}${s.duration?' · '+esc(s.duration):''}</div>
+        </div>
+        <div class="sess-right">
+          <span class="sess-pct">${sPct}%</span>
+          ${sPct===100?'<span class="done-badge">DONE</span>':''}
+          <span class="chevron open">▼</span>
+        </div>
+      </div>
+      <div class="sess-prog"><div class="sess-prog-fill" style="width:${sPct}%;background:${col}"></div></div>
+      <div class="sess-body">
+        ${tasks.map((t,ti) => {
+          const k=`${s.id}_${ti}`;
+          const isDone = !!prog[k];
+          return `<div class="tick-row${isDone?' done':''}">
+            <div class="tick-box">${isDone?'✓':''}</div>
+            <span class="tick-label">${esc(t)}</span>
+          </div>`;
+        }).join('')}
+        ${s.goal?`<div class="sess-goal">🎯 ${esc(s.goal)}</div>`:''}
+      </div>
+    </div>`;
+  });
+
+  // Mini segments — read-only
+  if ((plan.miniSegments||[]).length) {
+    html += `<div class="mini-grid">`;
+    (plan.miniSegments||[]).forEach((m,mi) => {
+      const tasks = m.tasks||[];
+      const mDone = tasks.filter((_,ti)=>prog[`${m.id}_${ti}`]).length;
+      const mPct = tasks.length ? Math.round(mDone/tasks.length*100) : 0;
+      const col = COLORS[(mi+2)%COLORS.length];
+      html += `<div class="mini-card">
+        <div class="mini-header" style="background:${col}">
+          <span class="mini-title-text">${esc(m.title||'Segment')}</span>
+          <span class="mini-dur">${esc(m.duration||'')}</span>
+        </div>
+        <div class="mini-prog"><div class="mini-prog-fill" style="width:${mPct}%"></div></div>
+        <div class="mini-body">
+          ${tasks.map((t,ti) => {
+            const k=`${m.id}_${ti}`; const isDone=!!prog[k];
+            return `<div class="mini-tick${isDone?' done':''}">
+              <div class="mini-tick-box">${isDone?'✓':''}</div>
+              <span class="mini-tick-label">${esc(t)}</span>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Daily targets — read-only
+  if ((plan.dailyTargets||[]).length) {
+    html += `<div class="targets-card">
+      <div class="targets-title">🎯 Daily Targets</div>
+      <div class="targets-pills">
+        ${(plan.dailyTargets||[]).map((t,ti) => {
+          const k=`daily_${ti}`; const isDone=!!prog[k];
+          return `<span class="target-pill${isDone?' done':''}" style="cursor:default">${isDone?'✔ ':''}${esc(t)}</span>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
+
+  if (pct===100) html += `<div class="complete-banner"><div class="emoji">🎉</div><h3>${esc(peerName)} completed everything!</h3></div>`;
+  return html;
+}
+
+function renderPeerCalendar() {
+  const MONTHS_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const today = todayStr();
+  const days = daysInMonth(peerCalYear, peerCalMonth);
+  const fd = firstDay(peerCalYear, peerCalMonth);
+
+  let html = `<div class="cal-nav" style="margin-bottom:12px">
+    <button class="lb-date-btn" onclick="peerCalMonth--;if(peerCalMonth<0){peerCalMonth=11;peerCalYear--;}renderPeerView()">‹</button>
+    <div>
+      <div class="cal-month">${MONTHS_FULL[peerCalMonth]}</div>
+      <div class="cal-year">${peerCalYear}</div>
+    </div>
+    <button class="lb-date-btn" onclick="peerCalMonth++;if(peerCalMonth>11){peerCalMonth=0;peerCalYear++;}renderPeerView()">›</button>
+  </div>
+  <div class="day-headers">`;
+  DAYS_SHORT.forEach(d=>{ html+=`<div class="day-hdr">${d}</div>`; });
+  html += `</div><div class="cal-grid">`;
+  for(let i=0;i<fd;i++) html+=`<div></div>`;
+  for(let d=1;d<=days;d++) {
+    const ds = dateStr(peerCalYear, peerCalMonth, d);
+    const plan = allPlans[ds];
+    const prog = (allProgress[ds]&&allProgress[ds][peerName])||{};
+    let pct = 0, hasPlan = false;
+    if (plan) {
+      hasPlan = true;
+      const keys = getPlanTaskKeys(plan);
+      pct = keys.length ? Math.round(keys.filter(k=>prog[k]).length/keys.length*100) : 0;
+    }
+    const isToday = ds===today;
+    const isPast = ds<today;
+    const classes = ['cal-day', hasPlan?'has-plan':'', pct===100?'done-day':pct>0?'inprog-day':'', isToday?'today':'', isPast?'past':''].filter(Boolean).join(' ');
+    html += `<div class="${classes}" onclick="peerSelectedDate='${ds}';peerTab='today';renderPeerView()">
+      <span class="cal-day-num">${d}</span>
+      ${hasPlan?`<div class="cal-prog-bar"><div class="cal-prog-fill" style="width:${pct}%;background:${pct===100?'#2e7d32':'#f9a825'}"></div></div>
+      <span class="cal-pct" style="color:${pct===100?'#2e7d32':'#f57f17'}">${pct}%</span>`:''}
+    </div>`;
+  }
+  html += `</div>
+  <div class="cal-legend" style="margin-top:12px">
+    <div class="leg-item"><div class="leg-dot" style="background:#e8f5e9;border-color:#a5d6a7"></div>Complete</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#fffde7;border-color:#fff176"></div>In progress</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#fff"></div>No plan</div>
+  </div>
+  <p style="font-size:.96rem;color:#aaa;text-align:center;margin-top:10px">Tap any day to see ${esc(peerName)}'s task progress</p>`;
+  return html;
+}
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2800);
+}
+
+/* ═══════════════════════════════════════════
+   USER MANAGEMENT (creator only)
+═══════════════════════════════════════════ */
+let allUsersData = {};
+
+function renderUserManagement() {
+  const container = document.getElementById('um-content');
+  const users = Object.entries(allUsersData).sort((a,b) => (a[1].num||0)-(b[1].num||0));
+  const today = todayStr();
+  const activeToday = users.filter(([name]) => {
+    const prog = (allProgress[today]&&allProgress[today][name])||{};
+    return Object.values(prog).some(v=>v);
+  }).length;
+
+  let html = `<div class="um-header">
+    <h2>👥 User Management</h2>
+    <p>Edit names or remove users · Creator only</p>
+  </div>
+  <div class="um-stats">
+    <div class="um-stat-card">
+      <div class="um-stat-n">${users.length}</div>
+      <div class="um-stat-l">Total Users</div>
+    </div>
+    <div class="um-stat-card">
+      <div class="um-stat-n">${activeToday}</div>
+      <div class="um-stat-l">Active Today</div>
+    </div>
+    <div class="um-stat-card">
+      <div class="um-stat-n">${users.filter(([n])=>getStreak(n)>0).length}</div>
+      <div class="um-stat-l">On Streak 🔥</div>
+    </div>
+  </div>`;
+
+  if (!users.length) {
+    html += `<div class="um-no-users">
+      <div style="font-size:3rem;margin-bottom:10px">👤</div>
+      <div>No users have logged in yet.</div>
+      <div style="font-size:1rem;margin-top:6px">Users appear here after their first login.</div>
+    </div>`;
+  } else {
+    html += `<div class="um-list">`;
+    users.forEach(([name, data]) => {
+      const num = data.num || '?';
+      const pass = USER_PASS_BASE + num;
+      const color = avatarColor(name);
+      const pct = getUserPct(name, today);
+      const streak = getStreak(name);
+      const safeNum = Number(num) || 0;
+      html += `<div class="um-row" data-name="${esc(name)}" data-num="${safeNum}">
+        <div class="um-avatar" style="background:${color}">${avatarInitial(name)}</div>
+        <div class="um-info">
+          <div class="um-name">${esc(name)}</div>
+          <div class="um-pass">🔑 Password: <strong>${pass}</strong> · User #${num}${streak>0?' · 🔥'+streak+'d':''}</div>
+          ${pct!==null?`<div style="margin-top:5px;height:4px;background:#f0f2ff;border-radius:2px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${pct===100?'var(--green)':'var(--blue)'};border-radius:2px;transition:width .4s"></div></div>`:''}
+        </div>
+        <div class="um-actions">
+          <button class="um-edit-btn um-edit-trigger">✏️ Edit</button>
+          <button class="um-del-btn um-del-trigger">🗑️ Del</button>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+  container.innerHTML = html;
+
+  // Event delegation — attach after innerHTML set
+  container.querySelectorAll('.um-edit-trigger').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const row = btn.closest('.um-row');
+      showEditUserModal(row.dataset.name, Number(row.dataset.num));
+    });
+  });
+  container.querySelectorAll('.um-del-trigger').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const row = btn.closest('.um-row');
+      showDeleteUserModal(row.dataset.name, Number(row.dataset.num));
+    });
+  });
+}
+function showModal(html) {
+  document.getElementById('modal-box').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('show');
+}
+document.addEventListener('click', e => {
+  if (e.target.id === 'modal-overlay') closeModal();
+});
+
+// Store pending edit/delete target so we don't pass names through onclick strings
+let _pendingEditName = '';
+let _pendingEditNum = 0;
+let _pendingDeleteName = '';
+
+function showEditUserModal(name, num) {
+  _pendingEditName = name;
+  _pendingEditNum = num;
+  showModal(`
+    <h3>✏️ Edit User Name</h3>
+    <p>Renaming <strong>${esc(name)}</strong> will transfer all their progress to the new name. Their password stays <strong>${USER_PASS_BASE + num}</strong>.</p>
+    <input class="modal-inp" id="edit-name-inp" value="${esc(name)}" placeholder="New name…" maxlength="30">
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-confirm green" onclick="confirmEditUser()">✅ Save</button>
+    </div>
+  `);
+  const inp = document.getElementById('edit-name-inp');
+  if (inp) { inp.focus(); inp.select(); }
+  inp && inp.addEventListener('keydown', e => { if(e.key==='Enter') confirmEditUser(); });
+}
+
+async function confirmEditUser() {
+  const oldName = _pendingEditName;
+  const num = _pendingEditNum;
+  const newName = document.getElementById('edit-name-inp')?.value.trim();
+  if (!newName) { showToast('Please enter a name'); return; }
+  if (newName === oldName) { closeModal(); return; }
+  if (allUsersData[newName]) { showToast('❌ That name is already taken'); return; }
+  try {
+    const progSnap = await db.ref('progress').get();
+    const progData = progSnap.val() || {};
+    const updates = {};
+    Object.keys(progData).forEach(date => {
+      if (progData[date] && progData[date][oldName]) {
+        updates[`progress/${date}/${newName}`] = progData[date][oldName];
+        updates[`progress/${date}/${oldName}`] = null;
+      }
+    });
+    updates[`users/${newName}`] = { num };
+    updates[`users/${oldName}`] = null;
+    await db.ref().update(updates);
+    closeModal();
+    showToast(`✅ Renamed to "${newName}"`);
+  } catch(e) {
+    showToast('❌ Failed — check connection');
+  }
+}
+
+function showDeleteUserModal(name, num) {
+  _pendingDeleteName = name;
+  showModal(`
+    <h3>🗑️ Delete User</h3>
+    <p>This will permanently delete <strong>${esc(name)}</strong> (User #${num}, password ${USER_PASS_BASE + num}) and <strong>all their progress data</strong>. This cannot be undone.</p>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-confirm red" onclick="confirmDeleteUser()">🗑️ Delete</button>
+    </div>
+  `);
+}
+
+async function confirmDeleteUser() {
+  const name = _pendingDeleteName;
+  try {
+    const progSnap = await db.ref('progress').get();
+    const progData = progSnap.val() || {};
+    const updates = {};
+    updates[`users/${name}`] = null;
+    Object.keys(progData).forEach(date => {
+      if (progData[date] && progData[date][name]) updates[`progress/${date}/${name}`] = null;
+    });
+    await db.ref().update(updates);
+    closeModal();
+    showToast(`✅ "${name}" deleted`);
+  } catch(e) {
+    showToast('❌ Failed — check connection');
+  }
+}
+
+/* ═══════════════════════════════════════════
+   SERVICE WORKER (PWA offline)
+═══════════════════════════════════════════ */
+if ('serviceWorker' in navigator) {
+  const swCode = `
+const CACHE='study-planner-v1';
+const ASSETS=['./'];
+self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
+self.addEventListener('fetch',e=>{
+  if(e.request.url.includes('firebaseio.com')||e.request.url.includes('googleapis.com')){
+    e.respondWith(fetch(e.request).catch(()=>new Response('',{status:503})));
+    return;
+  }
+  e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));
+});`;
+  const swBlob = new Blob([swCode], {type:'application/javascript'});
+  const swURL = URL.createObjectURL(swBlob);
+  navigator.serviceWorker.register(swURL).catch(()=>{});
+}
+
+/* ═══════════════════════════════════════════
+   NOTEBOOK DOODLE ENHANCER
+   Adds washi tape + sticker accents to dynamic cards
+   AND generates random floating doodles on each page open
+═══════════════════════════════════════════ */
+(function notebookDoodles() {
+  const tapeColors = [
+    'rgba(255,236,130,.7)',
+    'rgba(255,182,193,.65)',
+    'rgba(180,210,255,.65)',
+    'rgba(180,240,200,.65)',
+    'rgba(220,200,255,.65)',
+  ];
+  const doodleEmojis = ['🌸','⭐','🍀','🌈','✨','🦋','🌻','💫','🎀','🌷'];
+  const cornerEmojis  = ['📌','🔖','📎','🖊️','✏️'];
+
+  function pickRandom(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+  function rnd(min,max) { return min + Math.random()*(max-min); }
+
+  // ── Generate random floating doodles every page open ──
+  const DOODLE_PALETTES = [
+    { stroke:'#7b52ab', fill:'#ffe082', accent:'#f48fb1' },
+    { stroke:'#f48fb1', fill:'#b2dfdb', accent:'#ffb300' },
+    { stroke:'#00897b', fill:'#f9a825', accent:'#ce93d8' },
+    { stroke:'#5c6bc0', fill:'#f48fb1', accent:'#ffe082' },
+    { stroke:'#e91e63', fill:'#b2dfdb', accent:'#ffe082' },
+    { stroke:'#9c27b0', fill:'#a5d6a7', accent:'#ffcc80' },
+  ];
+
+  // Pool of SVG doodle shapes — each returns an SVG string placed in a viewBox
+  const DOODLE_SHAPES = [
+    // Spiral rings (binding)
+    (p) => `<ellipse cx="18" cy="15" rx="10" ry="6" fill="none" stroke="${p.stroke}" stroke-width="2"/>
+    <ellipse cx="18" cy="35" rx="10" ry="6" fill="none" stroke="${p.stroke}" stroke-width="2"/>
+    <ellipse cx="18" cy="55" rx="10" ry="6" fill="none" stroke="${p.stroke}" stroke-width="2"/>
+    <ellipse cx="18" cy="75" rx="10" ry="6" fill="none" stroke="${p.stroke}" stroke-width="2"/>
+    <ellipse cx="18" cy="95" rx="10" ry="6" fill="none" stroke="${p.stroke}" stroke-width="2"/>
+    <ellipse cx="18" cy="115" rx="10" ry="6" fill="none" stroke="${p.stroke}" stroke-width="2"/>`,
+    // Star + flower + lightning
+    (p) => `<path d="M27 5 L29 13 L37 13 L31 18 L33 26 L27 21 L21 26 L23 18 L17 13 L25 13Z" fill="${p.fill}" stroke="${p.accent}" stroke-width="1"/>
+    <circle cx="27" cy="55" r="7" fill="${p.accent}" opacity=".6"/>
+    <circle cx="27" cy="42" r="5" fill="${p.fill}" opacity=".5"/>
+    <circle cx="38" cy="48" r="5" fill="${p.fill}" opacity=".5"/>
+    <circle cx="38" cy="62" r="5" fill="${p.fill}" opacity=".5"/>
+    <circle cx="27" cy="68" r="5" fill="${p.fill}" opacity=".5"/>
+    <circle cx="16" cy="62" r="5" fill="${p.fill}" opacity=".5"/>
+    <circle cx="16" cy="48" r="5" fill="${p.fill}" opacity=".5"/>
+    <path d="M30 95 L20 113 L27 113 L18 133 L35 111 L28 111Z" fill="${p.fill}" stroke="${p.accent}" stroke-width="1"/>`,
+    // Cloud + music note + arrow
+    (p) => `<circle cx="20" cy="30" r="7" fill="none" stroke="${p.stroke}" stroke-width="1.5"/>
+    <circle cx="30" cy="27" r="9" fill="none" stroke="${p.stroke}" stroke-width="1.5"/>
+    <circle cx="40" cy="30" r="7" fill="none" stroke="${p.stroke}" stroke-width="1.5"/>
+    <rect x="13" y="30" width="34" height="10" rx="2" fill="none" stroke="${p.stroke}" stroke-width="1.5"/>
+    <path d="M28 60 L28 80 Q23 83 23 78 Q23 73 28 76" fill="none" stroke="${p.accent}" stroke-width="1.5"/>
+    <circle cx="23" cy="80" r="4" fill="${p.accent}" opacity=".7"/>
+    <line x1="34" y1="55" x2="34" y2="70" stroke="${p.accent}" stroke-width="1.5"/>
+    <circle cx="30" cy="72" r="4" fill="${p.accent}" opacity=".7"/>
+    <path d="M15 105 Q27 99 39 105" fill="none" stroke="${p.stroke}" stroke-width="1.5"/>
+    <path d="M36 102 L39 105 L36 108" fill="none" stroke="${p.stroke}" stroke-width="1.5"/>`,
+    // Heart + spiral + diamond
+    (p) => `<path d="M27 20 C27 20 12 7 12 -3 C12 -10 19 -14 27 -5 C35 -14 42 -10 42 -3 C42 7 27 20 27 20Z" fill="${p.fill}" stroke="${p.accent}" stroke-width="1" transform="translate(0,20)"/>
+    <path d="M27 65 Q34 65 34 72 Q34 79 27 79 Q20 79 20 72 Q20 66 25 65" fill="none" stroke="${p.stroke}" stroke-width="1.5"/>
+    <path d="M27 95 L37 110 L27 125 L17 110 Z" fill="none" stroke="${p.accent}" stroke-width="1.5" stroke-dasharray="3 2"/>`,
+    // Bubbles + zigzag
+    (p) => `<circle cx="15" cy="20" r="8" fill="none" stroke="${p.stroke}" stroke-width="1.5"/>
+    <circle cx="35" cy="15" r="5" fill="none" stroke="${p.accent}" stroke-width="1.5"/>
+    <circle cx="25" cy="38" r="11" fill="none" stroke="${p.fill.replace(')',',.4)')||p.stroke}" stroke-width="1" stroke-dasharray="3 2"/>
+    <path d="M10 65 L18 58 L26 65 L34 58 L42 65" fill="none" stroke="${p.stroke}" stroke-width="1.5"/>
+    <path d="M10 80 L18 73 L26 80 L34 73 L42 80" fill="none" stroke="${p.accent}" stroke-width="1.5"/>
+    <path d="M20 100 Q27 108 20 116 Q13 108 20 100Z" fill="${p.fill}" stroke="${p.accent}" stroke-width="1"/>
+    <path d="M32 100 Q39 108 32 116 Q25 108 32 100Z" fill="${p.fill}" stroke="${p.accent}" stroke-width="1"/>`,
+    // Sun + rainbow arc + dots
+    (p) => `<circle cx="27" cy="25" r="9" fill="${p.fill}" stroke="${p.accent}" stroke-width="1.5"/>
+    <line x1="27" y1="10" x2="27" y2="4"  stroke="${p.fill}" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="27" y1="40" x2="27" y2="46" stroke="${p.fill}" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="12" y1="25" x2="6"  y2="25" stroke="${p.fill}" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="42" y1="25" x2="48" y2="25" stroke="${p.fill}" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M10 70 Q27 52 44 70" fill="none" stroke="${p.stroke}" stroke-width="2"/>
+    <path d="M14 75 Q27 60 40 75" fill="none" stroke="${p.accent}" stroke-width="1.5"/>
+    <path d="M18 80 Q27 68 36 80" fill="none" stroke="${p.fill}" stroke-width="1.5"/>
+    <circle cx="15" cy="105" r="3" fill="${p.accent}" opacity=".7"/>
+    <circle cx="27" cy="100" r="4" fill="${p.fill}" opacity=".7"/>
+    <circle cx="39" cy="105" r="3" fill="${p.accent}" opacity=".7"/>`,
+    // Concentric circles + crosshatch
+    (p) => `<circle cx="27" cy="30" r="22" fill="none" stroke="${p.stroke}" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <circle cx="27" cy="30" r="14" fill="none" stroke="${p.accent}" stroke-width="1"/>
+    <circle cx="27" cy="30" r="6"  fill="${p.fill}" opacity=".6"/>
+    <line x1="10" y1="70" x2="44" y2="110" stroke="${p.stroke}" stroke-width="1" opacity=".5"/>
+    <line x1="15" y1="70" x2="49" y2="110" stroke="${p.stroke}" stroke-width="1" opacity=".5"/>
+    <line x1="5"  y1="70" x2="39" y2="110" stroke="${p.stroke}" stroke-width="1" opacity=".5"/>
+    <line x1="10" y1="110" x2="44" y2="70"  stroke="${p.accent}" stroke-width="1" opacity=".4"/>
+    <line x1="5"  y1="110" x2="39" y2="70"  stroke="${p.accent}" stroke-width="1" opacity=".4"/>`,
+    // Butterfly + petals
+    (p) => `<path d="M27 60 C15 45 5 50 8 62 C11 74 22 70 27 60Z"  fill="${p.fill}" stroke="${p.accent}" stroke-width="1"/>
+    <path d="M27 60 C39 45 49 50 46 62 C43 74 32 70 27 60Z"  fill="${p.fill}" stroke="${p.accent}" stroke-width="1"/>
+    <path d="M27 60 C15 75 5 70 8 58 C11 46 22 50 27 60Z"  fill="${p.accent}" stroke="${p.stroke}" stroke-width="1"/>
+    <path d="M27 60 C39 75 49 70 46 58 C43 46 32 50 27 60Z" fill="${p.accent}" stroke="${p.stroke}" stroke-width="1"/>
+    <circle cx="27" cy="60" r="3" fill="${p.stroke}"/>
+    <path d="M14 15 Q20 8 27 15 Q34 8 40 15 Q34 22 27 29 Q20 22 14 15Z" fill="${p.fill}" stroke="${p.stroke}" stroke-width="1" opacity=".7"/>
+    <circle cx="27" cy="15" r="3" fill="${p.accent}" opacity=".8"/>`,
+  ];
+
+  // Configurations for the 3 floating doodle positions
+  const DOODLE_CONFIGS = [
+    // Left binding
+    { pos:'position:fixed;top:60px;left:2px;width:36px;height:120px;pointer-events:none;z-index:1', vb:'0 0 36 120', opa:'.35' },
+    // Top-right
+    { pos:'position:fixed;top:70px;right:6px;width:55px;height:140px;pointer-events:none;z-index:1', vb:'0 0 55 140', opa:'.13' },
+    // Bottom-left
+    { pos:'position:fixed;bottom:70px;left:45px;width:70px;height:130px;pointer-events:none;z-index:1', vb:'0 0 55 140', opa:'.10' },
+  ];
+
+  function injectRandomDoodles() {
+    const host = document.getElementById('doodle-host');
+    if (!host) return;
+    host.innerHTML = '';
+    DOODLE_CONFIGS.forEach(cfg => {
+      const pal = pickRandom(DOODLE_PALETTES);
+      const shapeFn = pickRandom(DOODLE_SHAPES);
+      const inner = shapeFn(pal);
+      const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+      svg.setAttribute('class','doodle-float');
+      svg.setAttribute('viewBox', cfg.vb);
+      svg.setAttribute('xmlns','http://www.w3.org/2000/svg');
+      svg.setAttribute('style', cfg.pos + ';opacity:' + cfg.opa);
+      svg.innerHTML = inner;
+      host.appendChild(svg);
+    });
+  }
+
+  // Inject on load
+  injectRandomDoodles();
+
+  // Also re-inject when user opens plan (day view becomes active)
+  const screenObserver = new MutationObserver((mutations) => {
+    for (const m of mutations) {
+      if (m.type === 'attributes' && m.attributeName === 'class') {
+        const el = m.target;
+        if (el.id === 'screen-day' && el.classList.contains('active')) {
+          injectRandomDoodles();
+        }
+      }
+    }
+  });
+  document.querySelectorAll('.screen').forEach(s => {
+    screenObserver.observe(s, { attributes: true });
+  });
+  // Also observe dynamically added screens
+  const bodyObs2 = new MutationObserver(() => {
+    document.querySelectorAll('.screen:not([data-doodle-watched])').forEach(s => {
+      s.setAttribute('data-doodle-watched','1');
+      screenObserver.observe(s, { attributes: true });
+    });
+  });
+  bodyObs2.observe(document.body, { childList:true, subtree:true });
+
+  // Observe DOM for session cards and add tape + sticker decorations
+  const observer = new MutationObserver(() => {
+    // Session cards — tape top-left + corner emoji
+    document.querySelectorAll('.session-card:not([data-notebook])').forEach(card => {
+      card.setAttribute('data-notebook','1');
+      card.style.position = 'relative';
+      card.style.overflow = 'visible';
+      card.style.marginTop = '18px';
+
+      // washi tape strip
+      const tape = document.createElement('div');
+      tape.style.cssText = `
+        position:absolute; top:-10px; left:${12+Math.random()*30}px;
+        width:${45+Math.random()*25}px; height:18px;
+        background:${pickRandom(tapeColors)};
+        border-radius:3px; transform:rotate(${(Math.random()-0.5)*4}deg);
+        box-shadow:0 1px 3px rgba(0,0,0,.08); z-index:2; pointer-events:none;
+      `;
+      card.appendChild(tape);
+
+      // corner sticker emoji
+      const sticker = document.createElement('span');
+      sticker.textContent = pickRandom(doodleEmojis);
+      sticker.style.cssText = `
+        position:absolute; top:6px; right:8px;
+        font-size:1.15rem; opacity:.55;
+        transform:rotate(${(Math.random()-0.5)*20}deg);
+        pointer-events:none; z-index:2;
+      `;
+      card.appendChild(sticker);
+    });
+
+    // e-cards (editor cards) — corner pin emoji
+    document.querySelectorAll('.e-card:not([data-notebook])').forEach(card => {
+      card.setAttribute('data-notebook','1');
+      card.style.position = 'relative';
+      const pin = document.createElement('span');
+      pin.textContent = pickRandom(cornerEmojis);
+      pin.style.cssText = `
+        position:absolute; top:-10px; right:12px;
+        font-size:1rem; opacity:.6;
+        transform:rotate(${(Math.random()-0.5)*15}deg);
+        pointer-events:none; z-index:3;
+      `;
+      card.appendChild(pin);
+    });
+
+    // leaderboard rows — tiny doodle accent
+    document.querySelectorAll('.lb-row:not([data-notebook])').forEach(row => {
+      row.setAttribute('data-notebook','1');
+      row.style.background = 'var(--paper2)';
+    });
+  });
+  observer.observe(document.body, { childList:true, subtree:true });
+})();
+
+</script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#3d2c8d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Study Planner">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Study Planner</title>
+
+<!-- PWA Manifest inline -->
+<script>
+// Set live date on login screen (JS date is fine here, just not in the installed icon)
+const _now = new Date();
+const _day = _now.getDate();
+const _months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const _mon = _months[_now.getMonth()];
+
+// Static clean calendar icon — works reliably as PWA icon
+const iconSvg192 = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'>
+  <rect width='192' height='192' rx='38' fill='%231a237e'/>
+  <rect x='24' y='48' width='144' height='120' rx='14' fill='white'/>
+  <rect x='24' y='48' width='144' height='46' rx='14' fill='%231a237e'/>
+  <rect x='24' y='74' width='144' height='20' fill='%231a237e'/>
+  <circle cx='66' cy='48' r='10' fill='%23f9a825'/>
+  <circle cx='126' cy='48' r='10' fill='%23f9a825'/>
+  <circle cx='66' cy='38' r='6' fill='%23c5cae9'/>
+  <circle cx='126' cy='38' r='6' fill='%23c5cae9'/>
+  <text x='96' y='82' font-size='18' font-weight='900' text-anchor='middle' font-family='Arial,sans-serif' fill='white'>STUDY</text>
+  <text x='96' y='140' font-size='58' font-weight='900' text-anchor='middle' font-family='Arial,sans-serif' fill='%231a237e'>📚</text>
+</svg>`;
+
+const iconSvg512 = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'>
+  <rect width='512' height='512' rx='100' fill='%231a237e'/>
+  <rect x='56' y='120' width='400' height='332' rx='36' fill='white'/>
+  <rect x='56' y='120' width='400' height='128' rx='36' fill='%231a237e'/>
+  <rect x='56' y='200' width='400' height='48' fill='%231a237e'/>
+  <circle cx='172' cy='120' r='28' fill='%23f9a825'/>
+  <circle cx='340' cy='120' r='28' fill='%23f9a825'/>
+  <circle cx='172' cy='92' r='16' fill='%23c5cae9'/>
+  <circle cx='340' cy='92' r='16' fill='%23c5cae9'/>
+  <text x='256' y='210' font-size='52' font-weight='900' text-anchor='middle' font-family='Arial,sans-serif' fill='white'>STUDY PLAN</text>
+  <text x='256' y='390' font-size='160' font-weight='900' text-anchor='middle' font-family='Arial,sans-serif' fill='%231a237e'>📚</text>
+</svg>`;
+
+const enc192 = encodeURIComponent(iconSvg192);
+const enc512 = encodeURIComponent(iconSvg512);
+
+const manifestData = {
+  name: "Daily Study Planner",
+  short_name: "StudyPlan",
+  description: "Collaborative daily study to-do list planner",
+  start_url: "./",
+  display: "standalone",
+  background_color: "#f0f4ff",
+  theme_color: "#1a237e",
+  orientation: "portrait-primary",
+  icons: [
+    { src: `data:image/svg+xml,${enc192}`, sizes: "192x192", type: "image/svg+xml" },
+    { src: `data:image/svg+xml,${enc512}`, sizes: "512x512", type: "image/svg+xml" }
+  ]
+};
+const blob = new Blob([JSON.stringify(manifestData)], {type:'application/json'});
+const manifestURL = URL.createObjectURL(blob);
+document.write('<link rel="manifest" href="' + manifestURL + '">');
+</script>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Caveat:wght@400;600;700&family=Nunito:wght@700;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --navy:#3d2c8d; --blue:#5c6bc0; --green:#388e3c; --purple:#7b52ab;
+  --red:#e53935; --orange:#fb8c00; --teal:#00897b; --gold:#ffb300;
+  --bg:#fdf8f0; --border:#d7c8f5; --text:#2d2047; --white:#fff;
+  --shadow:0 4px 18px rgba(90,50,150,.13);
+  --pink:#f48fb1; --peach:#ffe0b2; --mint:#b2dfdb; --lavender:#e8d5ff;
+  /* notebook palette */
+  --paper:#fdf8f0;
+  --paper2:#fff9f2;
+  --ruled:#e8ddd0;
+  --margin:#f4b8c1;
+  --ink:#2d2047;
+  --ink-light:#7a6a8a;
+  --tape-yellow:rgba(255,236,130,.75);
+  --tape-pink:rgba(255,182,193,.7);
+  --tape-blue:rgba(180,210,255,.7);
+  --tape-green:rgba(180,240,200,.7);
+  --sticker-bg:#fff9c4;
+}
+
+/* ── GLOBAL HANDWRITTEN FONT ── */
+* { font-family: 'Patrick Hand', cursive !important; }
+code, textarea, .setup-card textarea, #fb-config-input {
+  font-family: monospace !important;
+}
+
+/* ══════════════════════════════════════
+   NOTEBOOK PAPER BODY
+══════════════════════════════════════ */
+body {
+  background-color: var(--paper);
+  /* Ruled lines */
+  background-image:
+    /* red margin line — moved closer to left edge */
+    linear-gradient(90deg, transparent 20px, var(--margin) 20px, var(--margin) 22px, transparent 22px),
+    /* horizontal ruled lines every 32px */
+    repeating-linear-gradient(
+      180deg,
+      transparent,
+      transparent 31px,
+      var(--ruled) 31px,
+      var(--ruled) 32px
+    ),
+    radial-gradient(circle at 30% 20%, rgba(255,200,100,.06) 0%, transparent 60%),
+    radial-gradient(circle at 75% 80%, rgba(180,140,220,.05) 0%, transparent 60%);
+  min-height: 100vh;
+}
+
+/* ══════════════════════════════════════
+   TAPE STRIP MIXIN  (applied via ::before/::after on cards)
+══════════════════════════════════════ */
+.tape::before {
+  content:'';
+  position:absolute;
+  top:-10px; left:50%;
+  transform:translateX(-50%) rotate(-2deg);
+  width:60px; height:22px;
+  background:var(--tape-yellow);
+  border-radius:3px;
+  box-shadow:0 1px 3px rgba(0,0,0,.1);
+  z-index:2;
+}
+.tape-pink::before  { background:var(--tape-pink);  transform:translateX(-50%) rotate(1.5deg); }
+.tape-blue::before  { background:var(--tape-blue);  transform:translateX(-50%) rotate(-1deg); width:50px; }
+.tape-green::before { background:var(--tape-green); transform:translateX(-50%) rotate(2deg); width:55px; }
+
+/* ══════════════════════════════════════
+   DOODLE CORNER SVG (injected via pseudo on wrappers)
+══════════════════════════════════════ */
+.doodle-corner::after {
+  content:'';
+  position:absolute;
+  bottom:10px; right:10px;
+  width:60px; height:60px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'%3E%3Ccircle cx='10' cy='10' r='4' fill='none' stroke='%23d7c8f5' stroke-width='1.5'/%3E%3Ccircle cx='10' cy='10' r='8' fill='none' stroke='%23f4b8c1' stroke-width='1' stroke-dasharray='2 2'/%3E%3Cpath d='M25 8 Q30 2 35 8 Q40 14 35 20 Q30 26 25 20 Q20 14 25 8Z' fill='none' stroke='%23b8e0d4' stroke-width='1.5'/%3E%3Cpath d='M45 30 Q50 26 55 30 Q55 36 50 38 Q45 36 45 30Z' fill='%23ffe0b2' stroke='%23ffb300' stroke-width='1'/%3E%3Cline x1='2' y1='40' x2='20' y2='55' stroke='%23d7c8f5' stroke-width='1' stroke-dasharray='3 2'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity:.6;
+  pointer-events:none;
+}
+
+/* ══════════════════════════════════════
+   NAV — looks like a notebook header band
+══════════════════════════════════════ */
+.nav {
+  background: linear-gradient(135deg,#3d2c8d,#7b52ab);
+  /* washi tape top edge */
+  border-bottom: 3px solid var(--tape-yellow);
+  position:sticky; top:0; z-index:200;
+  display:flex; align-items:center; padding:0 14px; height:56px; gap:10px;
+  box-shadow:0 3px 16px rgba(90,50,150,.3);
+}
+.nav::before {
+  content:'🌸 ✦ ⭐ ✦ 🌸';
+  position:absolute;
+  top:0; right:60px;
+  font-size:.55rem;
+  color:rgba(255,255,255,.25);
+  letter-spacing:4px;
+  pointer-events:none;
+}
+
+/* ══════════════════════════════════════
+   CARDS — notebook paper look
+══════════════════════════════════════ */
+.session-card, .e-card, .ring-card,
+.targets-card, .lb-row, .um-row, .um-stat-card,
+.mini-card, .modal-box {
+  position: relative;
+}
+
+/* session cards look like torn notebook pages */
+.session-card {
+  background: var(--paper2);
+  border-radius: 4px 16px 16px 4px !important;
+  border-left: 4px solid var(--margin) !important;
+  border-top: 1.5px solid var(--ruled) !important;
+  border-bottom: 1.5px solid var(--ruled) !important;
+  border-right: 1.5px solid var(--ruled) !important;
+  box-shadow: 2px 3px 12px rgba(90,50,150,.1), 4px 5px 0 rgba(200,180,220,.15) !important;
+  /* ruled lines inside card */
+  background-image: repeating-linear-gradient(
+    180deg, transparent, transparent 31px, rgba(220,210,240,.3) 31px, rgba(220,210,240,.3) 32px
+  );
+}
+.session-card.all-done {
+  border-left: 4px solid #81c784 !important;
+  background-image: repeating-linear-gradient(
+    180deg, transparent, transparent 31px, rgba(180,230,180,.25) 31px, rgba(180,230,180,.25) 32px
+  );
+}
+
+/* e-cards look like sticky-note paper */
+.e-card {
+  background: var(--sticker-bg);
+  border-radius: 3px 3px 14px 3px !important;
+  box-shadow: 2px 3px 0 rgba(0,0,0,.08), 3px 5px 16px rgba(90,50,150,.1) !important;
+  border: 1.5px solid rgba(255,200,0,.3) !important;
+}
+.e-card::after {
+  content:'';
+  position:absolute;
+  top:0; right:0;
+  width:0; height:0;
+  border-style:solid;
+  border-width: 0 20px 20px 0;
+  border-color: transparent rgba(255,179,0,.25) transparent transparent;
+  border-radius:0 3px 0 0;
+}
+
+/* login card = notebook cover */
+.login-card {
+  background: var(--paper);
+  border-radius: 6px 6px 6px 6px !important;
+  border: 2px solid var(--ruled) !important;
+  border-left: 8px solid var(--navy) !important;
+  box-shadow: 4px 4px 0 rgba(90,50,150,.15), 6px 8px 24px rgba(90,50,150,.18) !important;
+  background-image: repeating-linear-gradient(
+    180deg, transparent, transparent 31px, var(--ruled) 31px, var(--ruled) 32px
+  );
+  position: relative;
+  overflow: visible !important;
+}
+/* notebook cover doodles in corners */
+.login-card::before {
+  content: '🌷 ✿ 🌼 ✿ 🌷';
+  position:absolute; top:-14px; left:50%;
+  transform:translateX(-50%);
+  font-size:1.1rem;
+  letter-spacing:4px;
+  pointer-events:none;
+}
+.login-card::after {
+  content:'';
+  position:absolute; bottom:16px; right:16px;
+  width:70px; height:70px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 70 70'%3E%3Ccircle cx='20' cy='20' r='12' fill='none' stroke='%23d7c8f5' stroke-width='2'/%3E%3Ccircle cx='20' cy='20' r='5' fill='%23f4b8c1'/%3E%3Cpath d='M35 5 Q42 15 35 25 Q28 15 35 5Z' fill='%23b8e0d4' stroke='%2300897b' stroke-width='1'/%3E%3Cpath d='M50 35 L60 28 L65 40 L55 50 Z' fill='none' stroke='%23ffb300' stroke-width='1.5' stroke-dasharray='3 2'/%3E%3Ccircle cx='55' cy='58' r='7' fill='%23ffe0b2' stroke='%23fb8c00' stroke-width='1.5'/%3E%3Cpath d='M5 50 Q10 40 20 50 Q10 60 5 50Z' fill='%23f48fb1' opacity='.6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-size:contain;
+  opacity:.5; pointer-events:none;
+}
+
+/* ring-card = journal entry header */
+.ring-card {
+  border-radius: 4px 16px 16px 4px !important;
+  border-left: 6px solid var(--gold) !important;
+  position: relative; overflow: visible !important;
+}
+.ring-card::before {
+  content: '📖 today\'s progress';
+  position:absolute; top:-14px; left:16px;
+  font-size:.8rem; color:var(--ink-light);
+  font-style:italic; pointer-events:none;
+}
+
+/* motivation = sticky note */
+.motivation {
+  border-radius: 3px 3px 14px 3px !important;
+  transform: rotate(-0.5deg);
+  box-shadow: 2px 2px 0 rgba(0,0,0,.07), 3px 4px 14px rgba(255,179,0,.2) !important;
+  position: relative;
+}
+.motivation::after {
+  content:'';
+  position:absolute; top:0; right:0;
+  width:0; height:0;
+  border-style:solid; border-width:0 16px 16px 0;
+  border-color:transparent rgba(255,160,0,.3) transparent transparent;
+}
+
+/* complete banner = confetti-decorated */
+.complete-banner {
+  border-radius: 16px !important;
+  position: relative; overflow: hidden;
+}
+.complete-banner::before {
+  content:'🎉 🌟 ✨ 🎊 💫 🌈 🎉';
+  display:block; font-size:1rem; letter-spacing:3px;
+  margin-bottom:4px; animation: confetti-drift 3s ease-in-out infinite alternate;
+}
+@keyframes confetti-drift {
+  from { letter-spacing:3px; opacity:.8; }
+  to   { letter-spacing:6px; opacity:1; }
+}
+
+/* no-plan = doodle empty page */
+.no-plan {
+  border-radius: 6px !important;
+  background-image:
+    repeating-linear-gradient(180deg, transparent, transparent 31px, var(--ruled) 31px, var(--ruled) 32px) !important;
+  background-color: var(--paper2) !important;
+  border: 2px dashed var(--margin) !important;
+}
+
+/* calendar days = small squares of graph paper */
+.cal-day {
+  border-radius: 6px !important;
+  background-color: var(--paper2) !important;
+  border: 1px solid var(--ruled) !important;
+  background-image:
+    linear-gradient(var(--ruled) 1px, transparent 1px),
+    linear-gradient(90deg, var(--ruled) 1px, transparent 1px) !important;
+  background-size: 8px 8px !important;
+}
+.cal-day.today {
+  border: 2px solid var(--purple) !important;
+  background-color: #f5eeff !important;
+  box-shadow: 0 0 0 3px rgba(123,82,171,.15) !important;
+}
+.cal-day.done-day {
+  background-color: #eaf7ec !important;
+  border: 1.5px solid #81c784 !important;
+}
+.cal-day.inprog-day {
+  background-color: #fffde7 !important;
+  border: 1.5px solid #ffe082 !important;
+}
+
+/* tab bar = notebook bottom edge */
+.tab-bar {
+  border-top: 3px solid var(--margin) !important;
+  background: var(--paper) !important;
+  background-image: linear-gradient(90deg, transparent 20px, var(--margin) 20px, var(--margin) 22px, transparent 22px) !important;
+}
+.tab-btn.active {
+  color: var(--navy) !important;
+  border-top: 3px solid var(--navy);
+  margin-top:-3px;
+}
+.tab-btn.active .tab-label { color: var(--navy) !important; }
+
+/* modal = torn paper note */
+.modal-box {
+  background: var(--paper2) !important;
+  border: 2px solid var(--ruled) !important;
+  border-left: 6px solid var(--purple) !important;
+  background-image: repeating-linear-gradient(
+    180deg, transparent, transparent 31px, var(--ruled) 31px, var(--ruled) 32px
+  ) !important;
+  box-shadow: 4px 4px 0 rgba(90,50,150,.12), 0 20px 60px rgba(0,0,0,.2) !important;
+}
+
+/* leaderboard rows = bookmarks */
+.lb-row {
+  border-radius: 4px 14px 14px 4px !important;
+  border-left: 4px solid var(--margin) !important;
+  background: var(--paper2) !important;
+}
+.lb-row.rank1-row { border-left: 4px solid var(--gold) !important; }
+.lb-row.rank2-row { border-left: 4px solid #90a4ae !important; }
+.lb-row.rank3-row { border-left: 4px solid #a1887f !important; }
+
+/* ══════════════════════════════════════
+   INPUTS — feel like writing on paper
+══════════════════════════════════════ */
+.inp, .e-inp, .modal-inp {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 2px solid var(--ruled) !important;
+  border-radius: 0 !important;
+  padding: 8px 4px !important;
+  font-size: 1.1rem !important;
+}
+.inp:focus, .e-inp:focus, .modal-inp:focus {
+  border-bottom-color: var(--purple) !important;
+  outline: none !important;
+  background: rgba(123,82,171,.03) !important;
+}
+
+/* ══════════════════════════════════════
+   WASHI TAPE STRIPS on key headings
+══════════════════════════════════════ */
+.cal-wrap > div:first-child::before,
+.lb-wrap::before,
+.day-wrap::before,
+.um-wrap::before {
+  content: '';
+  display: block;
+  height: 20px;
+  margin: 0 -12px 16px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--tape-yellow) 0px, var(--tape-yellow) 30px,
+    var(--tape-pink)   30px, var(--tape-pink)   60px,
+    var(--tape-blue)   60px, var(--tape-blue)   90px,
+    var(--tape-green)  90px, var(--tape-green) 120px
+  );
+  opacity: .55;
+  border-radius: 2px;
+}
+
+/* ══════════════════════════════════════
+   DOODLE SIDEBAR — floating SVG doodles
+══════════════════════════════════════ */
+.cal-wrap::after,
+.day-wrap::after,
+.lb-wrap::after {
+  content: '';
+  position: fixed;
+  right: -10px; top: 30%;
+  width: 80px; height: 200px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 200'%3E%3C!-- star --%3E%3Cpath d='M40 8 L43 18 L53 18 L45 24 L48 34 L40 28 L32 34 L35 24 L27 18 L37 18Z' fill='%23ffe082' stroke='%23ffb300' stroke-width='1'/%3E%3C!-- flower --%3E%3Ccircle cx='40' cy='70' r='6' fill='%23f48fb1'/%3E%3Ccircle cx='40' cy='57' r='5' fill='%23fce4ec'/%3E%3Ccircle cx='51' cy='63' r='5' fill='%23fce4ec'/%3E%3Ccircle cx='51' cy='77' r='5' fill='%23fce4ec'/%3E%3Ccircle cx='40' cy='83' r='5' fill='%23fce4ec'/%3E%3Ccircle cx='29' cy='77' r='5' fill='%23fce4ec'/%3E%3Ccircle cx='29' cy='63' r='5' fill='%23fce4ec'/%3E%3C!-- lightning --%3E%3Cpath d='M45 100 L35 118 L42 118 L33 138 L50 116 L43 116Z' fill='%23ffe082' stroke='%23fb8c00' stroke-width='1'/%3E%3C!-- heart --%3E%3Cpath d='M40 168 C40 168 25 155 25 145 C25 138 32 134 40 143 C48 134 55 138 55 145 C55 155 40 168 40 168Z' fill='%23f48fb1' stroke='%23e91e63' stroke-width='1'/%3E%3C!-- spiral --%3E%3Cpath d='M40 185 Q47 185 47 192 Q47 199 40 199 Q33 199 33 192 Q33 186 38 185' fill='none' stroke='%23b2dfdb' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: .18;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ══════════════════════════════════════
+   PAPER HOLE PUNCHES (left side decoration)
+══════════════════════════════════════ */
+body::before {
+  content: '';
+  position: fixed;
+  left: 0; top: 0;
+  width: 22px; height: 100vh;
+  background:
+    radial-gradient(circle 4px at 11px 80px,  #fff 3px, var(--ruled) 4px, transparent 4px),
+    radial-gradient(circle 4px at 11px 200px, #fff 3px, var(--ruled) 4px, transparent 4px),
+    radial-gradient(circle 4px at 11px 320px, #fff 3px, var(--ruled) 4px, transparent 4px),
+    radial-gradient(circle 4px at 11px 440px, #fff 3px, var(--ruled) 4px, transparent 4px),
+    radial-gradient(circle 4px at 11px 560px, #fff 3px, var(--ruled) 4px, transparent 4px),
+    radial-gradient(circle 4px at 11px 680px, #fff 3px, var(--ruled) 4px, transparent 4px),
+    radial-gradient(circle 4px at 11px 800px, #fff 3px, var(--ruled) 4px, transparent 4px);
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* ensure content clears margin line — reduced side margins */
+.cal-wrap, .day-wrap, .editor-wrap, .lb-wrap,
+.um-wrap, .fb-screen, .login-wrap {
+  padding-left: 26px !important;
+  padding-right: 8px !important;
+}
+/* nav stays full width */
+.nav { padding-left: 28px !important; }
+
+/* ── tighter card/wrap padding to maximise content width ── */
+.cal-wrap { padding-right: 4px !important; }
+.day-wrap  { padding-right: 4px !important; }
+.lb-wrap   { padding-right: 4px !important; }
+.editor-wrap { padding-right: 4px !important; }
+.sess-header { padding: 10px 8px !important; }
+.sess-body   { padding: 8px 8px 10px !important; }
+.ring-card   { padding: 14px 10px !important; }
+.targets-card { padding: 12px 10px !important; }
+.e-card      { padding: 14px 10px !important; }
+.lb-row      { padding: 10px 8px !important; }
+.um-row      { padding: 10px 8px !important; }
+/* ══════════════════════════════════════
+   STICKER-STYLE BADGES & TAGS
+══════════════════════════════════════ */
+.done-badge {
+  background: var(--green) !important;
+  border-radius: 4px !important;
+  font-size:1rem !important;
+  transform: rotate(-1deg);
+  display: inline-block;
+}
+.nav-badge {
+  border-radius: 4px !important;
+  transform: rotate(1deg);
+  display: inline-block !important;
+}
+
+/* ══════════════════════════════════════
+   PROGRESS BARS — pencil-sketch style
+══════════════════════════════════════ */
+.sess-prog, .lb-ubar-wrap, .cal-prog-bar {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--ruled) 0px, var(--ruled) 3px,
+    transparent 3px, transparent 6px
+  ) !important;
+  border-radius: 2px !important;
+}
+
+/* ══════════════════════════════════════
+   FLOATING DOODLE ELEMENTS (injected via JS)
+══════════════════════════════════════ */
+.doodle-float {
+  position:fixed; pointer-events:none; z-index:0; opacity:.12;
+}
+
+/* ══════════════════════════════════════
+   PEER / READONLY BANNER
+══════════════════════════════════════ */
+.peer-banner {
+  border-radius: 4px 16px 16px 4px !important;
+  border-left: 6px solid var(--gold) !important;
+}
+
+/* ══════════════════════════════════════
+   OFFLINE BAR — washi tape style
+══════════════════════════════════════ */
+.offline-bar {
+  background: repeating-linear-gradient(
+    90deg,
+    #ff8a80 0px, #ff8a80 20px,
+    #ff5252 20px, #ff5252 40px
+  ) !important;
+  color: #fff !important;
+  font-size:1.1rem !important;
+}
+
+/* ══════════════════════════════════════
+   TICK BOX — hand-drawn checkbox feel
+══════════════════════════════════════ */
+.tick-box {
+  border: 2px solid var(--ink-light) !important;
+  border-radius: 3px !important;
+  background: transparent !important;
+}
+.tick-row.done .tick-box {
+  background: var(--green) !important;
+  border-color: var(--green) !important;
+  border-radius: 3px !important;
+}
+
+/* ══════════════════════════════════════
+   RING NAME (today's label) on progress card
+══════════════════════════════════════ */
+.ring-tagline {
+  font-size:1rem !important;
+  opacity:.9 !important;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overscroll-behavior:none}
+body{font-family:'Patrick Hand',cursive;font-size:22px;background:var(--bg);color:var(--text);min-height:100vh;max-width:100vw;overflow-x:hidden}
+
+/* NAV */
+.nav{background:linear-gradient(135deg,#3d2c8d,#7b52ab);position:sticky;top:0;z-index:200;display:flex;align-items:center;padding:0 14px;height:60px;gap:10px;box-shadow:0 2px 16px rgba(90,50,150,.3)}
+.nav-title{font-family:'Patrick Hand',cursive;font-weight:700;color:#fff;font-size:1.8rem;flex:1;letter-spacing:.5px}
+.nav-badge{font-size:1.1rem;font-weight:700;padding:3px 9px;border-radius:10px}
+.nav-btn{background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:1.15rem;padding:6px 0;font-family:'Patrick Hand',cursive}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#69f0ae;flex-shrink:0}
+.sync-dot.off{background:#ef9a9a}
+
+/* SCREENS */
+.screen{display:none;min-height:calc(100vh - 52px - 58px)}
+.screen.active{display:block}
+
+/* LOGIN */
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.login-card{background:#fff;border-radius:24px;padding:36px 28px;box-shadow:0 8px 32px rgba(90,50,150,.15);max-width:400px;width:100%;text-align:center;border:2px solid var(--lavender)}
+.login-card h1{font-family:'Patrick Hand',cursive;font-size:2.2rem;font-weight:700;color:var(--navy);margin:8px 0 4px}
+.login-card p{color:#888;font-size:1.1rem;margin-bottom:24px}
+.inp{font-family:'Patrick Hand',cursive;font-size:1.25rem;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;width:100%;outline:none;background:#fafbff;color:var(--text);margin-bottom:16px}
+.inp:focus{border-color:var(--blue)}
+.btn-row{display:flex;gap:10px}
+.btn{padding:14px 0;border-radius:12px;border:none;font-family:'Patrick Hand',cursive;font-weight:700;font-size:1.3rem;cursor:pointer;flex:1;transition:.15s;letter-spacing:.2px}
+.btn:active{transform:scale(.97)}
+.btn-navy{background:linear-gradient(135deg,#3d2c8d,#7b52ab);color:#fff;box-shadow:0 3px 12px rgba(90,50,150,.3)}
+.btn-green{background:linear-gradient(135deg,#2e7d32,#43a047);color:#fff;box-shadow:0 3px 12px rgba(46,125,50,.3)}
+.btn-ghost{background:#f9f5ff;color:var(--navy);border:1.5px solid var(--border)}
+
+/* FIREBASE SETUP */
+.setup-card{background:#fff;border-radius:16px;padding:22px;margin:20px 14px;box-shadow:var(--shadow);border-left:5px solid var(--orange)}
+.setup-card h2{font-size:1rem;font-weight:700;color:var(--orange);margin-bottom:10px}
+.setup-card p{font-size:1.05rem;color:#555;line-height:1.6;margin-bottom:10px}
+.setup-card code{background:#f0f4ff;border-radius:6px;padding:2px 6px;font-size:1rem;color:var(--navy)}
+.setup-card textarea{width:100%;min-height:100px;font-family:monospace;font-size:1rem;padding:10px;border:1.5px solid var(--border);border-radius:8px;resize:vertical;outline:none}
+
+/* CALENDAR */
+.cal-wrap{padding:16px 12px 80px}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.cal-nav button{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:8px 18px;cursor:pointer;font-weight:700;font-size:1.1rem;color:var(--navy)}
+.cal-month{font-family:'Patrick Hand',cursive;font-weight:700;font-size:2rem;color:var(--navy);text-align:center}
+.cal-year{font-size:1.1rem;color:#888;text-align:center}
+.day-headers{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px}
+.day-hdr{text-align:center;font-size:.92rem;font-weight:700;color:#999;padding:4px 0}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-day{aspect-ratio:1;border:1.5px solid #e4d8ff;border-radius:12px;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:3px;transition:.12s;position:relative}
+.cal-day:active{transform:scale(.94)}
+.cal-day.today{border:2px solid var(--purple);box-shadow:0 0 0 3px rgba(123,82,171,.2);background:linear-gradient(135deg,#f3e5ff,#fff)}
+.cal-day.has-plan{background:#fff}
+.cal-day.done-day{background:linear-gradient(135deg,#e8f5e9,#f0fff4);border-color:#a5d6a7}
+.cal-day.inprog-day{background:linear-gradient(135deg,#fffde7,#fff8e1);border-color:#ffe082}
+.cal-day-num{font-weight:700;font-size:1rem;color:var(--navy);line-height:1}
+.cal-day.past .cal-day-num{color:#bbb}
+.cal-day.today .cal-day-num{color:var(--blue)}
+.cal-prog-bar{width:75%;height:3px;background:#e0e4f4;border-radius:2px;overflow:hidden}
+.cal-prog-fill{height:100%;border-radius:2px;transition:width .3s}
+.cal-pct{font-size:1rem;font-weight:700;line-height:1}
+.cal-legend{display:flex;gap:12px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:.96rem;color:#666}
+.leg-dot{width:12px;height:12px;border-radius:3px;border:1px solid #ddd}
+
+/* DAY VIEW */
+.day-wrap{padding:14px 12px 80px}
+.day-back{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.day-back button{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:7px 14px;cursor:pointer;font-weight:700;color:var(--navy);font-size:1.1rem;font-family:Poppins,sans-serif}
+.day-back button:active{transform:scale(.97)}
+.day-title{flex:1}
+.day-title h2{font-family:'Patrick Hand',cursive;font-weight:700;font-size:1.5rem;color:var(--navy);line-height:1.2}
+.day-title p{font-size:1.1rem;color:#888;margin-top:2px}
+.edit-toggle{background:var(--navy);color:#fff;border:none;border-radius:9px;padding:7px 12px;cursor:pointer;font-weight:700;font-size:1rem;font-family:Poppins,sans-serif}
+.edit-toggle:active{transform:scale(.97)}
+
+/* PROGRESS RING CARD */
+.ring-card{background:linear-gradient(135deg,#3d2c8d,#7b52ab);border-radius:14px;padding:11px 13px;margin-bottom:10px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 16px rgba(90,50,150,.22)}
+.ring-wrap{flex-shrink:0}
+.ring-info{flex:1;color:#fff}
+.ring-name{font-family:'Patrick Hand',cursive;font-weight:700;font-size:1.05rem;line-height:1.2}
+.ring-tagline{font-size:.78rem;opacity:.85;font-style:italic;margin:2px 0 6px;font-family:'Patrick Hand',cursive}
+.ring-stats{display:flex;gap:8px}
+.ring-stat{text-align:center}
+.ring-stat-n{font-family:'Patrick Hand',cursive;font-weight:900;font-size:1.1rem;line-height:1}
+.ring-stat-l{font-size:.62rem;opacity:.7}
+
+/* MOTIVATION */
+.motivation{background:linear-gradient(135deg,#fff8e1,#fff3e0);border-radius:10px;padding:7px 11px;margin-bottom:9px;border-left:3px solid var(--gold);font-size:.82rem;font-style:italic;color:#5d4037;font-family:'Patrick Hand',cursive;font-weight:600;box-shadow:0 1px 6px rgba(255,179,0,.12)}
+
+/* SESSIONS */
+.session-card{background:#fff;border-radius:12px;margin-bottom:8px;overflow:hidden;box-shadow:0 2px 10px rgba(90,50,150,.08);border:1.5px solid #ede0ff}
+.session-card.all-done{border:1.5px solid #a5d6a7;background:linear-gradient(135deg,#f0fff4,#fff)}
+.sess-header{display:flex;align-items:center;gap:7px;padding:8px 11px;cursor:pointer;user-select:none}
+.sess-header:active{background:#fafbff}
+.sess-icon{font-size:.95rem;flex-shrink:0}
+.sess-info{flex:1}
+.sess-label{font-weight:700;font-size:.88rem;color:var(--navy);font-family:'Patrick Hand',cursive}
+.sess-sub{font-size:.72rem;color:#888;margin-top:1px}
+.sess-right{display:flex;align-items:center;gap:5px}
+.sess-pct{font-size:.78rem;font-weight:700;color:var(--green)}
+.done-badge{background:var(--green);color:#fff;font-size:.68rem;font-weight:800;padding:1px 6px;border-radius:6px}
+.chevron{font-size:.75rem;color:#bbb;transition:transform .2s}
+.chevron.open{transform:rotate(180deg)}
+.sess-prog{height:2px;background:#f0f2ff}
+.sess-prog-fill{height:100%;transition:width .4s}
+.sess-body{padding:7px 10px 9px;border-top:1px solid #f0f2ff}
+
+/* TICK ROWS */
+.tick-row{display:flex;align-items:center;gap:6px;padding:5px 7px;border-radius:7px;cursor:pointer;margin-bottom:2px;border:1px solid transparent;transition:.12s}
+.tick-row:active{transform:scale(.98)}
+.tick-row.done{background:linear-gradient(135deg,#f0fff4,#e8f5e9);border-color:#c8e6c9}
+.tick-box{width:18px;height:18px;border-radius:5px;border:2px solid #ce93d8;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s;font-size:.72rem;color:#fff}
+.tick-row.done .tick-box{background:#66bb6a;border-color:#66bb6a}
+.tick-label{font-size:.78rem;font-weight:600;flex:1;line-height:1.35}
+.tick-row.done .tick-label{text-decoration:line-through;color:#bbb}
+.sess-goal{font-size:.62rem;color:#7b52ab;background:linear-gradient(135deg,#f3eaff,#ede0ff);border-radius:10px;padding:8px 9px;text-align:center;width:72px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;box-shadow:0 2px 8px rgba(123,82,171,.12);border:1px solid #e4d4ff;align-self:flex-start;margin-top:2px}
+.sess-goal-icon{font-size:1.3rem;line-height:1}
+.sess-goal-label{font-size:.52rem;font-weight:800;color:#9c6dd8;text-transform:uppercase;letter-spacing:.6px}
+.sess-goal-text{font-size:.6rem;color:#6a3fa0;font-weight:600;line-height:1.3;word-break:break-word}
+.sess-body-inner{display:flex;gap:8px;align-items:flex-start}
+
+/* MINI GRID */
+.mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px}
+.mini-card{background:#fff;border-radius:9px;overflow:hidden;box-shadow:var(--shadow)}
+.mini-header{padding:5px 8px;display:flex;align-items:center;justify-content:space-between}
+.mini-title-text{color:#fff;font-weight:800;font-size:.72rem}
+.mini-dur{color:rgba(255,255,255,.75);font-size:.62rem}
+.mini-prog{height:2px;background:rgba(255,255,255,.3)}
+.mini-prog-fill{height:100%;background:rgba(255,255,255,.8);transition:width .3s}
+.mini-body{padding:5px 8px}
+.mini-tick{display:flex;align-items:center;gap:5px;padding:3px 5px;border-radius:5px;cursor:pointer;margin-bottom:1px}
+.mini-tick:active{transform:scale(.97)}
+.mini-tick-box{width:14px;height:14px;border-radius:3px;border:1.5px solid #bdbdbd;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.6rem;color:#fff}
+.mini-tick.done .mini-tick-box{background:var(--green);border-color:var(--green)}
+.mini-tick-label{font-size:.7rem;flex:1;line-height:1.3}
+.mini-tick.done .mini-tick-label{text-decoration:line-through;color:#bbb}
+
+/* DAILY TARGETS */
+.targets-card{background:linear-gradient(135deg,#3d2c8d,#7b52ab);border-radius:12px;padding:9px 11px;margin-bottom:9px;box-shadow:0 3px 12px rgba(90,50,150,.18)}
+.targets-title{color:var(--gold);font-weight:800;font-size:.72rem;text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px}
+.targets-pills{display:flex;flex-wrap:wrap;gap:5px}
+.target-pill{background:rgba(255,255,255,.15);border:none;border-radius:6px;padding:4px 9px;color:#fff;font-size:.72rem;font-weight:600;cursor:pointer;font-family:Poppins,sans-serif;transition:.12s}
+.target-pill:active{transform:scale(.95)}
+.target-pill.done{background:rgba(46,125,50,.55);text-decoration:line-through;opacity:.8}
+
+/* COMPLETE BANNER */
+.complete-banner{background:linear-gradient(135deg,#e8f5e9,#f0fff4);border:1.5px solid #a5d6a7;border-radius:12px;padding:12px;text-align:center;margin-top:6px;box-shadow:0 3px 10px rgba(46,125,50,.12)}
+.complete-banner .emoji{font-size:2rem}
+.complete-banner h3{font-family:'Patrick Hand',cursive;font-weight:700;color:var(--green);font-size:1.15rem;margin:3px 0 2px}
+.complete-banner p{color:#388e3c;font-size:.78rem;font-family:'Patrick Hand',cursive}
+
+/* NO PLAN */
+.no-plan{text-align:center;padding:60px 20px;background:#fff;border-radius:18px;border:2px dashed #d7c8f5}
+.no-plan .emoji{font-size:3rem;margin-bottom:10px}
+.no-plan h3{color:#888;font-weight:700;margin-bottom:8px;font-family:'Patrick Hand',cursive;font-size:1.6rem}
+.no-plan p{color:#aaa;font-size:1rem;margin-bottom:16px}
+
+/* EDITOR */
+.editor-wrap{padding:14px 12px 80px}
+.e-card{background:#fff;border-radius:16px;padding:18px 16px;margin-bottom:14px;box-shadow:var(--shadow)}
+.e-card-title{font-weight:800;font-size:1.1rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
+.e-inp{font-family:'Patrick Hand',cursive;font-size:1rem;padding:8px 12px;border:1.5px solid var(--border);border-radius:9px;width:100%;outline:none;background:#fafbff;color:var(--text)}
+.e-inp:focus{border-color:var(--blue)}
+.e-label{font-size:1.1rem;font-weight:700;color:#666;display:block;margin-bottom:3px;margin-top:8px}
+.e-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sess-editor{background:#f8f9ff;border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid #e0e4f4;position:relative}
+.task-row{display:flex;gap:6px;margin-bottom:5px;align-items:center}
+.task-row .e-inp{flex:1}
+.del-btn{background:none;border:none;color:#e53935;cursor:pointer;font-size:1rem;flex-shrink:0;padding:0 4px;line-height:1}
+.add-task-btn{background:none;border:1.5px dashed var(--border);border-radius:8px;padding:6px 12px;font-size:1rem;cursor:pointer;color:#777;font-family:Poppins,sans-serif;width:100%;margin-top:4px}
+.add-task-btn:hover{border-color:var(--blue);color:var(--blue)}
+.remove-sess-btn{position:absolute;top:10px;right:10px;background:none;border:1px solid #e53935;border-radius:7px;padding:3px 9px;font-size:.96rem;cursor:pointer;color:#e53935;font-family:Poppins,sans-serif}
+.add-section-btn{background:none;border:1.5px dashed var(--border);border-radius:10px;padding:9px 0;width:100%;font-size:.84rem;cursor:pointer;color:#777;font-family:Poppins,sans-serif;margin-top:4px}
+.publish-btn{background:linear-gradient(135deg,#3d2c8d,#7b52ab);color:#fff;border:none;border-radius:14px;padding:13px 40px;font-weight:700;font-size:1.2rem;cursor:pointer;font-family:'Patrick Hand',cursive;display:block;margin:0 auto;transition:.15s;box-shadow:0 4px 16px rgba(90,50,150,.3)}
+.publish-btn:active{transform:scale(.97)}
+.publish-btn:disabled{background:#aaa;cursor:not-allowed}
+
+/* FIREBASE CONFIG SCREEN */
+.fb-screen{padding:20px 14px 80px}
+.fb-screen h2{font-family:'Nunito',sans-serif;font-weight:900;color:var(--navy);font-size:1.3rem;margin-bottom:4px}
+.fb-screen p{color:#666;font-size:1.05rem;margin-bottom:18px;line-height:1.6}
+.step-num{display:inline-flex;width:24px;height:24px;background:var(--navy);color:#fff;border-radius:50%;font-size:1rem;font-weight:700;align-items:center;justify-content:center;margin-right:6px;flex-shrink:0}
+.step{display:flex;align-items:flex-start;margin-bottom:12px;gap:0}
+.step-text{font-size:1.05rem;color:#444;line-height:1.6;flex:1}
+.step-text a{color:var(--blue);text-decoration:none}
+code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color:var(--navy)}
+
+/* TOAST */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:linear-gradient(135deg,#3d2c8d,#7b52ab);color:#fff;padding:10px 20px;border-radius:12px;font-size:1.05rem;font-weight:600;z-index:500;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 16px rgba(90,50,150,.4)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* OFFLINE BANNER */
+.offline-bar{background:#e53935;color:#fff;text-align:center;font-size:1rem;font-weight:700;padding:5px;display:none}
+.offline-bar.show{display:block}
+
+/* BOTTOM TAB BAR */
+.tab-bar{position:fixed;bottom:0;left:0;right:0;height:58px;background:#fff;border-top:1px solid #e0e4f4;display:none;z-index:300;box-shadow:0 -4px 18px rgba(26,35,126,.1)}
+.tab-bar.show{display:flex}
+.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:none;background:none;cursor:pointer;padding:6px 0;transition:.15s;color:#999;font-family:Poppins,sans-serif}
+.tab-btn:active{transform:scale(.92)}
+.tab-btn.active{color:var(--purple)}
+.tab-icon{font-size:1.3rem;line-height:1}
+.tab-label{font-size:1rem;font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+.tab-btn.active .tab-label{color:var(--purple)}
+.screen{min-height:calc(100vh - 52px - 58px)}
+
+/* LEADERBOARD */
+.lb-wrap{padding:14px 12px 20px}
+.lb-header{text-align:center;margin-bottom:18px}
+.lb-header h2{font-family:'Patrick Hand',cursive;font-weight:700;font-size:1.7rem;color:var(--navy)}
+.lb-header p{font-size:1rem;color:#888;margin-top:2px}
+.lb-date-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:18px}
+.lb-date-btn{background:#fff;border:1.5px solid var(--border);border-radius:9px;padding:6px 14px;cursor:pointer;font-weight:700;color:var(--navy);font-size:1.1rem;font-family:Poppins,sans-serif}
+.lb-date-label{font-size:1.1rem;font-weight:700;color:var(--navy);background:#fff;border:1.5px solid var(--border);border-radius:9px;padding:6px 14px}
+.lb-top3{display:flex;align-items:flex-end;justify-content:center;gap:10px;margin-bottom:20px}
+.lb-podium{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:.15s}
+.lb-podium:active{transform:scale(.95)}
+.lb-avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:1.2rem;color:#fff;position:relative;border:3px solid transparent}
+.lb-podium.rank1 .lb-avatar{width:64px;height:64px;font-size:1.5rem;border-color:var(--gold);box-shadow:0 0 0 3px rgba(249,168,37,.3)}
+.lb-podium.rank2 .lb-avatar{border-color:#90a4ae}
+.lb-podium.rank3 .lb-avatar{border-color:#a1887f}
+.lb-crown{position:absolute;top:-14px;font-size:1rem}
+.lb-pname{font-size:.96rem;font-weight:700;color:var(--navy);text-align:center;max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-ppct{font-size:.8rem;font-weight:900;color:var(--green)}
+.lb-podium.rank1 .lb-ppct{font-size:1rem}
+.lb-block{height:36px;border-radius:6px 6px 0 0;width:54px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:900;color:#fff}
+.lb-podium.rank1 .lb-block{height:54px;width:66px;background:var(--gold)}
+.lb-podium.rank2 .lb-block{background:#90a4ae}
+.lb-podium.rank3 .lb-block{background:#a1887f}
+.lb-list{display:flex;flex-direction:column;gap:8px}
+.lb-row{background:#fff;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);cursor:pointer;transition:.15s;border:1.5px solid transparent}
+.lb-row:active{transform:scale(.98)}
+.lb-row.me{border-color:var(--blue);background:#f0f4ff}
+.lb-rank{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:#bbb;width:24px;text-align:center;flex-shrink:0}
+.lb-row.rank1-row .lb-rank{color:var(--gold)}
+.lb-row.rank2-row .lb-rank{color:#90a4ae}
+.lb-row.rank3-row .lb-rank{color:#a1887f}
+.lb-uavatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:1.15rem;color:#fff;flex-shrink:0}
+.lb-uinfo{flex:1;min-width:0}
+.lb-uname{font-weight:700;font-size:1.1rem;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-uname .me-tag{font-size:.65rem;background:var(--blue);color:#fff;border-radius:5px;padding:1px 5px;margin-left:5px;font-weight:700}
+.lb-ubar-wrap{height:5px;background:#f0f2ff;border-radius:3px;margin-top:4px;overflow:hidden}
+.lb-ubar{height:100%;border-radius:3px;transition:width .5s}
+.lb-upct{font-size:1.1rem;font-weight:900;flex-shrink:0}
+.lb-streak{font-size:.96rem;color:#f57f17;font-weight:700;margin-top:2px}
+.lb-no-data{text-align:center;padding:40px 20px;color:#aaa;font-size:1.1rem}
+.lb-empty-avatar{width:38px;height:38px;border-radius:50%;background:#f0f2ff;flex-shrink:0}
+
+/* PEER VIEW */
+.peer-back{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.peer-back button{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:7px 14px;cursor:pointer;font-weight:700;color:var(--navy);font-size:1.1rem;font-family:Poppins,sans-serif}
+.peer-banner{background:linear-gradient(135deg,#3d2c8d,#7b52ab);border-radius:18px;padding:16px 20px;margin-bottom:14px;display:flex;align-items:center;gap:14px;color:#fff;box-shadow:0 4px 18px rgba(90,50,150,.2)}
+.peer-big-avatar{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:1.4rem;color:#fff;flex-shrink:0;border:3px solid rgba(255,255,255,.4)}
+.peer-banner-info{flex:1}
+.peer-banner-name{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem}
+.peer-banner-sub{font-size:1rem;opacity:.8;margin-top:2px}
+.peer-tabs{display:flex;background:#f0f4ff;border-radius:12px;padding:3px;margin-bottom:14px;gap:3px}
+.peer-tab{flex:1;padding:8px 0;border:none;border-radius:9px;background:none;font-family:Poppins,sans-serif;font-size:.8rem;font-weight:700;color:#888;cursor:pointer;transition:.15s}
+.peer-tab.active{background:#fff;color:var(--navy);box-shadow:0 2px 8px rgba(26,35,126,.1)}
+.readonly-overlay{pointer-events:none;opacity:.85}
+.readonly-note{background:#fff3e0;border:1px solid #ffe0b2;border-radius:10px;padding:8px 12px;font-size:1rem;color:#e65100;font-weight:600;text-align:center;margin-bottom:10px}
+
+/* USER MANAGEMENT */
+.um-wrap{padding:14px 12px 20px}
+.um-header{text-align:center;margin-bottom:18px}
+.um-header h2{font-family:'Patrick Hand',cursive;font-weight:700;font-size:1.7rem;color:var(--navy)}
+.um-header p{font-size:1rem;color:#888;margin-top:2px}
+.um-stats{display:flex;gap:10px;margin-bottom:18px}
+.um-stat-card{flex:1;background:#fff;border-radius:12px;padding:12px;text-align:center;box-shadow:var(--shadow)}
+.um-stat-n{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.4rem;color:var(--navy)}
+.um-stat-l{font-size:.7rem;color:#888;margin-top:2px}
+.um-list{display:flex;flex-direction:column;gap:8px}
+.um-row{background:#fff;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow)}
+.um-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;color:#fff;flex-shrink:0}
+.um-info{flex:1;min-width:0}
+.um-name{font-weight:700;font-size:1.1rem;color:var(--navy)}
+.um-pass{font-size:.96rem;color:#888;margin-top:2px}
+.um-actions{display:flex;gap:6px;flex-shrink:0}
+.um-edit-btn{background:#e8eaf6;border:none;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:1rem;font-weight:700;color:var(--navy);font-family:Poppins,sans-serif}
+.um-del-btn{background:#ffebee;border:none;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:1rem;font-weight:700;color:#c62828;font-family:Poppins,sans-serif}
+.um-edit-btn:active,.um-del-btn:active{transform:scale(.95)}
+.um-no-users{text-align:center;padding:50px 20px;color:#aaa;font-size:1.1rem}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;display:none}
+.modal-overlay.show{display:flex}
+.modal-box{background:#fff;border-radius:20px;padding:28px 24px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-box h3{font-family:'Patrick Hand',cursive;font-weight:700;font-size:1.4rem;color:var(--navy);margin-bottom:6px}
+.modal-box p{font-size:1.05rem;color:#666;margin-bottom:18px;line-height:1.5}
+.modal-inp{font-family:'Patrick Hand',cursive;font-size:1.05rem;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;width:100%;outline:none;background:#fafbff;color:var(--text);margin-bottom:14px}
+.modal-inp:focus{border-color:var(--blue)}
+.modal-btns{display:flex;gap:10px}
+.modal-cancel{flex:1;padding:11px;border-radius:10px;border:1.5px solid var(--border);background:#fff;font-family:'Patrick Hand',cursive;font-weight:700;font-size:1rem;cursor:pointer;color:#666}
+.modal-confirm{flex:1;padding:11px;border-radius:10px;border:none;font-family:'Patrick Hand',cursive;font-weight:700;font-size:1rem;cursor:pointer;color:#fff}
+.modal-confirm.green{background:var(--green)}
+.modal-confirm.red{background:#c62828}
+</style>
+</head>
+<body>
+
+<!-- ══ NOTEBOOK DOODLES — injected dynamically each load ══ -->
+<div id="doodle-host"></div>
+
+<!-- OFFLINE BAR -->
+<div class="offline-bar" id="offline-bar">📵 Offline — changes will sync when you're back online! 🔄</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- NAV (hidden on login/setup) -->
+<div class="nav" id="nav" style="display:none">
+  <span class="nav-title">📚 Study Planner ✨</span>
+  <div class="sync-dot off" id="sync-dot" title="Connection status"></div>
+  <span class="nav-badge" id="role-badge" style="background:var(--gold);color:var(--navy)"></span>
+  <button class="nav-btn" onclick="showEditMyNameModal()" title="Edit my name">✏️</button>
+  <button class="nav-btn" onclick="signOut()">Sign out</button>
+</div>
+
+<!-- ══ SCREEN: FIREBASE SETUP ══ -->
+<div class="screen active" id="screen-setup">
+  <div class="fb-screen">
+    <h2>⚙️ One-time Setup</h2>
+    <p>This app uses <strong>Firebase Realtime Database</strong> (free) so all your users sync live without needing any platform. Do this once — paste your Firebase config below.</p>
+
+    <div class="step"><span class="step-num">1</span><span class="step-text">Go to <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> → Create a project (e.g. "StudyPlanner")</span></div>
+    <div class="step"><span class="step-num">2</span><span class="step-text">Click <strong>Realtime Database</strong> → Create database → Start in <strong>test mode</strong></span></div>
+    <div class="step"><span class="step-num">3</span><span class="step-text">Go to Project Settings (⚙️) → Your apps → Add web app → Register → Copy the <code>firebaseConfig</code> object</span></div>
+    <div class="step"><span class="step-num">4</span><span class="step-text">Paste the entire <code>firebaseConfig = { ... }</code> JSON below and click Save</span></div>
+
+    <div class="e-card" style="margin-top:8px">
+      <div class="e-card-title" style="color:var(--orange)">🔑 Firebase Config</div>
+      <p style="font-size:1rem;color:#888;margin-bottom:10px">Paste the config object from Firebase console (the part inside the curly braces)</p>
+      <textarea class="e-inp" id="fb-config-input" style="min-height:120px;font-family:monospace;font-size:.76rem" placeholder='{
+  "apiKey": "AIza...",
+  "authDomain": "yourapp.firebaseapp.com",
+  "databaseURL": "https://yourapp-default-rtdb.firebaseio.com",
+  "projectId": "yourapp",
+  "storageBucket": "yourapp.appspot.com",
+  "messagingSenderId": "123456",
+  "appId": "1:123456:web:abc123"
+}'></textarea>
+      <button class="btn btn-navy" style="margin-top:12px;width:100%;padding:12px" onclick="saveFirebaseConfig()">💾 Save & Connect</button>
+      <p style="font-size:.96rem;color:#aaa;margin-top:8px;text-align:center">Config is saved locally on this device only.</p>
+    </div>
+
+    <div class="e-card" style="border-left:4px solid var(--green)">
+      <div class="e-card-title" style="color:var(--green)">📱 How to distribute to users</div>
+      <p style="font-size:1.05rem;color:#555;line-height:1.6">
+        1. After setup, the creator saves this HTML file with the config pre-filled<br>
+        2. Share the HTML file via WhatsApp / Google Drive / any link<br>
+        3. Users open it in <strong>Chrome</strong> → tap the menu → <strong>"Add to Home Screen"</strong><br>
+        4. It installs as an app — works offline too, syncs when back online
+      </p>
+      <p style="font-size:1rem;color:#888;margin-top:8px">💡 Tip: After you configure Firebase, use your browser's "Save as" to save this page — the config gets embedded in the saved HTML for easy sharing.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN: LOGIN ══ -->
+<div class="screen" id="screen-login">
+  <div class="login-wrap">
+    <div class="login-card" style="position:relative;overflow:visible">
+      <!-- washi tape strip across top -->
+      <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%) rotate(-1.5deg);width:80px;height:22px;background:rgba(255,236,130,.8);border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,.1);z-index:5"></div>
+      <!-- mini doodle stickers -->
+      <div style="position:absolute;top:8px;right:12px;font-size:1.4rem;transform:rotate(12deg);opacity:.7">📎</div>
+      <div style="position:absolute;bottom:12px;left:10px;font-size:1.1rem;transform:rotate(-8deg);opacity:.6">🌸</div>
+      <div style="font-size:3rem">🌟</div>
+      <div id="login-date-display" style="font-family:'Patrick Hand',cursive;font-weight:700;font-size:1.1rem;color:var(--purple);margin:4px 0 2px"></div>
+      <h1 style="font-size:2rem">Study Planner 📚</h1>
+      <p>Let's crush it together! 💪</p>
+      <input class="inp" id="login-name" placeholder="Your name…" maxlength="30" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
+      <input class="inp" id="login-pass" type="password" placeholder="Password…" maxlength="20" onkeydown="if(event.key==='Enter')doLogin(pendingRole||'user')">
+      <div class="btn-row">
+        <button class="btn btn-navy" onclick="pendingRole='creator';doLogin('creator')">✏️ Creator</button>
+        <button class="btn btn-green" onclick="pendingRole='user';doLogin('user')">✅ User</button>
+      </div>
+      <p style="font-size:.96rem;color:#aaa;margin-top:14px">Creator publishes plans · Users track progress</p>
+      <button onclick="showSetup()" style="background:none;border:none;color:#bbb;font-size:.96rem;cursor:pointer;margin-top:10px;font-family:Poppins,sans-serif">⚙️ Change Firebase config</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN: CALENDAR ══ -->
+<div class="screen" id="screen-calendar">
+  <div class="cal-wrap" style="padding:14px 12px 80px">
+    <div id="cal-wrap-inner"></div>
+  </div>
+</div>
+
+<!-- ══ SCREEN: DAY ══ -->
+<div class="screen" id="screen-day">
+  <div class="day-wrap" id="day-content"></div>
+</div>
+
+<!-- ══ SCREEN: LEADERBOARD ══ -->
+<div class="screen" id="screen-leaderboard">
+  <div class="lb-wrap" id="lb-content"></div>
+</div>
+
+<!-- ══ SCREEN: PEER VIEW ══ -->
+<div class="screen" id="screen-peer">
+  <div class="day-wrap" id="peer-content"></div>
+</div>
+
+<!-- ══ SCREEN: USER MANAGEMENT (creator only) ══ -->
+<div class="screen" id="screen-users">
+  <div class="um-wrap" id="um-content"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-box" id="modal-box"></div>
+</div>
+
+<!-- BOTTOM TAB BAR -->
+<div class="tab-bar" id="tab-bar">
+  <button class="tab-btn active" id="tab-my" onclick="switchTab('my')">
+    <span class="tab-icon">📅</span>
+    <span class="tab-label">My Plan</span>
+  </button>
+  <button class="tab-btn" id="tab-lb" onclick="switchTab('lb')">
+    <span class="tab-icon">🏆</span>
+    <span class="tab-label">Leaderboard</span>
+  </button>
+  <button class="tab-btn" id="tab-users" style="display:none" onclick="switchTab('users')">
+    <span class="tab-icon">👥</span>
+    <span class="tab-label">Users</span>
+  </button>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════ */
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const COLORS = ['#1a237e','#2e7d32','#6a1b9a','#e65100','#00695c','#c62828'];
+const ICONS = ['🌅','🌤️','🌙','📖','✏️','🔬','💡','🎯'];
+const QUOTES = [
+  "✨ You've got this! Every page you read is a step closer to your dream!",
+  "🌟 Small steps every day lead to BIG results — keep going!",
+  "💪 Your future self is cheering you on right now!",
+  "🚀 The secret is to START — you're already here, that's amazing!",
+  "🌈 Consistency beats perfection — show up and shine!",
+  "☀️ Today's effort is tomorrow's success. Believe in yourself!",
+  "🎯 Focus. Breathe. You are more capable than you think!",
+  "💫 Every expert was once a beginner. Keep learning, keep growing!",
+];
+
+let db = null;
+let userName = '';
+let userRole = '';
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+let selectedDate = todayStr();
+let allPlans = {};      // date → plan
+let allProgress = {};   // date → {userName → {taskKey: bool}}
+let editingPlan = null;
+let planListeners = {};
+let progListeners = {};
+let isOnline = navigator.onLine;
+
+function todayStr() { return new Date().toISOString().split('T')[0]; }
+function dateStr(y,m,d) { return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
+
+/* ── Midnight date rollover ────────────────────────────────────
+   Schedules a refresh at exactly 00:00:00 local time each night.
+   Re-renders whichever screen is currently visible so "today"
+   highlights jump to the new date without a page reload.
+─────────────────────────────────────────────────────────────── */
+function scheduleMidnightRefresh() {
+  const now  = new Date();
+  // ms remaining until next local midnight
+  const msToMidnight = new Date(
+    now.getFullYear(), now.getMonth(), now.getDate() + 1,
+    0, 0, 0, 0
+  ) - now;
+
+  setTimeout(function onMidnight() {
+    const fresh = new Date();
+    // Sync the calendar month/year in case the month just rolled
+    calYear  = fresh.getFullYear();
+    calMonth = fresh.getMonth();
+
+    // Re-render whichever screen is active
+    const activeScreen = document.querySelector('.screen.active');
+    if (activeScreen) {
+      const id = activeScreen.id;
+      if (id === 'screen-calendar')    renderCalendar();
+      else if (id === 'screen-day')    renderDayView(selectedDate);
+      else if (id === 'screen-lb')     renderLeaderboard();
+    }
+
+    // Re-schedule for the NEXT midnight (handles multi-night stays)
+    scheduleMidnightRefresh();
+  }, msToMidnight);
+}
+// Kick off on app load
+scheduleMidnightRefresh();
+function daysInMonth(y,m) { return new Date(y,m+1,0).getDate(); }
+function firstDay(y,m) { return new Date(y,m,1).getDay(); }
+function fmtDisplay(ds) {
+  if(!ds) return '';
+  const d = new Date(ds+'T12:00:00');
+  return d.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+
+/* ═══════════════════════════════════════════
+   FIREBASE INIT
+═══════════════════════════════════════════ */
+function initFirebase(config) {
+  try {
+    if (firebase.apps.length) firebase.app().delete().catch(()=>{});
+    firebase.initializeApp(config);
+    db = firebase.database();
+    db.ref('.info/connected').on('value', snap => {
+      isOnline = !!snap.val();
+      document.getElementById('sync-dot').className = 'sync-dot' + (isOnline ? '' : ' off');
+      document.getElementById('offline-bar').className = 'offline-bar' + (isOnline ? '' : ' show');
+    });
+    return true;
+  } catch(e) {
+    console.error(e);
+    return false;
+  }
+}
+
+function saveFirebaseConfig() {
+  const raw = document.getElementById('fb-config-input').value.trim();
+  let config;
+  try {
+    // allow pasting with or without the variable name
+    const cleaned = raw.replace(/^.*?=\s*/,'').replace(/;?\s*$/,'');
+    config = JSON.parse(cleaned);
+  } catch(e) {
+    showToast('❌ Invalid JSON — check your config');
+    return;
+  }
+  if (!config.databaseURL) { showToast('❌ Missing databaseURL in config'); return; }
+  localStorage.setItem('fb_config', JSON.stringify(config));
+  if (initFirebase(config)) {
+    showToast('✅ Firebase connected!');
+    showScreen('login');
+  } else {
+    showToast('❌ Firebase init failed — check config');
+  }
+}
+
+function showSetup() { showScreen('setup'); }
+
+/* ═══════════════════════════════════════════
+   BOOT
+═══════════════════════════════════════════ */
+window.addEventListener('load', () => {
+  // Set live date on login screen
+  const loginDate = document.getElementById('login-date-display');
+  if (loginDate) {
+    const d = new Date();
+    loginDate.textContent = d.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  // Check saved firebase config
+  if (!localStorage.getItem('fb_config')) {
+  localStorage.setItem('fb_config', JSON.stringify({
+    "apiKey": "AIzaSyBgw9H5zTOyP8u-FAxWh5-VIC3Nka69gCM",
+    "authDomain": "studyplanner-1ab64.firebaseapp.com",
+    "databaseURL": "https://studyplanner-1ab64-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "projectId": "studyplanner-1ab64",
+    "storageBucket": "studyplanner-1ab64.firebasestorage.app",
+    "messagingSenderId": "1027107496017",
+    "appId": "1:1027107496017:web:1626655885af09b9851870"
+  }));
+}
+  const saved = localStorage.getItem('fb_config');
+  if (saved) {
+    try {
+      const config = JSON.parse(saved);
+      if (initFirebase(config)) {
+        // Check saved session — auto-login if found
+        const session = localStorage.getItem('session');
+        if (session) {
+          try {
+            const { name, role } = JSON.parse(session);
+            if (name && role) {
+              userName = name;
+              userRole = role;
+              lbDate = todayStr();
+              selectedDate = todayStr();
+              updateNavBadge();
+              startListeners();
+              openDayAfterLoad();
+              return;
+            }
+          } catch(e) {}
+        }
+        showScreen('login');
+        return;
+      }
+    } catch(e) {}
+  }
+  showScreen('setup');
+});
+
+window.addEventListener('online',  () => { isOnline=true; });
+window.addEventListener('offline', () => { isOnline=false; });
+
+/* ═══════════════════════════════════════════
+   SCREENS & TABS
+═══════════════════════════════════════════ */
+let activeTab = 'my';
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  const noNav = name==='setup'||name==='login';
+  document.getElementById('nav').style.display = noNav ? 'none' : 'flex';
+  document.getElementById('tab-bar').className = 'tab-bar' + (noNav ? '' : ' show');
+  // Show users tab only for creator
+  document.getElementById('tab-users').style.display = (!noNav && userRole==='creator') ? 'flex' : 'none';
+  if (name === 'calendar') { activeTab='my'; updateTabBar(); renderCalendar(); }
+  if (name === 'leaderboard') { activeTab='lb'; updateTabBar(); renderLeaderboard(); }
+  if (name === 'users') { activeTab='users'; updateTabBar(); renderUserManagement(); }
+}
+
+function updateTabBar() {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const t = document.getElementById('tab-' + activeTab);
+  if (t) t.classList.add('active');
+}
+
+function switchTab(tab) {
+  activeTab = tab;
+  updateTabBar();
+  if (tab === 'my') {
+    // Go to today's plan directly
+    selectedDate = todayStr();
+    renderDayView(selectedDate);
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-day').classList.add('active');
+  } else if (tab === 'lb') {
+    showScreen('leaderboard');
+  } else if (tab === 'users') {
+    showScreen('users');
+  }
+}
+
+/* ═══════════════════════════════════════════
+   PASSWORDS
+   Creator : 54321
+   User 1  : 101, User 2 : 102, User 3 : 103 …
+   User number is stored in Firebase under users/{name}
+   First time a name logs in → assigned next available number
+═══════════════════════════════════════════ */
+const CREATOR_PASS = '54321';
+const USER_PASS_BASE = 100; // user 1 → 101, user 2 → 102 …
+let pendingRole = 'user';
+
+async function doLogin(role) {
+  const name = document.getElementById('login-name').value.trim();
+  const pass = document.getElementById('login-pass').value.trim();
+  if (!name) { showToast('Please enter your name'); return; }
+  if (!pass)  { showToast('Please enter your password'); return; }
+
+  if (role === 'creator') {
+    if (pass !== CREATOR_PASS) { showToast('❌ Wrong creator password'); return; }
+    finishLogin(name, 'creator');
+    return;
+  }
+
+  // User login — look up or assign user number
+  if (!db) { showToast('❌ Not connected to Firebase'); return; }
+  try {
+    const snap = await db.ref(`users/${name}`).get();
+    let userNum;
+    if (snap.exists()) {
+      userNum = snap.val().num;
+    } else {
+      // New user — assign next number
+      const allSnap = await db.ref('users').get();
+      const allUsers = allSnap.val() || {};
+      const nums = Object.values(allUsers).map(u => u.num || 0);
+      userNum = nums.length ? Math.max(...nums) + 1 : 1;
+      await db.ref(`users/${name}`).set({ num: userNum });
+    }
+    const expectedPass = String(USER_PASS_BASE + userNum);
+    if (pass !== expectedPass) {
+      showToast(`❌ Wrong password for ${name}`);
+      return;
+    }
+    finishLogin(name, 'user');
+  } catch(e) {
+    showToast('❌ Login error — check connection');
+  }
+}
+
+function finishLogin(name, role) {
+  userName = name;
+  userRole = role;
+  lbDate = todayStr();
+  selectedDate = todayStr();
+  document.getElementById('login-pass').value = '';
+  // Save session so device remembers the user
+  localStorage.setItem('session', JSON.stringify({ name, role }));
+  updateNavBadge();
+  startListeners();
+  // Go straight to today's plan
+  openDayAfterLoad();
+}
+
+async function openDayAfterLoad() {
+  // Small delay to let Firebase load today's plan first
+  await new Promise(r => setTimeout(r, 800));
+  renderDayView(todayStr());
+  showScreen('day');
+}
+
+function updateNavBadge() {
+  const badge = document.getElementById('role-badge');
+  badge.textContent = userRole === 'creator' ? '✏️ Creator' : '✅ ' + userName;
+  badge.style.background = userRole === 'creator' ? 'var(--gold)' : '#4caf50';
+  badge.style.color = '#1a237e';
+}
+
+function showEditMyNameModal() {
+  if (userRole === 'creator') {
+    showModal(`
+      <h3>✏️ Edit Your Name</h3>
+      <p>Change the name shown for your Creator account.</p>
+      <input class="modal-inp" id="my-name-inp" value="${esc(userName)}" placeholder="Your name…" maxlength="30">
+      <div class="modal-btns">
+        <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+        <button class="modal-confirm green" onclick="confirmEditMyName()">✅ Save</button>
+      </div>
+    `);
+  } else {
+    const myData = allUsersData[userName];
+    const myNum = myData ? myData.num : null;
+    showModal(`
+      <h3>✏️ Edit Your Name</h3>
+      <p>Changing your name transfers all your progress to the new name. Your password stays the same (<strong>${myNum ? USER_PASS_BASE + myNum : '—'}</strong>).</p>
+      <input class="modal-inp" id="my-name-inp" value="${esc(userName)}" placeholder="Your name…" maxlength="30">
+      <div class="modal-btns">
+        <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+        <button class="modal-confirm green" onclick="confirmEditMyName()">✅ Save</button>
+      </div>
+    `);
+  }
+  const inp = document.getElementById('my-name-inp');
+  if (inp) { inp.focus(); inp.select(); }
+  inp && inp.addEventListener('keydown', e => { if(e.key==='Enter') confirmEditMyName(); });
+}
+
+async function confirmEditMyName() {
+  const newName = document.getElementById('my-name-inp')?.value.trim();
+  if (!newName) { showToast('Please enter a name'); return; }
+  if (newName === userName) { closeModal(); return; }
+
+  if (userRole === 'creator') {
+    userName = newName;
+    localStorage.setItem('session', JSON.stringify({ name: newName, role: 'creator' }));
+    updateNavBadge();
+    closeModal();
+    showToast(`✅ Name changed to "${newName}"`);
+    return;
+  }
+
+  // User — rename in Firebase
+  if (allUsersData[newName]) { showToast('❌ That name is already taken'); return; }
+  try {
+    const myData = allUsersData[userName];
+    const myNum = myData ? myData.num : 1;
+    const progSnap = await db.ref('progress').get();
+    const progData = progSnap.val() || {};
+    const updates = {};
+    Object.keys(progData).forEach(date => {
+      if (progData[date][userName]) {
+        updates[`progress/${date}/${newName}`] = progData[date][userName];
+        updates[`progress/${date}/${userName}`] = null;
+      }
+    });
+    updates[`users/${newName}`] = { num: myNum };
+    updates[`users/${userName}`] = null;
+    await db.ref().update(updates);
+    userName = newName;
+    localStorage.setItem('session', JSON.stringify({ name: newName, role: 'user' }));
+    updateNavBadge();
+    closeModal();
+    showToast(`✅ Name changed to "${newName}"`);
+  } catch(e) {
+    showToast('❌ Failed — check connection');
+  }
+}
+
+function signOut() {
+  Object.values(planListeners).forEach(off => off && off());
+  Object.values(progListeners).forEach(off => off && off());
+  planListeners = {}; progListeners = {};
+  allPlans = {}; allProgress = {}; allUsersData = {};
+  userName = ''; userRole = ''; pendingRole = 'user';
+  localStorage.removeItem('session');
+  document.getElementById('login-name').value = '';
+  document.getElementById('login-pass').value = '';
+  showScreen('login');
+}
+
+/* ═══════════════════════════════════════════
+   REALTIME LISTENERS
+═══════════════════════════════════════════ */
+function startListeners() {
+  if (!db) return;
+  db.ref('plans').on('value', snap => {
+    allPlans = snap.val() || {};
+    if (document.getElementById('screen-calendar').classList.contains('active')) renderCalendar();
+    if (document.getElementById('screen-day').classList.contains('active')) renderDayView(selectedDate);
+    if (document.getElementById('screen-leaderboard').classList.contains('active')) renderLeaderboard();
+    if (document.getElementById('screen-peer').classList.contains('active')) renderPeerView();
+  });
+  db.ref('progress').on('value', snap => {
+    allProgress = snap.val() || {};
+    if (document.getElementById('screen-calendar').classList.contains('active')) renderCalendar();
+    if (document.getElementById('screen-day').classList.contains('active')) renderDayView(selectedDate);
+    if (document.getElementById('screen-leaderboard').classList.contains('active')) renderLeaderboard();
+    if (document.getElementById('screen-peer').classList.contains('active')) renderPeerView();
+    if (document.getElementById('screen-users').classList.contains('active')) renderUserManagement();
+  });
+  db.ref('users').on('value', snap => {
+    allUsersData = snap.val() || {};
+    if (document.getElementById('screen-users').classList.contains('active')) renderUserManagement();
+  });
+}
+
+/* ═══════════════════════════════════════════
+   CALENDAR
+═══════════════════════════════════════════ */
+function changeMonth(dir) {
+  calMonth += dir;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCalendar();
+}
+
+const CAL_QUOTES = [
+  {e:'🔥', t:'Every day is a new opportunity to grow!'},
+  {e:'⚡', t:'Consistency beats perfection every time.'},
+  {e:'🏆', t:'Champions train even when they don\'t feel like it.'},
+  {e:'🌟', t:'Your daily effort compounds into greatness.'},
+  {e:'💪', t:'One more task done. One step closer to success!'},
+  {e:'🎯', t:'Focus on progress, not perfection.'},
+  {e:'🚀', t:'Small steps daily = giant leaps yearly.'},
+  {e:'🌈', t:'Stay consistent. Your results are coming.'},
+];
+
+function renderCalendar() {
+  const container = document.getElementById('cal-wrap-inner');
+  if (!container) return;
+
+  const today = todayStr();
+  const todayD = new Date();
+  const days = daysInMonth(calYear, calMonth);
+  const fd = firstDay(calYear, calMonth);
+  const isCurrentMonth = (calYear === todayD.getFullYear() && calMonth === todayD.getMonth());
+
+  // Compute monthly stats for current user
+  let totalTasks=0, doneTasks=0, plannedDays=0, completedDays=0, streakCount=getStreak(userName);
+  for (let d=1; d<=days; d++) {
+    const ds = dateStr(calYear, calMonth, d);
+    const plan = allPlans[ds];
+    if (!plan) continue;
+    plannedDays++;
+    const keys = getPlanTaskKeys(plan);
+    const myProg = (allProgress[ds]&&allProgress[ds][userName])||{};
+    const done = keys.filter(k=>myProg[k]).length;
+    totalTasks += keys.length;
+    doneTasks += done;
+    if (keys.length && keys.every(k=>myProg[k])) completedDays++;
+  }
+  const monthPct = totalTasks ? Math.round(doneTasks/totalTasks*100) : 0;
+
+  // Pick a daily rotating quote
+  const qIdx = (todayD.getDate() + todayD.getMonth()) % CAL_QUOTES.length;
+  const cq = CAL_QUOTES[qIdx];
+
+  const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DAY_LABELS = ['S','M','T','W','T','F','S'];
+
+  // Today's theme — drives calendar colour coherence
+  const calTheme = getDayTheme(today);
+  const calGrad = calTheme.grad;
+  const calAccent = calTheme.accent;
+  // Extract the two hex colours from the gradient for use in today's cell
+  const calCols = calGrad.match(/#[0-9a-f]{6}/gi) || ['#1a237e','#3949ab'];
+
+  let html = `
+  <!-- ── Hero banner ── -->
+  <div style="background:${calGrad};border-radius:20px;padding:18px 16px 16px;margin-bottom:14px;position:relative;overflow:hidden">
+    <div style="position:absolute;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.05);top:-40px;right:-30px"></div>
+    <div style="position:absolute;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.06);bottom:-20px;left:10px"></div>
+
+    <!-- month nav -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;position:relative">
+      <button onclick="changeMonth(-1)" style="background:rgba(255,255,255,.15);border:none;border-radius:10px;width:36px;height:36px;color:#fff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center">‹</button>
+      <div style="text-align:center">
+        <div style="font-family:'Nunito',sans-serif;font-weight:900;color:#fff;font-size:1.5rem;line-height:1">${MONTH_NAMES[calMonth]}</div>
+        <div style="color:rgba(255,255,255,.6);font-size:1rem;margin-top:2px">${calYear}</div>
+      </div>
+      <button onclick="changeMonth(1)" style="background:rgba(255,255,255,.15);border:none;border-radius:10px;width:36px;height:36px;color:#fff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center">›</button>
+    </div>
+
+    <!-- monthly stats row -->
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      ${[
+        [`${completedDays}/${plannedDays}`,'Days Done','📅'],
+        [`${monthPct}%`,'Progress','📊'],
+        [`${streakCount}`,'Day Streak','🔥'],
+        [`${doneTasks}/${totalTasks}`,'Tasks','✅'],
+      ].map(([v,l,e])=>`<div style="flex:1;background:rgba(255,255,255,.12);border-radius:10px;padding:7px 4px;text-align:center">
+        <div style="font-size:1rem;margin-bottom:1px">${e}</div>
+        <div style="font-family:'Nunito',sans-serif;font-weight:900;color:#fff;font-size:1.1rem;line-height:1">${v}</div>
+        <div style="font-size:.55rem;color:rgba(255,255,255,.65);margin-top:1px">${l}</div>
+      </div>`).join('')}
+    </div>
+
+    <!-- monthly progress bar -->
+    <div style="height:5px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden;margin-bottom:6px">
+      <div style="height:100%;width:${monthPct}%;background:${calAccent};border-radius:3px;transition:width .6s ease"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between">
+      ${[0,25,50,75,100].map(v=>`<span style="font-size:.55rem;color:rgba(255,255,255,.4)">${v}%</span>`).join('')}
+    </div>
+  </div>
+
+  <!-- ── Daily quote strip ── -->
+  <div style="background:#fff;border-radius:14px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 14px rgba(26,35,126,.08);border-left:4px solid ${calAccent}">
+    <span style="font-size:1.5rem;flex-shrink:0">${cq.e}</span>
+    <span style="font-size:1rem;color:#444;font-style:italic;font-weight:500;line-height:1.5">${cq.t}</span>
+  </div>
+
+  <!-- ── Day-of-week headers ── -->
+  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px">
+    ${DAY_LABELS.map((d,i)=>`<div style="text-align:center;font-size:.65rem;font-weight:800;color:${i===0||i===6?'#e53935':'#888'};padding:3px 0">${d}</div>`).join('')}
+  </div>
+
+  <!-- ── Calendar grid ── -->
+  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:14px">
+    ${Array.from({length:fd}).map(()=>`<div></div>`).join('')}
+    ${Array.from({length:days},(_,i)=>i+1).map(d=>{
+      const ds = dateStr(calYear, calMonth, d);
+      const plan = allPlans[ds];
+      const myProg = (allProgress[ds]&&allProgress[ds][userName])||{};
+      const keys = plan ? getPlanTaskKeys(plan) : [];
+      const done = keys.filter(k=>myProg[k]).length;
+      const pct = keys.length ? Math.round(done/keys.length*100) : 0;
+      const isToday = ds===today;
+      const isPast = ds<today;
+      const isFuture = ds>today;
+      const dow = new Date(ds+'T12:00:00').getDay();
+      const isWeekend = dow===0||dow===6;
+      const allDone = pct===100;
+      const inProg = pct>0&&pct<100;
+
+      // Pick background and border based on state
+      // Today's cell uses the daily theme gradient for full coherence
+      let bg='#fff', border='#e8eaf6', numColor=isWeekend?'#e53935':'#1a237e', shadow='';
+      if (isToday) { bg=calGrad; border=calCols[0]; numColor='#fff'; shadow=`0 4px 14px rgba(0,0,0,.25)`; }
+      else if (allDone) { bg='linear-gradient(135deg,#e8f5e9,#f1f8e9)'; border='#81c784'; }
+      else if (inProg) { bg='linear-gradient(135deg,#fff8e1,#fffde7)'; border='#ffd54f'; }
+      else if (plan && pct===0) { bg='#f0f4ff'; border='#9fa8da'; }
+      else if (isPast && !plan) { bg='#fafafa'; numColor='#ccc'; border='#f0f0f0'; }
+
+      const emoji = allDone?'✅':inProg?'📖':isToday?'⭐':plan?'📋':'';
+
+      return `<div onclick="openDay('${ds}')"
+        style="aspect-ratio:1;border-radius:12px;background:${bg};border:1.5px solid ${border};cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:3px;box-shadow:${shadow};transition:transform .12s,box-shadow .12s;position:relative"
+        onmousedown="this.style.transform='scale(.93)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(.93)'" ontouchend="this.style.transform=''">
+        ${isToday?`<div style="position:absolute;top:-1px;right:-1px;width:8px;height:8px;background:${calAccent};border-radius:50%;border:1.5px solid #fff"></div>`:''}
+        <span style="font-weight:900;font-size:1.05rem;color:${numColor};line-height:1">${d}</span>
+        ${emoji?`<span style="font-size:.65rem;line-height:1">${emoji}</span>`:''}
+        ${plan&&!allDone&&keys.length?`<div style="width:70%;height:2.5px;background:#e0e4f4;border-radius:2px;overflow:hidden;margin-top:1px">
+          <div style="height:100%;width:${pct}%;background:${inProg?calAccent:'#9fa8da'};border-radius:2px"></div>
+        </div>`:''}
+        ${plan&&keys.length?`<span style="font-size:.52rem;font-weight:700;color:${allDone?'#2e7d32':inProg?calAccent:'#9fa8da'};line-height:1">${pct}%</span>`:''}
+        ${userRole==='creator'&&!plan?`<span style="font-size:.5rem;color:#d0d4e8;line-height:1">+add</span>`:''}
+      </div>`;
+    }).join('')}
+  </div>
+
+  <!-- ── Legend ── -->
+  <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:12px">
+    ${[
+      ['linear-gradient(135deg,#e8f5e9,#f1f8e9)','#81c784','✅ Complete'],
+      ['linear-gradient(135deg,#fff8e1,#fffde7)','#ffd54f','📖 In Progress'],
+      ['#f0f4ff','#9fa8da','📋 Plan Added'],
+      ['#fff','#e8eaf6','— No Plan'],
+    ].map(([bg,border,label])=>`<div style="display:flex;align-items:center;gap:5px">
+      <div style="width:14px;height:14px;border-radius:4px;background:${bg};border:1.5px solid ${border}"></div>
+      <span style="font-size:.92rem;color:#666">${label}</span>
+    </div>`).join('')}
+  </div>
+
+  <!-- ── Motivational bottom strip ── -->
+  <div style="background:${calGrad};border-radius:14px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+    <div>
+      <div style="color:${calAccent};font-family:'Nunito',sans-serif;font-weight:900;font-size:1.05rem">🎯 ${isCurrentMonth?`Today is ${todayD.toLocaleDateString('en-IN',{weekday:'long'})}!`:`Keep going, ${userName}!`}</div>
+      <div style="color:rgba(255,255,255,.75);font-size:.7rem;margin-top:2px">${monthPct===100?'🏆 Perfect month! Legendary!':monthPct>=75?'💪 Almost a perfect month!':monthPct>=50?'⚡ Halfway there — keep pushing!':monthPct>0?'🚀 Good start — stay consistent!':'📅 Tap any day to start tracking'}</div>
+    </div>
+    <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:6px 12px;text-align:center;flex-shrink:0">
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;color:${calAccent};font-size:1.2rem">${monthPct}%</div>
+      <div style="font-size:.58rem;color:rgba(255,255,255,.6)">this month</div>
+    </div>
+  </div>`;
+
+  container.innerHTML = html;
+}
+
+function openDay(ds) {
+  selectedDate = ds;
+  renderDayView(ds);
+  showScreen('day');
+}
+
+/* ═══════════════════════════════════════════
+   DAY VIEW
+═══════════════════════════════════════════ */
+function getPlanTaskKeys(plan) {
+  if (!plan) return [];
+  const keys = [];
+  (plan.sessions||[]).forEach(s => (s.tasks||[]).forEach((_,ti) => keys.push(`${s.id}_${ti}`)));
+  (plan.miniSegments||[]).forEach(s => (s.tasks||[]).forEach((_,ti) => keys.push(`${s.id}_${ti}`)));
+  (plan.dailyTargets||[]).forEach((_,ti) => keys.push(`daily_${ti}`));
+  return keys;
+}
+
+function getMyProgress(date) {
+  return (allProgress[date] && allProgress[date][userName]) || {};
+}
+
+// Rich quote bank — categorised by progress level
+const QUOTES_START = [
+  {q:"The secret of getting ahead is getting started.", a:"Mark Twain", e:"🚀"},
+  {q:"You don't have to be great to start, but you have to start to be great.", a:"Zig Ziglar", e:"⚡"},
+  {q:"One step at a time is all it takes to get you there.", a:"Emily Dickinson", e:"👣"},
+  {q:"The journey of a thousand miles begins with one step.", a:"Lao Tzu", e:"🌏"},
+  {q:"Start where you are. Use what you have. Do what you can.", a:"Arthur Ashe", e:"💪"},
+  {q:"Believe you can and you're halfway there.", a:"Theodore Roosevelt", e:"🌟"},
+  {q:"Your future is created by what you do today, not tomorrow.", a:"Robert Kiyosaki", e:"🔥"},
+  {q:"Dream big. Start small. Act now.", a:"Robin Sharma", e:"🎯"},
+];
+const QUOTES_MID = [
+  {q:"Keep going. Everything you need will come to you at the perfect time.", a:"Anonymous", e:"⏩"},
+  {q:"You are doing better than you think.", a:"Anonymous", e:"💡"},
+  {q:"Push yourself because no one else is going to do it for you.", a:"Anonymous", e:"💥"},
+  {q:"Success is the sum of small efforts repeated day in and day out.", a:"Robert Collier", e:"📈"},
+  {q:"Hard work beats talent when talent doesn't work hard.", a:"Tim Notke", e:"🏆"},
+  {q:"Don't watch the clock; do what it does. Keep going.", a:"Sam Levenson", e:"⏰"},
+  {q:"The difference between ordinary and extraordinary is that little extra.", a:"Jimmy Johnson", e:"✨"},
+  {q:"Concentrate all your thoughts upon the work at hand.", a:"Alexander Graham Bell", e:"🎯"},
+];
+const QUOTES_DONE = [
+  {q:"Well done is better than well said.", a:"Benjamin Franklin", e:"🏅"},
+  {q:"Success is not final; failure is not fatal. It is the courage to continue that counts.", a:"Winston Churchill", e:"👑"},
+  {q:"You did it! Champions keep playing until they get it right.", a:"Billie Jean King", e:"🎊"},
+  {q:"The harder you work, the luckier you get.", a:"Gary Player", e:"🍀"},
+  {q:"Today you are one step closer to your dream.", a:"Anonymous", e:"🌈"},
+];
+
+// Day themes — rotate by date hash
+const DAY_THEMES = [
+  { grad:'linear-gradient(135deg,#1a237e,#283593)', accent:'#f9a825', ring:'#f9a825' },
+  { grad:'linear-gradient(135deg,#1b5e20,#2e7d32)', accent:'#69f0ae', ring:'#69f0ae' },
+  { grad:'linear-gradient(135deg,#4a148c,#6a1b9a)', accent:'#ea80fc', ring:'#ea80fc' },
+  { grad:'linear-gradient(135deg,#bf360c,#e64a19)', accent:'#ffccbc', ring:'#ffccbc' },
+  { grad:'linear-gradient(135deg,#006064,#00838f)', accent:'#80deea', ring:'#80deea' },
+  { grad:'linear-gradient(135deg,#880e4f,#ad1457)', accent:'#f48fb1', ring:'#f48fb1' },
+];
+
+// Milestone emojis shown as pct increases
+const MILESTONES = [
+  {at:25, emoji:'⚡', msg:'Great start!'},
+  {at:50, emoji:'🔥', msg:'Halfway there!'},
+  {at:75, emoji:'💪', msg:'Almost done!'},
+  {at:100, emoji:'🏆', msg:'Completed!'},
+];
+
+function dateHash(ds) {
+  return Math.abs(ds.split('-').reduce((a,b)=>a*31+parseInt(b),0));
+}
+
+function getDayTheme(ds) { return DAY_THEMES[dateHash(ds) % DAY_THEMES.length]; }
+
+function getDayQuote(ds, pct) {
+  const h = dateHash(ds);
+  if (pct === 100) return QUOTES_DONE[h % QUOTES_DONE.length];
+  if (pct >= 40)   return QUOTES_MID[h % QUOTES_MID.length];
+  return QUOTES_START[h % QUOTES_START.length];
+}
+
+// Fun session icons — larger pool
+const SESS_ICONS = ['🌅','📖','✏️','🔬','💡','🎯','🧠','⚡','🌙','🔭','📐','🎓','🧮','🗂️','📊','🏹'];
+const SESS_GRADIENTS = [
+  'linear-gradient(135deg,#1a237e,#3949ab)',
+  'linear-gradient(135deg,#1b5e20,#43a047)',
+  'linear-gradient(135deg,#4a148c,#8e24aa)',
+  'linear-gradient(135deg,#bf360c,#f4511e)',
+  'linear-gradient(135deg,#006064,#0097a7)',
+  'linear-gradient(135deg,#880e4f,#e91e63)',
+];
+
+function renderDayView(date) {
+  const plan = allPlans[date];
+  const myProg = getMyProgress(date);
+  const container = document.getElementById('day-content');
+  const keys = getPlanTaskKeys(plan);
+  const done = keys.filter(k=>myProg[k]).length;
+  const pct = keys.length ? Math.round(done/keys.length*100) : 0;
+  const theme = getDayTheme(date);
+  const quote = plan ? getDayQuote(date, pct) : null;
+  const streak = getStreak(userName);
+
+  // Header
+  let html = `<div class="day-back">
+    <button onclick="showScreen('calendar')">‹ Calendar</button>
+    <div class="day-title">
+      <h2>${fmtDisplay(date)}</h2>
+    </div>
+    ${userRole==='creator' ? `<button class="edit-toggle" onclick="openEditor('${date}')">${plan?'✏️ Edit':'➕ Create'}</button>` : ''}
+  </div>`;
+
+  if (!plan) {
+    html += `<div class="no-plan">
+      <div style="font-size:4rem;margin-bottom:8px">📭</div>
+      <h3>No plan yet</h3>
+      <p>${userRole==='creator' ? 'Create a plan for this day.' : 'The creator hasn\'t published a plan for this day yet.'}</p>
+      ${userRole==='creator' ? `<button class="btn btn-navy" style="padding:10px 24px;margin-top:8px" onclick="openEditor('${date}')">➕ Create Plan</button>` : ''}
+    </div>`;
+    container.innerHTML = html;
+    return;
+  }
+
+  // ── Hero progress ring card (peer-view style) ──
+  html += `<div class="ring-card" style="background:${theme.grad};margin-bottom:10px">
+    <div class="ring-wrap">
+      <svg width="76" height="76">
+        <circle cx="38" cy="38" r="31" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="5"/>
+        <circle cx="38" cy="38" r="31" fill="none" stroke="${pct===100?'#69f0ae':theme.accent}" stroke-width="5"
+          stroke-dasharray="${2*Math.PI*31}" stroke-dashoffset="${2*Math.PI*31*(1-pct/100)}"
+          stroke-linecap="round" style="transform:rotate(-90deg);transform-origin:38px 38px;transition:stroke-dashoffset .8s ease"/>
+        <text x="38" y="35" text-anchor="middle" fill="white" font-size="13" font-weight="900" font-family="Nunito,sans-serif">${pct}%</text>
+        <text x="38" y="47" text-anchor="middle" fill="rgba(255,255,255,.7)" font-size="7" font-family="Poppins,sans-serif">DONE</text>
+      </svg>
+    </div>
+    <div class="ring-info">
+      <div class="ring-name">${esc(plan.examName||'Study Plan')}</div>
+      ${plan.tagline?`<div class="ring-tagline">${esc(plan.tagline)}</div>`:''}
+      <div class="ring-stats">
+        <div class="ring-stat"><div class="ring-stat-n">${done}</div><div class="ring-stat-l">Done ✅</div></div>
+        <div class="ring-stat"><div class="ring-stat-n">${keys.length}</div><div class="ring-stat-l">Total 📋</div></div>
+        <div class="ring-stat"><div class="ring-stat-n">${streak}</div><div class="ring-stat-l">Streak 🔥</div></div>
+      </div>
+    </div>
+  </div>`;
+
+  // ── Quote card ──
+  html += `<div class="motivation">
+    <span style="font-size:1rem;margin-right:6px">${quote.e}</span>
+    <span style="font-style:italic;font-size:.8rem">"${quote.q}"</span>
+    <div style="font-size:.68rem;color:#9e7c60;margin-top:2px;font-weight:600">— ${quote.a}</div>
+  </div>`;
+
+  // ── Milestone nudge ──
+  const milestone = [...MILESTONES].reverse().find(m => pct >= m.at);
+  if (pct > 0 && pct < 100 && milestone) {
+    const nextM = MILESTONES.find(m => m.at > pct);
+    if (nextM) {
+      const remaining = keys.length - done;
+      html += `<div style="background:linear-gradient(90deg,rgba(255,255,255,.12),rgba(255,255,255,.06));border:1px solid ${theme.accent};border-radius:8px;padding:6px 10px;margin-bottom:9px;display:flex;align-items:center;gap:7px;backdrop-filter:blur(4px)">
+        <span style="font-size:.9rem">${nextM.emoji}</span>
+        <div>
+          <div style="font-size:.65rem;font-weight:700;color:${theme.accent}">${nextM.msg} — only ${remaining} task${remaining>1?'s':''} to go!</div>
+          <div style="font-size:.58rem;color:${theme.accent};opacity:.75;margin-top:1px">Next milestone at ${nextM.at}% 🎯</div>
+        </div>
+      </div>`;
+    }
+  }
+
+  // ── Sessions — notebook card style (matching peer view) ──
+  (plan.sessions||[]).forEach((s,si) => {
+    const tasks   = s.tasks||[];
+    const sDone   = tasks.filter((_,ti)=>myProg[`${s.id}_${ti}`]).length;
+    const sPct    = tasks.length ? Math.round(sDone/tasks.length*100) : 0;
+    const subCol  = s.subjectColor || COLORS[si%COLORS.length];
+
+    html += `<div class="session-card${sPct===100?' all-done':''}">
+      <div class="sess-header" onclick="toggleSessionBody('sb-${s.id}','sc-${s.id}')">
+        <span class="sess-icon">${SESS_ICONS[si%SESS_ICONS.length]}</span>
+        <div class="sess-info">
+          <div class="sess-label">${esc(s.label||'Session')}</div>
+          <div class="sess-sub">${esc(s.subject||'')}${s.duration?' · '+esc(s.duration):''}</div>
+          ${s.timeSlot?`<div style="font-size:.65rem;color:#aaa;margin-top:1px">🕐 ${esc(s.timeSlot)}</div>`:''}
+        </div>
+        <div class="sess-right">
+          ${sPct===100
+            ?`<span class="done-badge">✓ DONE</span>`
+            :`<span class="sess-pct" style="color:${subCol}">${sPct}%</span>`}
+          <span class="chevron open" id="sc-${s.id}">▼</span>
+        </div>
+      </div>
+      <div class="sess-prog"><div class="sess-prog-fill" style="width:${sPct}%;background:${subCol}"></div></div>
+      <div class="sess-body" id="sb-${s.id}">
+        <div class="sess-body-inner">
+          <div style="flex:1;min-width:0">
+            ${tasks.map((t,ti) => {
+              const k=`${s.id}_${ti}`, isDone=!!myProg[k];
+              return `<div class="tick-row${isDone?' done':''}" onclick="toggleTask('${date}','${k}',this)">
+                <div class="tick-box" style="${isDone?`background:${subCol};border-color:${subCol}`:'border-color:'+subCol}">${isDone?'✓':''}</div>
+                <span class="tick-label">${esc(t)}</span>
+                ${isDone?`<span style="font-size:.7rem;opacity:.6">✨</span>`:''}
+              </div>`;
+            }).join('')}
+            ${!tasks.length?`<div style="font-size:.72rem;color:#ccc;padding:6px;text-align:center">No tasks</div>`:''}
+            ${sPct===100?`<div style="text-align:center;padding:4px 0 1px;font-size:.72rem;font-weight:700;color:#2e7d32">🎉 Session Complete!</div>`:''}
+          </div>
+          ${s.goal?`<div class="sess-goal">
+            <span class="sess-goal-icon">🎯</span>
+            <span class="sess-goal-label">Goal</span>
+            <span class="sess-goal-text">${esc(s.goal)}</span>
+          </div>`:''}
+        </div>
+      </div>
+    </div>`;
+  });
+
+  // ── Mini segments — notebook mini-card style (theme-coherent colours) ──
+  if ((plan.miniSegments||[]).length) {
+    // Derive 6 tinted variants from the theme's gradient endpoints
+    const THEME_MINI_COLS = [
+      theme.grad.match(/#[0-9a-f]{6}/gi)?.[0] || '#1a237e',
+      theme.grad.match(/#[0-9a-f]{6}/gi)?.[1] || '#3949ab',
+      theme.accent,
+      theme.grad.match(/#[0-9a-f]{6}/gi)?.[0] || '#1a237e',
+      theme.grad.match(/#[0-9a-f]{6}/gi)?.[1] || '#3949ab',
+      theme.accent,
+    ];
+    html += `<div class="mini-grid">`;
+    (plan.miniSegments||[]).forEach((m,mi)=>{
+      const tasks = m.tasks||[];
+      const mDone = tasks.filter((_,ti)=>myProg[`${m.id}_${ti}`]).length;
+      const mPct  = tasks.length ? Math.round(mDone/tasks.length*100) : 0;
+      // Use creator-set colour if present, else derive from theme
+      const col   = m.subjectColor || THEME_MINI_COLS[mi % THEME_MINI_COLS.length];
+      html += `<div class="mini-card">
+        <div class="mini-header" style="background:${col}">
+          <span class="mini-title-text">${esc(m.title||'Segment')}</span>
+          <span class="mini-dur">${esc(m.duration||'')}${mPct===100?' ✅':` ${mPct}%`}</span>
+        </div>
+        ${m.timeSlot?`<div style="font-size:.62rem;color:#aaa;padding:2px 8px">🕐 ${esc(m.timeSlot)}</div>`:''}
+        <div class="mini-prog"><div class="mini-prog-fill" style="width:${mPct}%;background:${col}"></div></div>
+        <div class="mini-body">
+          ${tasks.map((t,ti)=>{
+            const k=`${m.id}_${ti}`, isDone=!!myProg[k];
+            return `<div class="mini-tick${isDone?' done':''}" onclick="toggleTask('${date}','${k}',null)" style="cursor:pointer">
+              <div class="mini-tick-box" style="${isDone?`background:${col};border-color:${col}`:'border-color:'+col}">${isDone?'✓':''}</div>
+              <span class="mini-tick-label">${esc(t)}</span>
+            </div>`;
+          }).join('')}
+          ${!tasks.length?`<p style="font-size:.65rem;color:#ccc;text-align:center;padding:3px">No tasks</p>`:''}
+          ${mPct===100?`<div style="text-align:center;font-size:.65rem;color:#2e7d32;font-weight:700;padding-top:3px">✅ Done!</div>`:''}
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // ── Daily targets — notebook targets-card style ──
+  if ((plan.dailyTargets||[]).length) {
+    const tDone = (plan.dailyTargets||[]).filter((_,ti)=>myProg[`daily_${ti}`]).length;
+    const tTotal = plan.dailyTargets.length;
+    html += `<div class="targets-card" style="background:${theme.grad}">
+      <div class="targets-title">🎯 Daily Targets${plan.totalTime?` <span style="float:right;font-size:.65rem;opacity:.8">⏱️ ${esc(plan.totalTime)}</span>`:''}
+      </div>
+      <div style="height:3px;background:rgba(255,255,255,.2);border-radius:2px;margin-bottom:7px;overflow:hidden">
+        <div style="height:100%;width:${tTotal?Math.round(tDone/tTotal*100):0}%;background:${theme.accent};border-radius:2px;transition:width .5s"></div>
+      </div>
+      <div class="targets-pills">
+        ${(plan.dailyTargets||[]).map((t,ti)=>{
+          const k=`daily_${ti}`, isDone=!!myProg[k];
+          return `<button onclick="toggleTask('${date}','${k}',null)" class="target-pill${isDone?' done':''}">
+            ${isDone?'✅ ':'☑️ '}${esc(t)}
+          </button>`;
+        }).join('')}
+      </div>
+      <div style="margin-top:7px;font-size:.65rem;color:rgba(255,255,255,.7);text-align:center">
+        ${tDone}/${tTotal} targets done 🏆
+      </div>
+    </div>`;
+  }
+
+  // ── Completion / kick-start banner ──
+  if (pct === 100) {
+    const h = dateHash(date);
+    const celebEmojis = ['🎉','🏆','🌟','🎊','👑','🥇','💯','🔥'];
+    const celebMsg = [
+      `Incredible work, ${esc(userName)}! You crushed it today! 💪`,
+      `${esc(userName)}, you are unstoppable! 100% complete! 🚀`,
+      `Outstanding, ${esc(userName)}! This is what champions look like! 🏅`,
+      `${esc(userName)} — another day, another victory! Keep going! 🌟`,
+    ][h % 4];
+    html += `<div class="complete-banner">
+      <div class="emoji">${celebEmojis[h%celebEmojis.length]}</div>
+      <h3>All Tasks Complete!</h3>
+      <p>${celebMsg}</p>
+    </div>`;
+  } else if (pct === 0 && keys.length > 0) {
+    html += `<div style="background:#fff;border:1.5px dashed #c5cae9;border-radius:10px;padding:10px;text-align:center;margin-top:3px">
+      <div style="font-size:1.3rem;margin-bottom:3px">🚀</div>
+      <div style="font-weight:700;color:#1a237e;font-size:.82rem">Ready to start your day?</div>
+      <div style="color:#888;font-size:.72rem;margin-top:2px">Tap any task above to begin. You've got this, ${esc(userName)}!</div>
     </div>`;
   }
 
