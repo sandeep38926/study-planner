@@ -522,6 +522,7 @@ let selectedDate = todayStr();
 let allPlans = {};      // date → plan
 let allProgress = {};   // date → {userName → {taskKey: bool}}
 let editingPlan = null;
+let isEditing = false;
 let planListeners = {};
 let progListeners = {};
 let isOnline = navigator.onLine;
@@ -842,14 +843,14 @@ function startListeners() {
   db.ref('plans').on('value', snap => {
     allPlans = snap.val() || {};
     if (document.getElementById('screen-calendar').classList.contains('active')) renderCalendar();
-    if (document.getElementById('screen-day').classList.contains('active')) renderDayView(selectedDate);
+    if (!isEditing && document.getElementById('screen-day').classList.contains('active')) renderDayView(selectedDate);
     if (document.getElementById('screen-leaderboard').classList.contains('active')) renderLeaderboard();
     if (document.getElementById('screen-peer').classList.contains('active')) renderPeerView();
   });
   db.ref('progress').on('value', snap => {
     allProgress = snap.val() || {};
     if (document.getElementById('screen-calendar').classList.contains('active')) renderCalendar();
-    if (document.getElementById('screen-day').classList.contains('active')) renderDayView(selectedDate);
+    if (!isEditing && document.getElementById('screen-day').classList.contains('active')) renderDayView(selectedDate);
     if (document.getElementById('screen-leaderboard').classList.contains('active')) renderLeaderboard();
     if (document.getElementById('screen-peer').classList.contains('active')) renderPeerView();
     if (document.getElementById('screen-users').classList.contains('active')) renderUserManagement();
@@ -1457,6 +1458,7 @@ async function toggleTask(date, key, el) {
    EDITOR
 ═══════════════════════════════════════════ */
 function openEditor(date) {
+  isEditing = true;
   selectedDate = date;
   editingPlan = allPlans[date] ? JSON.parse(JSON.stringify(allPlans[date])) : {
     examName:'Study Plan', tagline:'Plan Your Day, Ace Your Exam!',
@@ -1638,7 +1640,7 @@ function updateTarget(ti,v){ editingPlan.dailyTargets[ti]=v; }
 function removeTarget(ti){ saveEditorState(); editingPlan.dailyTargets.splice(ti,1); renderEditor(); }
 function addEditorTarget(){ saveEditorState(); editingPlan.dailyTargets.push(''); renderEditor(); }
 
-function cancelEditor() { renderDayView(selectedDate); }
+function cancelEditor() { isEditing = false; renderDayView(selectedDate); }
 
 async function publishPlan() {
   // Sync all live input values into editingPlan before publishing
@@ -1649,6 +1651,7 @@ async function publishPlan() {
   try {
     await db.ref(`plans/${selectedDate}`).set(editingPlan);
     allPlans[selectedDate] = editingPlan;
+    isEditing = false;
     showToast('✅ Plan published!');
     renderDayView(selectedDate);
   } catch(e) {
