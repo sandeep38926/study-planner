@@ -519,9 +519,10 @@ let userRole = '';
 let calYear = new Date().getFullYear();
 let calMonth = new Date().getMonth();
 let selectedDate = todayStr();
-let allPlans = {};      // date → plan
-let allProgress = {};   // date → {userName → {taskKey: bool}}
+let allPlans = {};
+let allProgress = {};
 let editingPlan = null;
+let isEditing = false;
 let planListeners = {};
 let progListeners = {};
 let isOnline = navigator.onLine;
@@ -660,10 +661,10 @@ function updateTabBar() {
 }
 
 function switchTab(tab) {
+  if (isEditing) return; // don't switch tabs while editing
   activeTab = tab;
   updateTabBar();
   if (tab === 'my') {
-    // Go to today's plan directly
     selectedDate = todayStr();
     renderDayView(selectedDate);
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -741,8 +742,10 @@ function finishLogin(name, role) {
 async function openDayAfterLoad() {
   // Small delay to let Firebase load today's plan first
   await new Promise(r => setTimeout(r, 800));
-  renderDayView(todayStr());
-  showScreen('day');
+  if (!isEditing) {
+    renderDayView(todayStr());
+    showScreen('day');
+  }
 }
 
 function updateNavBadge() {
@@ -1456,8 +1459,6 @@ async function toggleTask(date, key, el) {
 /* ═══════════════════════════════════════════
    EDITOR
 ═══════════════════════════════════════════ */
-let isEditing = false; // true while editor is open — blocks Firebase from overwriting it
-
 function openEditor(date) {
   selectedDate = date;
   isEditing = true;
@@ -1587,25 +1588,25 @@ function renderTargetEditor(t,ti) {
 }
 
 // Session ops
-function updateSess(id,k,v){ const s=editingPlan.sessions.find(s=>s.id===id); if(s) s[k]=v; }
-function removeEditorSession(id){ syncMetaToEditingPlan(); editingPlan.sessions=editingPlan.sessions.filter(s=>s.id!==id); renderEditor(); }
-function addEditorSession(){ syncMetaToEditingPlan(); editingPlan.sessions.push({id:'s_'+Date.now(),label:'',duration:'',timeSlot:'',subjectColor:'#1a237e',subject:'',goal:'',tasks:[]}); renderEditor(); }
-function addTaskToSess(id){ syncMetaToEditingPlan(); const s=editingPlan.sessions.find(s=>s.id===id); if(s){s.tasks.push(''); renderEditor();} }
-function updateTask(id,ti,v){ const s=editingPlan.sessions.find(s=>s.id===id); if(s)s.tasks[ti]=v; }
-function removeTask(id,ti){ syncMetaToEditingPlan(); const s=editingPlan.sessions.find(s=>s.id===id); if(s){s.tasks.splice(ti,1); renderEditor();} }
+function updateSess(id,k,v){ if(!editingPlan)return; const s=editingPlan.sessions.find(s=>s.id===id); if(s) s[k]=v; }
+function removeEditorSession(id){ if(!editingPlan)return; syncMetaToEditingPlan(); editingPlan.sessions=editingPlan.sessions.filter(s=>s.id!==id); renderEditor(); }
+function addEditorSession(){ if(!editingPlan)return; syncMetaToEditingPlan(); editingPlan.sessions.push({id:'s_'+Date.now(),label:'',duration:'',timeSlot:'',subjectColor:'#1a237e',subject:'',goal:'',tasks:[]}); renderEditor(); }
+function addTaskToSess(id){ if(!editingPlan)return; syncMetaToEditingPlan(); const s=editingPlan.sessions.find(s=>s.id===id); if(s){s.tasks.push(''); renderEditor();} }
+function updateTask(id,ti,v){ if(!editingPlan)return; const s=editingPlan.sessions.find(s=>s.id===id); if(s)s.tasks[ti]=v; }
+function removeTask(id,ti){ if(!editingPlan)return; syncMetaToEditingPlan(); const s=editingPlan.sessions.find(s=>s.id===id); if(s){s.tasks.splice(ti,1); renderEditor();} }
 
 // Mini ops
-function updateMini(id,k,v){ const m=editingPlan.miniSegments.find(m=>m.id===id); if(m) m[k]=v; }
-function removeEditorMini(id){ syncMetaToEditingPlan(); editingPlan.miniSegments=editingPlan.miniSegments.filter(m=>m.id!==id); renderEditor(); }
-function addEditorMini(){ syncMetaToEditingPlan(); editingPlan.miniSegments.push({id:'m_'+Date.now(),title:'',duration:'',timeSlot:'',subjectColor:'#c62828',tasks:[]}); renderEditor(); }
-function addMiniTask(id){ syncMetaToEditingPlan(); const m=editingPlan.miniSegments.find(m=>m.id===id); if(m){m.tasks.push(''); renderEditor();} }
-function updateMiniTask(id,ti,v){ const m=editingPlan.miniSegments.find(m=>m.id===id); if(m)m.tasks[ti]=v; }
-function removeMiniTask(id,ti){ syncMetaToEditingPlan(); const m=editingPlan.miniSegments.find(m=>m.id===id); if(m){m.tasks.splice(ti,1); renderEditor();} }
+function updateMini(id,k,v){ if(!editingPlan)return; const m=editingPlan.miniSegments.find(m=>m.id===id); if(m) m[k]=v; }
+function removeEditorMini(id){ if(!editingPlan)return; syncMetaToEditingPlan(); editingPlan.miniSegments=editingPlan.miniSegments.filter(m=>m.id!==id); renderEditor(); }
+function addEditorMini(){ if(!editingPlan)return; syncMetaToEditingPlan(); editingPlan.miniSegments.push({id:'m_'+Date.now(),title:'',duration:'',timeSlot:'',subjectColor:'#c62828',tasks:[]}); renderEditor(); }
+function addMiniTask(id){ if(!editingPlan)return; syncMetaToEditingPlan(); const m=editingPlan.miniSegments.find(m=>m.id===id); if(m){m.tasks.push(''); renderEditor();} }
+function updateMiniTask(id,ti,v){ if(!editingPlan)return; const m=editingPlan.miniSegments.find(m=>m.id===id); if(m)m.tasks[ti]=v; }
+function removeMiniTask(id,ti){ if(!editingPlan)return; syncMetaToEditingPlan(); const m=editingPlan.miniSegments.find(m=>m.id===id); if(m){m.tasks.splice(ti,1); renderEditor();} }
 
 // Target ops
-function updateTarget(ti,v){ editingPlan.dailyTargets[ti]=v; }
-function removeTarget(ti){ syncMetaToEditingPlan(); editingPlan.dailyTargets.splice(ti,1); renderEditor(); }
-function addEditorTarget(){ syncMetaToEditingPlan(); editingPlan.dailyTargets.push(''); renderEditor(); }
+function updateTarget(ti,v){ if(!editingPlan)return; editingPlan.dailyTargets[ti]=v; }
+function removeTarget(ti){ if(!editingPlan)return; syncMetaToEditingPlan(); editingPlan.dailyTargets.splice(ti,1); renderEditor(); }
+function addEditorTarget(){ if(!editingPlan)return; syncMetaToEditingPlan(); editingPlan.dailyTargets.push(''); renderEditor(); }
 
 function cancelEditor() { isEditing = false; renderDayView(selectedDate); }
 
