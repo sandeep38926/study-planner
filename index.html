@@ -1,4 +1,4 @@
-<!-- Version 12 -->
+<!-- Version 13 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -457,7 +457,7 @@ body::before {
 .day-wrap  { padding-right: 4px !important; }
 .lb-wrap   { padding-right: 4px !important; }
 .editor-wrap { padding-right: 4px !important; }
-.sess-header { padding: 10px 8px !important; }
+.sess-header { padding: 7px 8px !important; }
 .sess-body   { padding: 8px 8px 10px !important; }
 .ring-card   { padding: 14px 10px !important; }
 .targets-card { padding: 12px 10px !important; }
@@ -635,8 +635,8 @@ body{font-family:'Patrick Hand',cursive;font-size:22px;background:var(--bg);colo
 .sess-header:active{background:#fafbff}
 .sess-icon{font-size:.95rem;flex-shrink:0}
 .sess-info{flex:1}
-.sess-label{font-weight:700;font-size:.88rem;color:var(--navy);font-family:'Patrick Hand',cursive}
-.sess-sub{font-size:.72rem;color:#888;margin-top:1px}
+.sess-label{font-weight:700;font-size:.88rem;color:var(--navy);font-family:'Patrick Hand',cursive;line-height:1.1}
+.sess-sub{font-size:.72rem;color:#888;margin-top:0px;line-height:1.1}
 .sess-right{display:flex;align-items:center;gap:5px}
 .sess-pct{font-size:.78rem;font-weight:700;color:var(--green)}
 .done-badge{background:var(--green);color:#fff;font-size:.68rem;font-weight:800;padding:1px 6px;border-radius:6px}
@@ -1569,7 +1569,7 @@ function getPlanTaskKeys(plan) {
   const keys = [];
   (plan.sessions||[]).forEach(s => (s.tasks||[]).forEach((_,ti) => keys.push(`${s.id}_${ti}`)));
   (plan.miniSegments||[]).forEach(s => (s.tasks||[]).forEach((_,ti) => keys.push(`${s.id}_${ti}`)));
-  (plan.dailyTargets||[]).forEach((_,ti) => keys.push(`daily_${ti}`));
+  // dailyTargets are intentionally excluded — they are not counted in total tasks
   return keys;
 }
 
@@ -1738,7 +1738,7 @@ function renderDayView(date) {
         <div class="sess-info">
           <div class="sess-label">${esc(s.label||'Session')}</div>
           <div class="sess-sub">${esc(s.subject||'')}${s.duration?' · '+esc(s.duration):''}</div>
-          ${s.timeSlot?`<div style="font-size:.65rem;color:#aaa;margin-top:1px">🕐 ${esc(s.timeSlot)}</div>`:''}
+          ${s.timeSlot?`<div style="font-size:.65rem;color:#aaa;margin-top:0px;line-height:1.1">🕐 ${esc(s.timeSlot)}</div>`:''}
         </div>
         <div class="sess-right">
           ${sPct===100
@@ -1788,10 +1788,11 @@ function renderDayView(date) {
       const tasks = m.tasks||[];
       const mDone = tasks.filter((_,ti)=>myProg[`${m.id}_${ti}`]).length;
       const mPct  = tasks.length ? Math.round(mDone/tasks.length*100) : 0;
-      // Use creator-set colour if present, else derive from theme
-      const col   = m.subjectColor || THEME_MINI_COLS[mi % THEME_MINI_COLS.length];
+      // Use creator-set colour if present, else use day theme gradient for coherence
+      const col   = m.subjectColor || theme.accent;
+      const headerBg = m.subjectColor ? m.subjectColor : theme.grad;
       html += `<div class="mini-card">
-        <div class="mini-header" style="background:${col}">
+        <div class="mini-header" style="background:${headerBg}">
           <span class="mini-title-text">${esc(m.title||'Segment')}</span>
           <span class="mini-dur">${esc(m.duration||'')}${mPct===100?' ✅':` ${mPct}%`}</span>
         </div>
