@@ -842,14 +842,14 @@ function startListeners() {
   db.ref('plans').on('value', snap => {
     allPlans = snap.val() || {};
     if (document.getElementById('screen-calendar').classList.contains('active')) renderCalendar();
-    if (document.getElementById('screen-day').classList.contains('active')) renderDayView(selectedDate);
+    if (document.getElementById('screen-day').classList.contains('active') && !isEditing) renderDayView(selectedDate);
     if (document.getElementById('screen-leaderboard').classList.contains('active')) renderLeaderboard();
     if (document.getElementById('screen-peer').classList.contains('active')) renderPeerView();
   });
   db.ref('progress').on('value', snap => {
     allProgress = snap.val() || {};
     if (document.getElementById('screen-calendar').classList.contains('active')) renderCalendar();
-    if (document.getElementById('screen-day').classList.contains('active')) renderDayView(selectedDate);
+    if (document.getElementById('screen-day').classList.contains('active') && !isEditing) renderDayView(selectedDate);
     if (document.getElementById('screen-leaderboard').classList.contains('active')) renderLeaderboard();
     if (document.getElementById('screen-peer').classList.contains('active')) renderPeerView();
     if (document.getElementById('screen-users').classList.contains('active')) renderUserManagement();
@@ -1456,14 +1456,22 @@ async function toggleTask(date, key, el) {
 /* ═══════════════════════════════════════════
    EDITOR
 ═══════════════════════════════════════════ */
+let isEditing = false; // true while editor is open — blocks Firebase from overwriting it
+
 function openEditor(date) {
   selectedDate = date;
+  isEditing = true;
   editingPlan = allPlans[date] ? JSON.parse(JSON.stringify(allPlans[date])) : {
     examName:'Study Plan', tagline:'Plan Your Day, Ace Your Exam!',
     totalTime:'', sessions:[], miniSegments:[], dailyTargets:[], date
   };
   renderEditor();
-  showScreen('day'); // editor renders inside day screen
+  // Show day screen without triggering renderDayView
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-day').classList.add('active');
+  document.getElementById('nav').style.display = 'flex';
+  document.getElementById('tab-bar').className = 'tab-bar show';
+  document.getElementById('tab-users').style.display = userRole==='creator' ? 'flex' : 'none';
 }
 
 function syncMetaToEditingPlan() {
@@ -1599,7 +1607,7 @@ function updateTarget(ti,v){ editingPlan.dailyTargets[ti]=v; }
 function removeTarget(ti){ syncMetaToEditingPlan(); editingPlan.dailyTargets.splice(ti,1); renderEditor(); }
 function addEditorTarget(){ syncMetaToEditingPlan(); editingPlan.dailyTargets.push(''); renderEditor(); }
 
-function cancelEditor() { renderDayView(selectedDate); }
+function cancelEditor() { isEditing = false; renderDayView(selectedDate); }
 
 async function publishPlan() {
   // Sync meta fields
@@ -1612,6 +1620,7 @@ async function publishPlan() {
   try {
     await db.ref(`plans/${selectedDate}`).set(editingPlan);
     allPlans[selectedDate] = editingPlan;
+    isEditing = false;
     showToast('✅ Plan published!');
     renderDayView(selectedDate);
   } catch(e) {
