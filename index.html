@@ -231,25 +231,275 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min
 .no-plan h3{color:#888;font-weight:700;margin-bottom:8px}
 .no-plan p{color:#aaa;font-size:.82rem;margin-bottom:16px}
 
-/* EDITOR */
-.editor-wrap{padding:14px 12px 80px}
-.e-card{background:#fff;border-radius:16px;padding:18px 16px;margin-bottom:14px;box-shadow:var(--shadow)}
-.e-card-title{font-weight:800;font-size:.9rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
-.e-inp{font-family:'Poppins',sans-serif;font-size:.84rem;padding:8px 12px;border:1.5px solid var(--border);border-radius:9px;width:100%;outline:none;background:#fafbff;color:var(--text)}
-.e-inp:focus{border-color:var(--blue)}
-.e-label{font-size:.73rem;font-weight:600;color:#666;display:block;margin-bottom:3px;margin-top:8px}
-.e-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.sess-editor{background:#f8f9ff;border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid #e0e4f4;position:relative}
-.task-row{display:flex;gap:6px;margin-bottom:5px;align-items:center}
+/* EDITOR — Handwritten Notebook Style */
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Patrick+Hand&display=swap');
+
+:root {
+  --paper:#fffdf5;
+  --paper2:#fff9e8;
+  --ink:#2c2016;
+  --ink2:#4a3728;
+  --rule:#c8d4e8;
+  --red-margin:#e8a0a0;
+  --pencil:#8b7355;
+  --sketch-blue:#3a5a8c;
+}
+
+.editor-wrap{
+  padding:0 0 80px;
+  background:var(--paper);
+  min-height:100vh;
+  position:relative;
+}
+
+/* Ruled lines background across entire editor */
+.editor-wrap::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:
+    repeating-linear-gradient(
+      transparent,
+      transparent 27px,
+      var(--rule) 27px,
+      var(--rule) 28px
+    );
+  background-position:0 52px;
+  pointer-events:none;
+  z-index:0;
+  opacity:.55;
+}
+
+/* Red margin line */
+.editor-wrap::after{
+  content:'';
+  position:fixed;
+  top:0; left:52px; bottom:0;
+  width:2px;
+  background:var(--red-margin);
+  pointer-events:none;
+  z-index:0;
+  opacity:.7;
+}
+
+/* All editor children sit above the ruled bg */
+.editor-wrap > * { position:relative; z-index:1; }
+
+.e-card{
+  background:transparent;
+  border-radius:0;
+  padding:18px 18px 18px 68px;
+  margin-bottom:4px;
+  box-shadow:none;
+  border:none;
+  border-top:2px dashed rgba(139,115,85,.25);
+}
+.e-card:first-child{ border-top:none; }
+
+.e-card-title{
+  font-family:'Caveat',cursive;
+  font-weight:700;
+  font-size:1.45rem;
+  color:var(--sketch-blue);
+  text-transform:none;
+  letter-spacing:.5px;
+  margin-bottom:12px;
+  line-height:1.2;
+  /* hand-underline effect */
+  border-bottom:2.5px solid;
+  border-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='4'%3E%3Cpath d='M0 3 Q5 1 10 3 Q15 4 20 2' stroke='%233a5a8c' stroke-width='1.5' fill='none'/%3E%3C/svg%3E") 0 0 100% 0 / 0 0 3px 0 round;
+  padding-bottom:4px;
+  display:inline-block;
+}
+
+/* Inputs look like handwritten underlined lines */
+.e-inp{
+  font-family:'Patrick Hand',cursive;
+  font-size:.95rem;
+  padding:6px 4px 4px;
+  border:none;
+  border-bottom:2px solid var(--pencil);
+  border-radius:0;
+  width:100%;
+  outline:none;
+  background:transparent;
+  color:var(--ink);
+  transition:border-color .2s;
+  caret-color:var(--sketch-blue);
+}
+.e-inp:focus{
+  border-bottom:2.5px solid var(--sketch-blue);
+  background:rgba(58,90,140,.04);
+}
+.e-inp::placeholder{ color:rgba(139,115,85,.55); font-style:italic; }
+
+/* Select inherits the same pen-line style */
+select.e-inp{
+  -webkit-appearance:none;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1 L6 7 L11 1' stroke='%238b7355' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 4px center;
+  padding-right:22px;
+  cursor:pointer;
+}
+
+.e-label{
+  font-family:'Caveat',cursive;
+  font-size:.92rem;
+  font-weight:600;
+  color:var(--pencil);
+  display:block;
+  margin-bottom:2px;
+  margin-top:10px;
+}
+
+.e-grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* Session blocks look like sticky-note tabs */
+.sess-editor{
+  background:rgba(255,248,220,.6);
+  border-radius:2px 8px 8px 2px;
+  padding:14px 14px 14px 20px;
+  margin-bottom:12px;
+  border:none;
+  border-left:4px solid var(--sketch-blue);
+  position:relative;
+  box-shadow:2px 3px 8px rgba(44,32,22,.08);
+}
+.sess-editor:nth-child(2n){ background:rgba(220,235,255,.45); border-left-color:#5a7a3c; }
+.sess-editor:nth-child(3n){ background:rgba(255,230,220,.45); border-left-color:#a04040; }
+
+.task-row{display:flex;gap:6px;margin-bottom:4px;align-items:center}
 .task-row .e-inp{flex:1}
-.del-btn{background:none;border:none;color:#e53935;cursor:pointer;font-size:1rem;flex-shrink:0;padding:0 4px;line-height:1}
-.add-task-btn{background:none;border:1.5px dashed var(--border);border-radius:8px;padding:6px 12px;font-size:.78rem;cursor:pointer;color:#777;font-family:Poppins,sans-serif;width:100%;margin-top:4px}
-.add-task-btn:hover{border-color:var(--blue);color:var(--blue)}
-.remove-sess-btn{position:absolute;top:10px;right:10px;background:none;border:1px solid #e53935;border-radius:7px;padding:3px 9px;font-size:.72rem;cursor:pointer;color:#e53935;font-family:Poppins,sans-serif}
-.add-section-btn{background:none;border:1.5px dashed var(--border);border-radius:10px;padding:9px 0;width:100%;font-size:.84rem;cursor:pointer;color:#777;font-family:Poppins,sans-serif;margin-top:4px}
-.publish-btn{background:var(--navy);color:#fff;border:none;border-radius:12px;padding:13px 40px;font-weight:700;font-size:1rem;cursor:pointer;font-family:Poppins,sans-serif;display:block;margin:0 auto;transition:.15s}
-.publish-btn:active{transform:scale(.97)}
-.publish-btn:disabled{background:#aaa;cursor:not-allowed}
+
+/* Task delete looks like eraser scratch */
+.del-btn{
+  background:none;
+  border:none;
+  color:#c0504040;
+  cursor:pointer;
+  font-size:1rem;
+  flex-shrink:0;
+  padding:0 4px;
+  line-height:1;
+  opacity:.6;
+  transition:opacity .2s;
+  font-family:'Caveat',cursive;
+}
+.del-btn:hover{ opacity:1; color:#c05040; }
+
+/* Add task button — looks like a pencil annotation */
+.add-task-btn{
+  background:none;
+  border:none;
+  border-bottom:1.5px dashed var(--pencil);
+  border-radius:0;
+  padding:5px 0;
+  font-size:.88rem;
+  cursor:pointer;
+  color:var(--pencil);
+  font-family:'Caveat',cursive;
+  width:100%;
+  margin-top:6px;
+  text-align:left;
+  letter-spacing:.3px;
+  opacity:.75;
+  transition:opacity .2s;
+}
+.add-task-btn:hover{ opacity:1; color:var(--sketch-blue); border-bottom-color:var(--sketch-blue); }
+
+.remove-sess-btn{
+  position:absolute;
+  top:8px;right:8px;
+  background:none;
+  border:none;
+  font-size:.72rem;
+  cursor:pointer;
+  color:rgba(160,64,64,.6);
+  font-family:'Caveat',cursive;
+  padding:2px 6px;
+  letter-spacing:.3px;
+}
+.remove-sess-btn:hover{ color:#a04040; }
+
+/* Add section button — looks like a margin note */
+.add-section-btn{
+  background:none;
+  border:2px dashed rgba(139,115,85,.3);
+  border-radius:6px;
+  padding:9px 0;
+  width:100%;
+  font-size:.95rem;
+  cursor:pointer;
+  color:var(--pencil);
+  font-family:'Caveat',cursive;
+  margin-top:6px;
+  letter-spacing:.4px;
+  transition:.2s;
+}
+.add-section-btn:hover{ border-color:var(--sketch-blue); color:var(--sketch-blue); background:rgba(58,90,140,.04); }
+
+/* Publish button — looks like a rubber stamp */
+.publish-btn{
+  background:var(--sketch-blue);
+  color:#fff;
+  border:none;
+  border-radius:4px;
+  padding:13px 40px;
+  font-weight:700;
+  font-size:1.2rem;
+  cursor:pointer;
+  font-family:'Caveat',cursive;
+  display:block;
+  margin:20px auto 0;
+  transition:.15s;
+  letter-spacing:1px;
+  box-shadow:3px 4px 0 rgba(44,32,22,.2);
+  position:relative;
+}
+.publish-btn::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:4px;
+  border:2px solid rgba(255,255,255,.25);
+}
+.publish-btn:active{ transform:translate(2px,2px); box-shadow:1px 2px 0 rgba(44,32,22,.2); }
+.publish-btn:disabled{ background:var(--pencil); opacity:.6; cursor:not-allowed; box-shadow:none; }
+
+/* Day back header in editor */
+#editor-content .day-back{
+  padding:14px 16px 10px 68px;
+  background:var(--paper2);
+  border-bottom:3px double var(--rule);
+  position:relative;
+  z-index:1;
+}
+#editor-content .day-back button{
+  font-family:'Caveat',cursive;
+  font-size:1rem;
+  background:none;
+  border:none;
+  border-bottom:2px solid var(--pencil);
+  border-radius:0;
+  color:var(--ink2);
+  padding:4px 8px 2px;
+  cursor:pointer;
+  font-weight:700;
+}
+#editor-content .day-title h2{
+  font-family:'Caveat',cursive;
+  font-size:1.4rem;
+  color:var(--ink);
+  font-weight:700;
+}
+#editor-content .day-title p{
+  font-family:'Patrick Hand',cursive;
+  font-size:.82rem;
+  color:var(--pencil);
+  font-style:italic;
+}
 
 /* FIREBASE CONFIG SCREEN */
 .fb-screen{padding:20px 14px 80px}
