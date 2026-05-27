@@ -461,6 +461,11 @@ code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color
   <div class="day-wrap" id="day-content"></div>
 </div>
 
+<!-- ══ SCREEN: EDITOR (isolated — no Firebase listeners touch this) ══ -->
+<div class="screen" id="screen-editor">
+  <div class="editor-wrap" id="editor-content"></div>
+</div>
+
 <!-- ══ SCREEN: LEADERBOARD ══ -->
 <div class="screen" id="screen-leaderboard">
   <div class="lb-wrap" id="lb-content"></div>
@@ -645,10 +650,11 @@ function showScreen(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + name).classList.add('active');
   const noNav = name==='setup'||name==='login';
+  const noTab = noNav || name==='editor'; // editor gets nav but no tab bar highlight
   document.getElementById('nav').style.display = noNav ? 'none' : 'flex';
-  document.getElementById('tab-bar').className = 'tab-bar' + (noNav ? '' : ' show');
+  document.getElementById('tab-bar').className = 'tab-bar' + (noTab ? '' : ' show');
   // Show users tab only for creator
-  document.getElementById('tab-users').style.display = (!noNav && userRole==='creator') ? 'flex' : 'none';
+  document.getElementById('tab-users').style.display = (!noTab && userRole==='creator') ? 'flex' : 'none';
   if (name === 'calendar') { activeTab='my'; updateTabBar(); renderCalendar(); }
   if (name === 'leaderboard') { activeTab='lb'; updateTabBar(); renderLeaderboard(); }
   if (name === 'users') { activeTab='users'; updateTabBar(); renderUserManagement(); }
@@ -664,7 +670,7 @@ function switchTab(tab) {
   activeTab = tab;
   updateTabBar();
   if (tab === 'my') {
-    // Go to today's plan directly
+    // If editor is open, don't navigate away
     if (isEditing) return;
     selectedDate = todayStr();
     renderDayView(selectedDate);
@@ -1501,7 +1507,7 @@ function startEditingStatusListener() {
   if (!db || editingStatusListener) return;
   editingStatusListener = db.ref('editingStatus').on('value', snap => {
     const status = snap.val();
-    // Only affects non-creators viewing the day screen
+    // Only affects non-creators viewing the day screen (not the editor)
     if (userRole === 'creator') return;
     if (!document.getElementById('screen-day').classList.contains('active')) return;
     if (status && status.date === todayStr() && selectedDate === todayStr()) {
@@ -1540,13 +1546,13 @@ function openEditor(date) {
   // Broadcast editing status to users only when editing today
   if (date === todayStr()) setEditingStatus(date, true);
   buildEditorDOM();
-  if (!document.getElementById('screen-day').classList.contains('active')) showScreen('day');
+  showScreen('editor');
 }
 
 // ── Build editor entirely via DOM (no innerHTML re-render on add/remove) ──────
 function buildEditorDOM() {
   const plan = editingPlan;
-  const wrap = document.getElementById('day-content');
+  const wrap = document.getElementById('editor-content');
 
   wrap.innerHTML = `
     <div class="day-back">
@@ -1819,6 +1825,7 @@ function cancelEditor() {
   isEditing = false;
   if (selectedDate === todayStr()) setEditingStatus(selectedDate, false);
   renderDayView(selectedDate);
+  showScreen('day');
 }
 
 async function publishPlan() {
@@ -1832,13 +1839,14 @@ async function publishPlan() {
     if (selectedDate === todayStr()) setEditingStatus(selectedDate, false);
     showToast('✅ Plan published!');
     renderDayView(selectedDate);
+    showScreen('day');
   } catch(e) {
     showToast('❌ Failed to publish — check connection');
     btn.disabled=false; btn.textContent='💾 Publish Plan';
   }
 }
 
-// Keep old renderEditor as no-op (safety)
+// Legacy aliases (safety)
 function renderEditor() { buildEditorDOM(); }
 function saveEditorState() {}
 
