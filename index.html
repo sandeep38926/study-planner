@@ -844,6 +844,7 @@ function signOut() {
   if (editingStatusListener && db) { db.ref('editingStatus').off('value', editingStatusListener); editingStatusListener = null; }
   if (isEditing && selectedDate === todayStr()) setEditingStatus(selectedDate, false);
   isEditing = false;
+  resumeListeners();
   allPlans = {}; allProgress = {}; allUsersData = {};
   userName = ''; userRole = ''; pendingRole = 'user';
   localStorage.removeItem('session');
@@ -855,14 +856,16 @@ function signOut() {
 /* ═══════════════════════════════════════════
    REALTIME LISTENERS
 ═══════════════════════════════════════════ */
+let _listenersPaused = false;
+
 function startListeners() {
   if (!db) return;
   startEditingStatusListener();
   db.ref('plans').on('value', snap => {
     allPlans = snap.val() || {};
+    if (_listenersPaused) return; // editor is active — never touch its DOM
     if (document.getElementById('screen-calendar').classList.contains('active')) renderCalendar();
-    if (!isEditing && document.getElementById('screen-day').classList.contains('active')) {
-      // If user was seeing the creating-banner and plan just published, show it now
+    if (document.getElementById('screen-day').classList.contains('active')) {
       renderDayView(selectedDate);
     }
     if (document.getElementById('screen-leaderboard').classList.contains('active')) renderLeaderboard();
@@ -870,8 +873,9 @@ function startListeners() {
   });
   db.ref('progress').on('value', snap => {
     allProgress = snap.val() || {};
+    if (_listenersPaused) return; // editor is active — never touch its DOM
     if (document.getElementById('screen-calendar').classList.contains('active')) renderCalendar();
-    if (!isEditing && document.getElementById('screen-day').classList.contains('active')) renderDayView(selectedDate);
+    if (document.getElementById('screen-day').classList.contains('active')) renderDayView(selectedDate);
     if (document.getElementById('screen-leaderboard').classList.contains('active')) renderLeaderboard();
     if (document.getElementById('screen-peer').classList.contains('active')) renderPeerView();
     if (document.getElementById('screen-users').classList.contains('active')) renderUserManagement();
@@ -881,6 +885,9 @@ function startListeners() {
     if (document.getElementById('screen-users').classList.contains('active')) renderUserManagement();
   });
 }
+
+function pauseListeners()  { _listenersPaused = true;  }
+function resumeListeners() { _listenersPaused = false; }
 
 /* ═══════════════════════════════════════════
    CALENDAR
@@ -1545,8 +1552,14 @@ function renderCreatingBanner() {
 }
 
 function openEditor(date) {
+  // If already editing this date, don't rebuild — just show the screen
+  if (isEditing && selectedDate === date) {
+    showScreen('editor');
+    return;
+  }
   isEditing = true;
   selectedDate = date;
+  pauseListeners(); // stop Firebase from touching any DOM while editor is open
   editingPlan = allPlans[date] ? JSON.parse(JSON.stringify(allPlans[date])) : {
     examName:'Study Plan', tagline:'Plan Your Day, Ace Your Exam!',
     totalTime:'', sessions:[], miniSegments:[], dailyTargets:[], date
@@ -1831,6 +1844,7 @@ function removeTarget(ti) {
 
 function cancelEditor() {
   isEditing = false;
+  resumeListeners();
   if (selectedDate === todayStr()) setEditingStatus(selectedDate, false);
   renderDayView(selectedDate);
   showScreen('day');
@@ -1843,6 +1857,7 @@ async function publishPlan() {
     await db.ref('plans/' + selectedDate).set(editingPlan);
     allPlans[selectedDate] = editingPlan;
     isEditing = false;
+    resumeListeners(); // re-enable Firebase → DOM updates
     // Clear editing status so users see the new plan
     if (selectedDate === todayStr()) setEditingStatus(selectedDate, false);
     showToast('✅ Plan published!');
