@@ -1,4 +1,4 @@
-// Version 9
+<!-- Version 12 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -654,7 +654,11 @@ body{font-family:'Patrick Hand',cursive;font-size:22px;background:var(--bg);colo
 .tick-row.done .tick-box{background:#66bb6a;border-color:#66bb6a}
 .tick-label{font-size:.78rem;font-weight:600;flex:1;line-height:1.35}
 .tick-row.done .tick-label{text-decoration:line-through;color:#bbb}
-.sess-goal{font-size:.68rem;color:#777;background:#f0f4ff;border-radius:6px;padding:3px 8px;margin-top:5px;display:inline-flex;align-items:center;gap:4px;float:right;clear:both;max-width:55%}
+.sess-goal{font-size:.62rem;color:#7b52ab;background:linear-gradient(135deg,#f3eaff,#ede0ff);border-radius:10px;padding:8px 9px;text-align:center;width:72px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;box-shadow:0 2px 8px rgba(123,82,171,.12);border:1px solid #e4d4ff;align-self:flex-start;margin-top:2px}
+.sess-goal-icon{font-size:1.3rem;line-height:1}
+.sess-goal-label{font-size:.52rem;font-weight:800;color:#9c6dd8;text-transform:uppercase;letter-spacing:.6px}
+.sess-goal-text{font-size:.6rem;color:#6a3fa0;font-weight:600;line-height:1.3;word-break:break-word}
+.sess-body-inner{display:flex;gap:8px;align-items:flex-start}
 
 /* MINI GRID */
 .mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px}
@@ -998,38 +1002,39 @@ let planListeners = {};
 let progListeners = {};
 let isOnline = navigator.onLine;
 
-function todayStr() { return new Date().toISOString().split('T')[0]; }
+function todayStr() {
+  const n = new Date();
+  return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
+}
 function dateStr(y,m,d) { return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
 
 /* ── Midnight date rollover ────────────────────────────────────
-   Schedules a refresh at exactly 00:00:00 local time each night.
-   Re-renders whichever screen is currently visible so "today"
-   highlights jump to the new date without a page reload.
+   Fires at exactly 00:00:00 LOCAL time each night.
+   Uses local date construction so no UTC/IST drift.
+   Re-renders the active screen so "today" updates live.
 ─────────────────────────────────────────────────────────────── */
 function scheduleMidnightRefresh() {
-  const now  = new Date();
-  // ms remaining until next local midnight
-  const msToMidnight = new Date(
+  const now = new Date();
+  // Next local midnight — local Y/M/D so no UTC timezone drift
+  const nextMidnight = new Date(
     now.getFullYear(), now.getMonth(), now.getDate() + 1,
     0, 0, 0, 0
-  ) - now;
+  );
+  const msToMidnight = nextMidnight - now;
 
   setTimeout(function onMidnight() {
     const fresh = new Date();
-    // Sync the calendar month/year in case the month just rolled
+    // Keep calYear/calMonth in sync if month rolled over
     calYear  = fresh.getFullYear();
     calMonth = fresh.getMonth();
 
-    // Re-render whichever screen is active
-    const activeScreen = document.querySelector('.screen.active');
-    if (activeScreen) {
-      const id = activeScreen.id;
-      if (id === 'screen-calendar')    renderCalendar();
-      else if (id === 'screen-day')    renderDayView(selectedDate);
-      else if (id === 'screen-lb')     renderLeaderboard();
-    }
+    // Re-render the currently active screen
+    const activeId = (document.querySelector('.screen.active') || {}).id;
+    if      (activeId === 'screen-calendar')    renderCalendar();
+    else if (activeId === 'screen-day')         renderDayView(selectedDate);
+    else if (activeId === 'screen-leaderboard') renderLeaderboard();
 
-    // Re-schedule for the NEXT midnight (handles multi-night stays)
+    // Re-schedule for the next midnight
     scheduleMidnightRefresh();
   }, msToMidnight);
 }
@@ -1744,17 +1749,25 @@ function renderDayView(date) {
       </div>
       <div class="sess-prog"><div class="sess-prog-fill" style="width:${sPct}%;background:${subCol}"></div></div>
       <div class="sess-body" id="sb-${s.id}">
-        ${tasks.map((t,ti) => {
-          const k=`${s.id}_${ti}`, isDone=!!myProg[k];
-          return `<div class="tick-row${isDone?' done':''}" onclick="toggleTask('${date}','${k}',this)">
-            <div class="tick-box" style="${isDone?`background:${subCol};border-color:${subCol}`:'border-color:'+subCol}">${isDone?'✓':''}</div>
-            <span class="tick-label">${esc(t)}</span>
-            ${isDone?`<span style="font-size:.7rem;opacity:.6">✨</span>`:''}
-          </div>`;
-        }).join('')}
-        ${!tasks.length?`<div style="font-size:.72rem;color:#ccc;padding:6px;text-align:center">No tasks</div>`:''}
-        ${s.goal?`<div class="sess-goal">🎯 ${esc(s.goal)}</div>`:''}
-        ${sPct===100?`<div style="text-align:center;padding:4px 0 1px;font-size:.72rem;font-weight:700;color:#2e7d32">🎉 Session Complete!</div>`:''}
+        <div class="sess-body-inner">
+          <div style="flex:1;min-width:0">
+            ${tasks.map((t,ti) => {
+              const k=`${s.id}_${ti}`, isDone=!!myProg[k];
+              return `<div class="tick-row${isDone?' done':''}" onclick="toggleTask('${date}','${k}',this)">
+                <div class="tick-box" style="${isDone?`background:${subCol};border-color:${subCol}`:'border-color:'+subCol}">${isDone?'✓':''}</div>
+                <span class="tick-label">${esc(t)}</span>
+                ${isDone?`<span style="font-size:.7rem;opacity:.6">✨</span>`:''}
+              </div>`;
+            }).join('')}
+            ${!tasks.length?`<div style="font-size:.72rem;color:#ccc;padding:6px;text-align:center">No tasks</div>`:''}
+            ${sPct===100?`<div style="text-align:center;padding:4px 0 1px;font-size:.72rem;font-weight:700;color:#2e7d32">🎉 Session Complete!</div>`:''}
+          </div>
+          ${s.goal?`<div class="sess-goal">
+            <span class="sess-goal-icon">🎯</span>
+            <span class="sess-goal-label">Goal</span>
+            <span class="sess-goal-text">${esc(s.goal)}</span>
+          </div>`:''}
+        </div>
       </div>
     </div>`;
   });
@@ -2250,18 +2263,29 @@ function renderPeerDay(date) {
   const done = keys.filter(k=>prog[k]).length;
   const pct = keys.length ? Math.round(done/keys.length*100) : 0;
 
+  // Use the same day theme as the plan owner sees
+  const theme = getDayTheme(date);
+  const THEME_COLS = [
+    theme.grad.match(/#[0-9a-f]{6}/gi)?.[0] || '#1a237e',
+    theme.grad.match(/#[0-9a-f]{6}/gi)?.[1] || '#3949ab',
+    theme.accent,
+    theme.grad.match(/#[0-9a-f]{6}/gi)?.[0] || '#1a237e',
+    theme.grad.match(/#[0-9a-f]{6}/gi)?.[1] || '#3949ab',
+    theme.accent,
+  ];
+
   if (!plan) {
     return `<div class="no-plan"><div class="emoji">📭</div><h3>No plan for ${fmtDisplay(date)}</h3><p>The creator hasn't published a plan for this day.</p></div>`;
   }
 
   let html = `<div style="font-size:.8rem;color:#888;font-weight:600;margin-bottom:10px;text-align:center">${fmtDisplay(date)}</div>`;
 
-  // Ring
-  html += `<div class="ring-card" style="margin-bottom:14px">
+  // Ring — themed background + accent stroke
+  html += `<div class="ring-card" style="background:${theme.grad};margin-bottom:14px">
     <div class="ring-wrap">
       <svg width="110" height="110">
         <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="7"/>
-        <circle cx="55" cy="55" r="46" fill="none" stroke="${pct===100?'#69f0ae':'#f9a825'}" stroke-width="7"
+        <circle cx="55" cy="55" r="46" fill="none" stroke="${pct===100?'#69f0ae':theme.accent}" stroke-width="7"
           stroke-dasharray="${2*Math.PI*46}" stroke-dashoffset="${2*Math.PI*46*(1-pct/100)}"
           stroke-linecap="round" style="transform:rotate(-90deg);transform-origin:55px 55px"/>
         <text x="55" y="51" text-anchor="middle" fill="white" font-size="18" font-weight="900" font-family="Nunito,sans-serif">${pct}%</text>
@@ -2272,20 +2296,18 @@ function renderPeerDay(date) {
       <div class="ring-name">${esc(plan.examName||'Study Plan')}</div>
       <div class="ring-tagline">${esc(plan.tagline||'')}</div>
       <div class="ring-stats">
-        <div class="ring-stat"><div class="ring-stat-n">${done}</div><div class="ring-stat-l">Done</div></div>
-        <div class="ring-stat"><div class="ring-stat-n">${keys.length}</div><div class="ring-stat-l">Total</div></div>
+        <div class="ring-stat"><div class="ring-stat-n">${done}</div><div class="ring-stat-l">Done ✅</div></div>
+        <div class="ring-stat"><div class="ring-stat-n">${keys.length}</div><div class="ring-stat-l">Total 📋</div></div>
       </div>
     </div>
   </div>`;
 
-  // Sessions — read-only
-  const wrap = (inner) => `<div class="readonly-overlay">${inner}</div>`;
-
+  // Sessions — read-only, theme-coherent colours
   (plan.sessions||[]).forEach((s,si) => {
     const tasks = s.tasks||[];
     const sDone = tasks.filter((_,ti)=>prog[`${s.id}_${ti}`]).length;
     const sPct = tasks.length ? Math.round(sDone/tasks.length*100) : 0;
-    const col = COLORS[si%COLORS.length];
+    const col = s.subjectColor || THEME_COLS[si % THEME_COLS.length];
     html += `<div class="session-card${sPct===100?' all-done':''}">
       <div class="sess-header" onclick="toggleSection(this)">
         <span class="sess-icon">${ICONS[si%ICONS.length]}</span>
@@ -2294,7 +2316,7 @@ function renderPeerDay(date) {
           <div class="sess-sub">${esc(s.subject||'')}${s.duration?' · '+esc(s.duration):''}</div>
         </div>
         <div class="sess-right">
-          <span class="sess-pct">${sPct}%</span>
+          <span class="sess-pct" style="color:${col}">${sPct}%</span>
           ${sPct===100?'<span class="done-badge">DONE</span>':''}
           <span class="chevron open">▼</span>
         </div>
@@ -2305,34 +2327,33 @@ function renderPeerDay(date) {
           const k=`${s.id}_${ti}`;
           const isDone = !!prog[k];
           return `<div class="tick-row${isDone?' done':''}">
-            <div class="tick-box">${isDone?'✓':''}</div>
+            <div class="tick-box" style="${isDone?`background:${col};border-color:${col}`:'border-color:'+col}">${isDone?'✓':''}</div>
             <span class="tick-label">${esc(t)}</span>
           </div>`;
         }).join('')}
-        ${s.goal?`<div class="sess-goal">🎯 ${esc(s.goal)}</div>`:''}
       </div>
     </div>`;
   });
 
-  // Mini segments — read-only
+  // Mini segments — read-only, theme-coherent colours
   if ((plan.miniSegments||[]).length) {
     html += `<div class="mini-grid">`;
     (plan.miniSegments||[]).forEach((m,mi) => {
       const tasks = m.tasks||[];
       const mDone = tasks.filter((_,ti)=>prog[`${m.id}_${ti}`]).length;
       const mPct = tasks.length ? Math.round(mDone/tasks.length*100) : 0;
-      const col = COLORS[(mi+2)%COLORS.length];
+      const col = m.subjectColor || THEME_COLS[mi % THEME_COLS.length];
       html += `<div class="mini-card">
         <div class="mini-header" style="background:${col}">
           <span class="mini-title-text">${esc(m.title||'Segment')}</span>
-          <span class="mini-dur">${esc(m.duration||'')}</span>
+          <span class="mini-dur">${esc(m.duration||'')}${mPct===100?' ✅':` ${mPct}%`}</span>
         </div>
-        <div class="mini-prog"><div class="mini-prog-fill" style="width:${mPct}%"></div></div>
+        <div class="mini-prog"><div class="mini-prog-fill" style="width:${mPct}%;background:${col}"></div></div>
         <div class="mini-body">
           ${tasks.map((t,ti) => {
             const k=`${m.id}_${ti}`; const isDone=!!prog[k];
             return `<div class="mini-tick${isDone?' done':''}">
-              <div class="mini-tick-box">${isDone?'✓':''}</div>
+              <div class="mini-tick-box" style="${isDone?`background:${col};border-color:${col}`:'border-color:'+col}">${isDone?'✓':''}</div>
               <span class="mini-tick-label">${esc(t)}</span>
             </div>`;
           }).join('')}
@@ -2342,16 +2363,22 @@ function renderPeerDay(date) {
     html += `</div>`;
   }
 
-  // Daily targets — read-only
+  // Daily targets — read-only, themed background + accent progress bar
   if ((plan.dailyTargets||[]).length) {
-    html += `<div class="targets-card">
+    const tDone = (plan.dailyTargets||[]).filter((_,ti)=>prog[`daily_${ti}`]).length;
+    const tTotal = plan.dailyTargets.length;
+    html += `<div class="targets-card" style="background:${theme.grad}">
       <div class="targets-title">🎯 Daily Targets</div>
+      <div style="height:3px;background:rgba(255,255,255,.2);border-radius:2px;margin-bottom:7px;overflow:hidden">
+        <div style="height:100%;width:${tTotal?Math.round(tDone/tTotal*100):0}%;background:${theme.accent};border-radius:2px;transition:width .5s"></div>
+      </div>
       <div class="targets-pills">
         ${(plan.dailyTargets||[]).map((t,ti) => {
           const k=`daily_${ti}`; const isDone=!!prog[k];
           return `<span class="target-pill${isDone?' done':''}" style="cursor:default">${isDone?'✔ ':''}${esc(t)}</span>`;
         }).join('')}
       </div>
+      <div style="margin-top:7px;font-size:.65rem;color:rgba(255,255,255,.7);text-align:center">${tDone}/${tTotal} targets done 🏆</div>
     </div>`;
   }
 
