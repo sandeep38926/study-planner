@@ -1,4 +1,4 @@
-<!-- Version 13 -->
+<!-- Version 13-2 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1737,8 +1737,10 @@ function renderDayView(date) {
         <span class="sess-icon">${SESS_ICONS[si%SESS_ICONS.length]}</span>
         <div class="sess-info">
           <div class="sess-label">${esc(s.label||'Session')}</div>
-          <div class="sess-sub">${esc(s.subject||'')}${s.duration?' · '+esc(s.duration):''}</div>
-          ${s.timeSlot?`<div style="font-size:.65rem;color:#aaa;margin-top:0px;line-height:1.1">🕐 ${esc(s.timeSlot)}</div>`:''}
+          <div class="sess-sub" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <span>${esc(s.subject||'')}${s.duration?' · '+esc(s.duration):''}</span>
+            ${s.timeSlot?`<span style="color:#aaa;font-size:.65rem">🕐 ${esc(s.timeSlot)}</span>`:''}
+          </div>
         </div>
         <div class="sess-right">
           ${sPct===100
@@ -1793,10 +1795,9 @@ function renderDayView(date) {
       const headerBg = m.subjectColor ? m.subjectColor : theme.grad;
       html += `<div class="mini-card">
         <div class="mini-header" style="background:${headerBg}">
-          <span class="mini-title-text">${esc(m.title||'Segment')}</span>
+          <span class="mini-title-text">${esc(m.title||'Segment')}${m.timeSlot?' · 🕐 '+esc(m.timeSlot):''}</span>
           <span class="mini-dur">${esc(m.duration||'')}${mPct===100?' ✅':` ${mPct}%`}</span>
         </div>
-        ${m.timeSlot?`<div style="font-size:.62rem;color:#aaa;padding:2px 8px">🕐 ${esc(m.timeSlot)}</div>`:''}
         <div class="mini-prog"><div class="mini-prog-fill" style="width:${mPct}%;background:${col}"></div></div>
         <div class="mini-body">
           ${tasks.map((t,ti)=>{
