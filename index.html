@@ -1466,6 +1466,16 @@ function openEditor(date) {
   showScreen('day'); // editor renders inside day screen
 }
 
+function syncMetaToEditingPlan() {
+  // Pull current values from DOM into editingPlan before any re-render
+  const examEl = document.getElementById('e-examName');
+  const tagEl  = document.getElementById('e-tagline');
+  const timeEl = document.getElementById('e-totalTime');
+  if (examEl) editingPlan.examName  = examEl.value;
+  if (tagEl)  editingPlan.tagline   = tagEl.value;
+  if (timeEl) editingPlan.totalTime = timeEl.value;
+}
+
 function renderEditor() {
   const plan = editingPlan;
   const inp = 'class="e-inp"';
@@ -1478,11 +1488,11 @@ function renderEditor() {
   html += `<div class="e-card">
     <div class="e-card-title" style="color:var(--navy)">🏷️ Plan Details</div>
     <div class="e-grid2">
-      <div><label class="e-label">Exam / Course</label><input ${inp} id="e-examName" value="${esc(plan.examName||'')}" placeholder="SBI PO 2026"></div>
-      <div><label class="e-label">Total Study Time</label><input ${inp} id="e-totalTime" value="${esc(plan.totalTime||'')}" placeholder="7–8 Hrs"></div>
+      <div><label class="e-label">Exam / Course</label><input ${inp} id="e-examName" value="${esc(plan.examName||'')}" placeholder="SBI PO 2026" oninput="editingPlan.examName=this.value"></div>
+      <div><label class="e-label">Total Study Time</label><input ${inp} id="e-totalTime" value="${esc(plan.totalTime||'')}" placeholder="7–8 Hrs" oninput="editingPlan.totalTime=this.value"></div>
     </div>
     <label class="e-label">Tagline</label>
-    <input ${inp} id="e-tagline" value="${esc(plan.tagline||'')}" placeholder="Plan Your Day, Ace Your Exam!">
+    <input ${inp} id="e-tagline" value="${esc(plan.tagline||'')}" placeholder="Plan Your Day, Ace Your Exam!" oninput="editingPlan.tagline=this.value">
   </div>`;
 
   // Sessions
@@ -1522,11 +1532,11 @@ function renderSessionEditor(s,si) {
   return `<div class="sess-editor" id="sess-ed-${s.id}">
     <button class="remove-sess-btn" onclick="removeEditorSession('${s.id}')">🗑 Remove</button>
     <div class="e-grid2">
-      <div><label class="e-label">Label (e.g. Morning)</label><input class="e-inp" placeholder="Morning" value="${esc(s.label||'')}" onchange="updateSess('${s.id}','label',this.value)"></div>
-      <div><label class="e-label">Duration (e.g. 2 Hours)</label><input class="e-inp" placeholder="2 Hours" value="${esc(s.duration||'')}" onchange="updateSess('${s.id}','duration',this.value)"></div>
+      <div><label class="e-label">Label (e.g. Morning)</label><input class="e-inp" placeholder="Morning" value="${esc(s.label||'')}" oninput="updateSess('${s.id}','label',this.value)"></div>
+      <div><label class="e-label">Duration (e.g. 2 Hours)</label><input class="e-inp" placeholder="2 Hours" value="${esc(s.duration||'')}" oninput="updateSess('${s.id}','duration',this.value)"></div>
     </div>
     <div class="e-grid2">
-      <div><label class="e-label">Time Slot (e.g. 7:00 AM – 9:00 AM)</label><input class="e-inp" placeholder="7:00 AM – 9:00 AM" value="${esc(s.timeSlot||'')}" onchange="updateSess('${s.id}','timeSlot',this.value)"></div>
+      <div><label class="e-label">Time Slot (e.g. 7:00 AM – 9:00 AM)</label><input class="e-inp" placeholder="7:00 AM – 9:00 AM" value="${esc(s.timeSlot||'')}" oninput="updateSess('${s.id}','timeSlot',this.value)"></div>
       <div><label class="e-label">Subject Header Color</label>
         <select class="e-inp" onchange="updateSess('${s.id}','subjectColor',this.value)">
           ${colorOptions.map(c=>`<option value="${c}" ${(s.subjectColor||'#1a237e')===c?'selected':''} style="background:${c};color:#fff">${c}</option>`).join('')}
@@ -1534,12 +1544,12 @@ function renderSessionEditor(s,si) {
       </div>
     </div>
     <label class="e-label">Subject (e.g. Reasoning (Pre + Mains))</label>
-    <input class="e-inp" placeholder="Reasoning (Pre + Mains)" value="${esc(s.subject||'')}" onchange="updateSess('${s.id}','subject',this.value)">
+    <input class="e-inp" placeholder="Reasoning (Pre + Mains)" value="${esc(s.subject||'')}" oninput="updateSess('${s.id}','subject',this.value)">
     <label class="e-label">Goal</label>
-    <input class="e-inp" placeholder="Accuracy + puzzle solving speed" value="${esc(s.goal||'')}" onchange="updateSess('${s.id}','goal',this.value)">
+    <input class="e-inp" placeholder="Accuracy + puzzle solving speed" value="${esc(s.goal||'')}" oninput="updateSess('${s.id}','goal',this.value)">
     <label class="e-label">Tasks</label>
     <div id="tasks-ed-${s.id}">
-      ${(s.tasks||[]).map((t,ti)=>`<div class="task-row"><input class="e-inp" value="${esc(t)}" onchange="updateTask('${s.id}',${ti},this.value)"><button class="del-btn" onclick="removeTask('${s.id}',${ti})">✕</button></div>`).join('')}
+      ${(s.tasks||[]).map((t,ti)=>`<div class="task-row"><input class="e-inp" value="${esc(t)}" oninput="updateTask('${s.id}',${ti},this.value)"><button class="del-btn" onclick="removeTask('${s.id}',${ti})">✕</button></div>`).join('')}
     </div>
     <button class="add-task-btn" onclick="addTaskToSess('${s.id}')">＋ Task</button>
   </div>`;
@@ -1549,45 +1559,45 @@ function renderMiniEditor(m,mi) {
   const colorOptions = ['#1a237e','#2e7d32','#6a1b9a','#c62828','#00695c','#e65100','#0277bd','#558b2f'];
   return `<div class="sess-editor" id="mini-ed-${m.id}" style="padding:12px">
     <button class="del-btn" style="position:absolute;top:8px;right:8px" onclick="removeEditorMini('${m.id}')">✕</button>
-    <label class="e-label">Title</label><input class="e-inp" value="${esc(m.title||'')}" placeholder="Current Affairs" onchange="updateMini('${m.id}','title',this.value)">
-    <label class="e-label">Duration</label><input class="e-inp" value="${esc(m.duration||'')}" placeholder="40 min" onchange="updateMini('${m.id}','duration',this.value)">
-    <label class="e-label">Time Slot</label><input class="e-inp" value="${esc(m.timeSlot||'')}" placeholder="6:00 PM – 6:40 PM" onchange="updateMini('${m.id}','timeSlot',this.value)">
+    <label class="e-label">Title</label><input class="e-inp" value="${esc(m.title||'')}" placeholder="Current Affairs" oninput="updateMini('${m.id}','title',this.value)">
+    <label class="e-label">Duration</label><input class="e-inp" value="${esc(m.duration||'')}" placeholder="40 min" oninput="updateMini('${m.id}','duration',this.value)">
+    <label class="e-label">Time Slot</label><input class="e-inp" value="${esc(m.timeSlot||'')}" placeholder="6:00 PM – 6:40 PM" oninput="updateMini('${m.id}','timeSlot',this.value)">
     <label class="e-label">Header Color</label>
     <select class="e-inp" onchange="updateMini('${m.id}','subjectColor',this.value)">
       ${colorOptions.map(c=>`<option value="${c}" ${(m.subjectColor||'#c62828')===c?'selected':''}>${c}</option>`).join('')}
     </select>
     <label class="e-label">Tasks</label>
     <div id="minitasks-ed-${m.id}">
-      ${(m.tasks||[]).map((t,ti)=>`<div class="task-row"><input class="e-inp" value="${esc(t)}" onchange="updateMiniTask('${m.id}',${ti},this.value)"><button class="del-btn" onclick="removeMiniTask('${m.id}',${ti})">✕</button></div>`).join('')}
+      ${(m.tasks||[]).map((t,ti)=>`<div class="task-row"><input class="e-inp" value="${esc(t)}" oninput="updateMiniTask('${m.id}',${ti},this.value)"><button class="del-btn" onclick="removeMiniTask('${m.id}',${ti})">✕</button></div>`).join('')}
     </div>
     <button class="add-task-btn" onclick="addMiniTask('${m.id}')">＋ Task</button>
   </div>`;
 }
 
 function renderTargetEditor(t,ti) {
-  return `<div class="task-row" id="target-ed-${ti}"><input class="e-inp" value="${esc(t)}" placeholder="Target…" onchange="updateTarget(${ti},this.value)"><button class="del-btn" onclick="removeTarget(${ti})">✕</button></div>`;
+  return `<div class="task-row" id="target-ed-${ti}"><input class="e-inp" value="${esc(t)}" placeholder="Target…" oninput="updateTarget(${ti},this.value)"><button class="del-btn" onclick="removeTarget(${ti})">✕</button></div>`;
 }
 
 // Session ops
 function updateSess(id,k,v){ const s=editingPlan.sessions.find(s=>s.id===id); if(s) s[k]=v; }
-function removeEditorSession(id){ editingPlan.sessions=editingPlan.sessions.filter(s=>s.id!==id); renderEditor(); }
-function addEditorSession(){ editingPlan.sessions.push({id:'s_'+Date.now(),label:'',duration:'',timeSlot:'',subjectColor:'#1a237e',subject:'',goal:'',tasks:[]}); renderEditor(); }
-function addTaskToSess(id){ const s=editingPlan.sessions.find(s=>s.id===id); if(s){s.tasks.push(''); renderEditor();} }
+function removeEditorSession(id){ syncMetaToEditingPlan(); editingPlan.sessions=editingPlan.sessions.filter(s=>s.id!==id); renderEditor(); }
+function addEditorSession(){ syncMetaToEditingPlan(); editingPlan.sessions.push({id:'s_'+Date.now(),label:'',duration:'',timeSlot:'',subjectColor:'#1a237e',subject:'',goal:'',tasks:[]}); renderEditor(); }
+function addTaskToSess(id){ syncMetaToEditingPlan(); const s=editingPlan.sessions.find(s=>s.id===id); if(s){s.tasks.push(''); renderEditor();} }
 function updateTask(id,ti,v){ const s=editingPlan.sessions.find(s=>s.id===id); if(s)s.tasks[ti]=v; }
-function removeTask(id,ti){ const s=editingPlan.sessions.find(s=>s.id===id); if(s){s.tasks.splice(ti,1); renderEditor();} }
+function removeTask(id,ti){ syncMetaToEditingPlan(); const s=editingPlan.sessions.find(s=>s.id===id); if(s){s.tasks.splice(ti,1); renderEditor();} }
 
 // Mini ops
 function updateMini(id,k,v){ const m=editingPlan.miniSegments.find(m=>m.id===id); if(m) m[k]=v; }
-function removeEditorMini(id){ editingPlan.miniSegments=editingPlan.miniSegments.filter(m=>m.id!==id); renderEditor(); }
-function addEditorMini(){ editingPlan.miniSegments.push({id:'m_'+Date.now(),title:'',duration:'',timeSlot:'',subjectColor:'#c62828',tasks:[]}); renderEditor(); }
-function addMiniTask(id){ const m=editingPlan.miniSegments.find(m=>m.id===id); if(m){m.tasks.push(''); renderEditor();} }
+function removeEditorMini(id){ syncMetaToEditingPlan(); editingPlan.miniSegments=editingPlan.miniSegments.filter(m=>m.id!==id); renderEditor(); }
+function addEditorMini(){ syncMetaToEditingPlan(); editingPlan.miniSegments.push({id:'m_'+Date.now(),title:'',duration:'',timeSlot:'',subjectColor:'#c62828',tasks:[]}); renderEditor(); }
+function addMiniTask(id){ syncMetaToEditingPlan(); const m=editingPlan.miniSegments.find(m=>m.id===id); if(m){m.tasks.push(''); renderEditor();} }
 function updateMiniTask(id,ti,v){ const m=editingPlan.miniSegments.find(m=>m.id===id); if(m)m.tasks[ti]=v; }
-function removeMiniTask(id,ti){ const m=editingPlan.miniSegments.find(m=>m.id===id); if(m){m.tasks.splice(ti,1); renderEditor();} }
+function removeMiniTask(id,ti){ syncMetaToEditingPlan(); const m=editingPlan.miniSegments.find(m=>m.id===id); if(m){m.tasks.splice(ti,1); renderEditor();} }
 
 // Target ops
 function updateTarget(ti,v){ editingPlan.dailyTargets[ti]=v; }
-function removeTarget(ti){ editingPlan.dailyTargets.splice(ti,1); renderEditor(); }
-function addEditorTarget(){ editingPlan.dailyTargets.push(''); renderEditor(); }
+function removeTarget(ti){ syncMetaToEditingPlan(); editingPlan.dailyTargets.splice(ti,1); renderEditor(); }
+function addEditorTarget(){ syncMetaToEditingPlan(); editingPlan.dailyTargets.push(''); renderEditor(); }
 
 function cancelEditor() { renderDayView(selectedDate); }
 
