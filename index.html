@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#3d2c8d">
+<meta name="theme-color" content="#1a237e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Study Planner">
@@ -71,484 +71,24 @@ document.write('<link rel="manifest" href="' + manifestURL + '">');
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Nunito:wght@700;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&family=Poppins:wght@400;500;600;700&family=Caveat:wght@400;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
 
 <style>
 :root {
-  --navy:#3d2c8d; --blue:#5c6bc0; --green:#388e3c; --purple:#7b52ab;
-  --red:#e53935; --orange:#fb8c00; --teal:#00897b; --gold:#ffb300;
-  --bg:#fdf8f0; --border:#d7c8f5; --text:#2d2047; --white:#fff;
-  --shadow:0 4px 18px rgba(90,50,150,.13);
-  --pink:#f48fb1; --peach:#ffe0b2; --mint:#b2dfdb; --lavender:#e8d5ff;
-  /* notebook palette */
-  --paper:#fdf8f0;
-  --paper2:#fff9f2;
-  --ruled:#e8ddd0;
-  --margin:#f4b8c1;
-  --ink:#2d2047;
-  --ink-light:#7a6a8a;
-  --tape-yellow:rgba(255,236,130,.75);
-  --tape-pink:rgba(255,182,193,.7);
-  --tape-blue:rgba(180,210,255,.7);
-  --tape-green:rgba(180,240,200,.7);
-  --sticker-bg:#fff9c4;
-}
-
-/* ── GLOBAL HANDWRITTEN FONT ── */
-* { font-family: 'Caveat', cursive !important; }
-code, textarea, .setup-card textarea, #fb-config-input {
-  font-family: monospace !important;
-}
-
-/* ══════════════════════════════════════
-   NOTEBOOK PAPER BODY
-══════════════════════════════════════ */
-body {
-  background-color: var(--paper);
-  /* Ruled lines */
-  background-image:
-    /* red margin line — moved closer to left edge */
-    linear-gradient(90deg, transparent 20px, var(--margin) 20px, var(--margin) 22px, transparent 22px),
-    /* horizontal ruled lines every 32px */
-    repeating-linear-gradient(
-      180deg,
-      transparent,
-      transparent 31px,
-      var(--ruled) 31px,
-      var(--ruled) 32px
-    ),
-    radial-gradient(circle at 30% 20%, rgba(255,200,100,.06) 0%, transparent 60%),
-    radial-gradient(circle at 75% 80%, rgba(180,140,220,.05) 0%, transparent 60%);
-  min-height: 100vh;
-}
-
-/* ══════════════════════════════════════
-   TAPE STRIP MIXIN  (applied via ::before/::after on cards)
-══════════════════════════════════════ */
-.tape::before {
-  content:'';
-  position:absolute;
-  top:-10px; left:50%;
-  transform:translateX(-50%) rotate(-2deg);
-  width:60px; height:22px;
-  background:var(--tape-yellow);
-  border-radius:3px;
-  box-shadow:0 1px 3px rgba(0,0,0,.1);
-  z-index:2;
-}
-.tape-pink::before  { background:var(--tape-pink);  transform:translateX(-50%) rotate(1.5deg); }
-.tape-blue::before  { background:var(--tape-blue);  transform:translateX(-50%) rotate(-1deg); width:50px; }
-.tape-green::before { background:var(--tape-green); transform:translateX(-50%) rotate(2deg); width:55px; }
-
-/* ══════════════════════════════════════
-   DOODLE CORNER SVG (injected via pseudo on wrappers)
-══════════════════════════════════════ */
-.doodle-corner::after {
-  content:'';
-  position:absolute;
-  bottom:10px; right:10px;
-  width:60px; height:60px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'%3E%3Ccircle cx='10' cy='10' r='4' fill='none' stroke='%23d7c8f5' stroke-width='1.5'/%3E%3Ccircle cx='10' cy='10' r='8' fill='none' stroke='%23f4b8c1' stroke-width='1' stroke-dasharray='2 2'/%3E%3Cpath d='M25 8 Q30 2 35 8 Q40 14 35 20 Q30 26 25 20 Q20 14 25 8Z' fill='none' stroke='%23b8e0d4' stroke-width='1.5'/%3E%3Cpath d='M45 30 Q50 26 55 30 Q55 36 50 38 Q45 36 45 30Z' fill='%23ffe0b2' stroke='%23ffb300' stroke-width='1'/%3E%3Cline x1='2' y1='40' x2='20' y2='55' stroke='%23d7c8f5' stroke-width='1' stroke-dasharray='3 2'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-size: contain;
-  opacity:.6;
-  pointer-events:none;
-}
-
-/* ══════════════════════════════════════
-   NAV — looks like a notebook header band
-══════════════════════════════════════ */
-.nav {
-  background: linear-gradient(135deg,#3d2c8d,#7b52ab);
-  /* washi tape top edge */
-  border-bottom: 3px solid var(--tape-yellow);
-  position:sticky; top:0; z-index:200;
-  display:flex; align-items:center; padding:0 14px; height:56px; gap:10px;
-  box-shadow:0 3px 16px rgba(90,50,150,.3);
-}
-.nav::before {
-  content:'🌸 ✦ ⭐ ✦ 🌸';
-  position:absolute;
-  top:0; right:60px;
-  font-size:.55rem;
-  color:rgba(255,255,255,.25);
-  letter-spacing:4px;
-  pointer-events:none;
-}
-
-/* ══════════════════════════════════════
-   CARDS — notebook paper look
-══════════════════════════════════════ */
-.session-card, .e-card, .ring-card,
-.targets-card, .lb-row, .um-row, .um-stat-card,
-.mini-card, .modal-box {
-  position: relative;
-}
-
-/* session cards look like torn notebook pages */
-.session-card {
-  background: var(--paper2);
-  border-radius: 4px 16px 16px 4px !important;
-  border-left: 4px solid var(--margin) !important;
-  border-top: 1.5px solid var(--ruled) !important;
-  border-bottom: 1.5px solid var(--ruled) !important;
-  border-right: 1.5px solid var(--ruled) !important;
-  box-shadow: 2px 3px 12px rgba(90,50,150,.1), 4px 5px 0 rgba(200,180,220,.15) !important;
-  /* ruled lines inside card */
-  background-image: repeating-linear-gradient(
-    180deg, transparent, transparent 31px, rgba(220,210,240,.3) 31px, rgba(220,210,240,.3) 32px
-  );
-}
-.session-card.all-done {
-  border-left: 4px solid #81c784 !important;
-  background-image: repeating-linear-gradient(
-    180deg, transparent, transparent 31px, rgba(180,230,180,.25) 31px, rgba(180,230,180,.25) 32px
-  );
-}
-
-/* e-cards look like sticky-note paper */
-.e-card {
-  background: var(--sticker-bg);
-  border-radius: 3px 3px 14px 3px !important;
-  box-shadow: 2px 3px 0 rgba(0,0,0,.08), 3px 5px 16px rgba(90,50,150,.1) !important;
-  border: 1.5px solid rgba(255,200,0,.3) !important;
-}
-.e-card::after {
-  content:'';
-  position:absolute;
-  top:0; right:0;
-  width:0; height:0;
-  border-style:solid;
-  border-width: 0 20px 20px 0;
-  border-color: transparent rgba(255,179,0,.25) transparent transparent;
-  border-radius:0 3px 0 0;
-}
-
-/* login card = notebook cover */
-.login-card {
-  background: var(--paper);
-  border-radius: 6px 6px 6px 6px !important;
-  border: 2px solid var(--ruled) !important;
-  border-left: 8px solid var(--navy) !important;
-  box-shadow: 4px 4px 0 rgba(90,50,150,.15), 6px 8px 24px rgba(90,50,150,.18) !important;
-  background-image: repeating-linear-gradient(
-    180deg, transparent, transparent 31px, var(--ruled) 31px, var(--ruled) 32px
-  );
-  position: relative;
-  overflow: visible !important;
-}
-/* notebook cover doodles in corners */
-.login-card::before {
-  content: '🌷 ✿ 🌼 ✿ 🌷';
-  position:absolute; top:-14px; left:50%;
-  transform:translateX(-50%);
-  font-size:.85rem;
-  letter-spacing:4px;
-  pointer-events:none;
-}
-.login-card::after {
-  content:'';
-  position:absolute; bottom:16px; right:16px;
-  width:70px; height:70px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 70 70'%3E%3Ccircle cx='20' cy='20' r='12' fill='none' stroke='%23d7c8f5' stroke-width='2'/%3E%3Ccircle cx='20' cy='20' r='5' fill='%23f4b8c1'/%3E%3Cpath d='M35 5 Q42 15 35 25 Q28 15 35 5Z' fill='%23b8e0d4' stroke='%2300897b' stroke-width='1'/%3E%3Cpath d='M50 35 L60 28 L65 40 L55 50 Z' fill='none' stroke='%23ffb300' stroke-width='1.5' stroke-dasharray='3 2'/%3E%3Ccircle cx='55' cy='58' r='7' fill='%23ffe0b2' stroke='%23fb8c00' stroke-width='1.5'/%3E%3Cpath d='M5 50 Q10 40 20 50 Q10 60 5 50Z' fill='%23f48fb1' opacity='.6'/%3E%3C/svg%3E");
-  background-repeat:no-repeat; background-size:contain;
-  opacity:.5; pointer-events:none;
-}
-
-/* ring-card = journal entry header */
-.ring-card {
-  border-radius: 4px 16px 16px 4px !important;
-  border-left: 6px solid var(--gold) !important;
-  position: relative; overflow: visible !important;
-}
-.ring-card::before {
-  content: '📖 today\'s progress';
-  position:absolute; top:-14px; left:16px;
-  font-size:.8rem; color:var(--ink-light);
-  font-style:italic; pointer-events:none;
-}
-
-/* motivation = sticky note */
-.motivation {
-  border-radius: 3px 3px 14px 3px !important;
-  transform: rotate(-0.5deg);
-  box-shadow: 2px 2px 0 rgba(0,0,0,.07), 3px 4px 14px rgba(255,179,0,.2) !important;
-  position: relative;
-}
-.motivation::after {
-  content:'';
-  position:absolute; top:0; right:0;
-  width:0; height:0;
-  border-style:solid; border-width:0 16px 16px 0;
-  border-color:transparent rgba(255,160,0,.3) transparent transparent;
-}
-
-/* complete banner = confetti-decorated */
-.complete-banner {
-  border-radius: 16px !important;
-  position: relative; overflow: hidden;
-}
-.complete-banner::before {
-  content:'🎉 🌟 ✨ 🎊 💫 🌈 🎉';
-  display:block; font-size:1rem; letter-spacing:3px;
-  margin-bottom:4px; animation: confetti-drift 3s ease-in-out infinite alternate;
-}
-@keyframes confetti-drift {
-  from { letter-spacing:3px; opacity:.8; }
-  to   { letter-spacing:6px; opacity:1; }
-}
-
-/* no-plan = doodle empty page */
-.no-plan {
-  border-radius: 6px !important;
-  background-image:
-    repeating-linear-gradient(180deg, transparent, transparent 31px, var(--ruled) 31px, var(--ruled) 32px) !important;
-  background-color: var(--paper2) !important;
-  border: 2px dashed var(--margin) !important;
-}
-
-/* calendar days = small squares of graph paper */
-.cal-day {
-  border-radius: 6px !important;
-  background-color: var(--paper2) !important;
-  border: 1px solid var(--ruled) !important;
-  background-image:
-    linear-gradient(var(--ruled) 1px, transparent 1px),
-    linear-gradient(90deg, var(--ruled) 1px, transparent 1px) !important;
-  background-size: 8px 8px !important;
-}
-.cal-day.today {
-  border: 2px solid var(--purple) !important;
-  background-color: #f5eeff !important;
-  box-shadow: 0 0 0 3px rgba(123,82,171,.15) !important;
-}
-.cal-day.done-day {
-  background-color: #eaf7ec !important;
-  border: 1.5px solid #81c784 !important;
-}
-.cal-day.inprog-day {
-  background-color: #fffde7 !important;
-  border: 1.5px solid #ffe082 !important;
-}
-
-/* tab bar = notebook bottom edge */
-.tab-bar {
-  border-top: 3px solid var(--margin) !important;
-  background: var(--paper) !important;
-  background-image: linear-gradient(90deg, transparent 20px, var(--margin) 20px, var(--margin) 22px, transparent 22px) !important;
-}
-.tab-btn.active {
-  color: var(--navy) !important;
-  border-top: 3px solid var(--navy);
-  margin-top:-3px;
-}
-.tab-btn.active .tab-label { color: var(--navy) !important; }
-
-/* modal = torn paper note */
-.modal-box {
-  background: var(--paper2) !important;
-  border: 2px solid var(--ruled) !important;
-  border-left: 6px solid var(--purple) !important;
-  background-image: repeating-linear-gradient(
-    180deg, transparent, transparent 31px, var(--ruled) 31px, var(--ruled) 32px
-  ) !important;
-  box-shadow: 4px 4px 0 rgba(90,50,150,.12), 0 20px 60px rgba(0,0,0,.2) !important;
-}
-
-/* leaderboard rows = bookmarks */
-.lb-row {
-  border-radius: 4px 14px 14px 4px !important;
-  border-left: 4px solid var(--margin) !important;
-  background: var(--paper2) !important;
-}
-.lb-row.rank1-row { border-left: 4px solid var(--gold) !important; }
-.lb-row.rank2-row { border-left: 4px solid #90a4ae !important; }
-.lb-row.rank3-row { border-left: 4px solid #a1887f !important; }
-
-/* ══════════════════════════════════════
-   INPUTS — feel like writing on paper
-══════════════════════════════════════ */
-.inp, .e-inp, .modal-inp {
-  background: transparent !important;
-  border: none !important;
-  border-bottom: 2px solid var(--ruled) !important;
-  border-radius: 0 !important;
-  padding: 8px 4px !important;
-  font-size: 1.1rem !important;
-}
-.inp:focus, .e-inp:focus, .modal-inp:focus {
-  border-bottom-color: var(--purple) !important;
-  outline: none !important;
-  background: rgba(123,82,171,.03) !important;
-}
-
-/* ══════════════════════════════════════
-   WASHI TAPE STRIPS on key headings
-══════════════════════════════════════ */
-.cal-wrap > div:first-child::before,
-.lb-wrap::before,
-.day-wrap::before,
-.um-wrap::before {
-  content: '';
-  display: block;
-  height: 20px;
-  margin: 0 -12px 16px;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--tape-yellow) 0px, var(--tape-yellow) 30px,
-    var(--tape-pink)   30px, var(--tape-pink)   60px,
-    var(--tape-blue)   60px, var(--tape-blue)   90px,
-    var(--tape-green)  90px, var(--tape-green) 120px
-  );
-  opacity: .55;
-  border-radius: 2px;
-}
-
-/* ══════════════════════════════════════
-   DOODLE SIDEBAR — floating SVG doodles
-══════════════════════════════════════ */
-.cal-wrap::after,
-.day-wrap::after,
-.lb-wrap::after {
-  content: '';
-  position: fixed;
-  right: -10px; top: 30%;
-  width: 80px; height: 200px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 200'%3E%3C!-- star --%3E%3Cpath d='M40 8 L43 18 L53 18 L45 24 L48 34 L40 28 L32 34 L35 24 L27 18 L37 18Z' fill='%23ffe082' stroke='%23ffb300' stroke-width='1'/%3E%3C!-- flower --%3E%3Ccircle cx='40' cy='70' r='6' fill='%23f48fb1'/%3E%3Ccircle cx='40' cy='57' r='5' fill='%23fce4ec'/%3E%3Ccircle cx='51' cy='63' r='5' fill='%23fce4ec'/%3E%3Ccircle cx='51' cy='77' r='5' fill='%23fce4ec'/%3E%3Ccircle cx='40' cy='83' r='5' fill='%23fce4ec'/%3E%3Ccircle cx='29' cy='77' r='5' fill='%23fce4ec'/%3E%3Ccircle cx='29' cy='63' r='5' fill='%23fce4ec'/%3E%3C!-- lightning --%3E%3Cpath d='M45 100 L35 118 L42 118 L33 138 L50 116 L43 116Z' fill='%23ffe082' stroke='%23fb8c00' stroke-width='1'/%3E%3C!-- heart --%3E%3Cpath d='M40 168 C40 168 25 155 25 145 C25 138 32 134 40 143 C48 134 55 138 55 145 C55 155 40 168 40 168Z' fill='%23f48fb1' stroke='%23e91e63' stroke-width='1'/%3E%3C!-- spiral --%3E%3Cpath d='M40 185 Q47 185 47 192 Q47 199 40 199 Q33 199 33 192 Q33 186 38 185' fill='none' stroke='%23b2dfdb' stroke-width='1.5'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-size: contain;
-  opacity: .18;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* ══════════════════════════════════════
-   PAPER HOLE PUNCHES (left side decoration)
-══════════════════════════════════════ */
-body::before {
-  content: '';
-  position: fixed;
-  left: 0; top: 0;
-  width: 22px; height: 100vh;
-  background:
-    radial-gradient(circle 4px at 11px 80px,  #fff 3px, var(--ruled) 4px, transparent 4px),
-    radial-gradient(circle 4px at 11px 200px, #fff 3px, var(--ruled) 4px, transparent 4px),
-    radial-gradient(circle 4px at 11px 320px, #fff 3px, var(--ruled) 4px, transparent 4px),
-    radial-gradient(circle 4px at 11px 440px, #fff 3px, var(--ruled) 4px, transparent 4px),
-    radial-gradient(circle 4px at 11px 560px, #fff 3px, var(--ruled) 4px, transparent 4px),
-    radial-gradient(circle 4px at 11px 680px, #fff 3px, var(--ruled) 4px, transparent 4px),
-    radial-gradient(circle 4px at 11px 800px, #fff 3px, var(--ruled) 4px, transparent 4px);
-  pointer-events: none;
-  z-index: 1000;
-}
-
-/* ensure content clears margin line — reduced side margins */
-.cal-wrap, .day-wrap, .editor-wrap, .lb-wrap,
-.um-wrap, .fb-screen, .login-wrap {
-  padding-left: 28px !important;
-  padding-right: 6px !important;
-}
-/* nav stays full width */
-.nav { padding-left: 28px !important; }
-
-/* ── tighter card/wrap padding to maximise content width ── */
-.cal-wrap { padding-right: 4px !important; }
-.day-wrap  { padding-right: 4px !important; }
-.lb-wrap   { padding-right: 4px !important; }
-.editor-wrap { padding-right: 4px !important; }
-.sess-header { padding: 10px 8px !important; }
-.sess-body   { padding: 8px 8px 10px !important; }
-.ring-card   { padding: 14px 10px !important; }
-.targets-card { padding: 12px 10px !important; }
-.e-card      { padding: 14px 10px !important; }
-.lb-row      { padding: 10px 8px !important; }
-.um-row      { padding: 10px 8px !important; }
-/* ══════════════════════════════════════
-   STICKER-STYLE BADGES & TAGS
-══════════════════════════════════════ */
-.done-badge {
-  background: var(--green) !important;
-  border-radius: 4px !important;
-  font-size:.75rem !important;
-  transform: rotate(-1deg);
-  display: inline-block;
-}
-.nav-badge {
-  border-radius: 4px !important;
-  transform: rotate(1deg);
-  display: inline-block !important;
-}
-
-/* ══════════════════════════════════════
-   PROGRESS BARS — pencil-sketch style
-══════════════════════════════════════ */
-.sess-prog, .lb-ubar-wrap, .cal-prog-bar {
-  background: repeating-linear-gradient(
-    90deg,
-    var(--ruled) 0px, var(--ruled) 3px,
-    transparent 3px, transparent 6px
-  ) !important;
-  border-radius: 2px !important;
-}
-
-/* ══════════════════════════════════════
-   FLOATING DOODLE ELEMENTS (injected via JS)
-══════════════════════════════════════ */
-.doodle-float {
-  position:fixed; pointer-events:none; z-index:0; opacity:.12;
-}
-
-/* ══════════════════════════════════════
-   PEER / READONLY BANNER
-══════════════════════════════════════ */
-.peer-banner {
-  border-radius: 4px 16px 16px 4px !important;
-  border-left: 6px solid var(--gold) !important;
-}
-
-/* ══════════════════════════════════════
-   OFFLINE BAR — washi tape style
-══════════════════════════════════════ */
-.offline-bar {
-  background: repeating-linear-gradient(
-    90deg,
-    #ff8a80 0px, #ff8a80 20px,
-    #ff5252 20px, #ff5252 40px
-  ) !important;
-  color: #fff !important;
-  font-size:.9rem !important;
-}
-
-/* ══════════════════════════════════════
-   TICK BOX — hand-drawn checkbox feel
-══════════════════════════════════════ */
-.tick-box {
-  border: 2px solid var(--ink-light) !important;
-  border-radius: 3px !important;
-  background: transparent !important;
-}
-.tick-row.done .tick-box {
-  background: var(--green) !important;
-  border-color: var(--green) !important;
-  border-radius: 3px !important;
-}
-
-/* ══════════════════════════════════════
-   RING NAME (today's label) on progress card
-══════════════════════════════════════ */
-.ring-tagline {
-  font-size:1rem !important;
-  opacity:.9 !important;
+  --navy:#1a237e; --blue:#1565c0; --green:#2e7d32; --purple:#6a1b9a;
+  --red:#c62828; --orange:#e65100; --teal:#00695c; --gold:#f9a825;
+  --bg:#f0f4ff; --border:#c5cae9; --text:#1a1a2e; --white:#fff;
+  --shadow:0 4px 18px rgba(26,35,126,.12);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overscroll-behavior:none}
-body{font-family:'Caveat',cursive;font-size:19px;background:var(--bg);color:var(--text);min-height:100vh;max-width:100vw;overflow-x:hidden}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:100vw;overflow-x:hidden}
 
 /* NAV */
-.nav{background:linear-gradient(135deg,#3d2c8d,#7b52ab);position:sticky;top:0;z-index:200;display:flex;align-items:center;padding:0 14px;height:52px;gap:10px;box-shadow:0 2px 16px rgba(90,50,150,.3)}
-.nav-title{font-family:'Caveat',cursive;font-weight:700;color:#fff;font-size:1.6rem;flex:1;letter-spacing:.5px}
-.nav-badge{font-size:.85rem;font-weight:700;padding:3px 9px;border-radius:10px}
-.nav-btn{background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:.95rem;padding:6px 0;font-family:'Caveat',cursive}
+.nav{background:var(--navy);position:sticky;top:0;z-index:200;display:flex;align-items:center;padding:0 14px;height:52px;gap:10px;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+.nav-title{font-family:'Nunito',sans-serif;font-weight:900;color:#fff;font-size:1rem;flex:1}
+.nav-badge{font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:10px}
+.nav-btn{background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:.8rem;padding:6px 0;font-family:Poppins,sans-serif}
 .sync-dot{width:8px;height:8px;border-radius:50%;background:#69f0ae;flex-shrink:0}
 .sync-dot.off{background:#ef9a9a}
 
@@ -558,17 +98,17 @@ body{font-family:'Caveat',cursive;font-size:19px;background:var(--bg);color:var(
 
 /* LOGIN */
 .login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
-.login-card{background:#fff;border-radius:24px;padding:36px 28px;box-shadow:0 8px 32px rgba(90,50,150,.15);max-width:400px;width:100%;text-align:center;border:2px solid var(--lavender)}
-.login-card h1{font-family:'Caveat',cursive;font-size:2.2rem;font-weight:700;color:var(--navy);margin:8px 0 4px}
+.login-card{background:#fff;border-radius:20px;padding:36px 28px;box-shadow:var(--shadow);max-width:400px;width:100%;text-align:center}
+.login-card h1{font-family:'Nunito',sans-serif;font-size:1.8rem;font-weight:900;color:var(--navy);margin:8px 0 4px}
 .login-card p{color:#888;font-size:.85rem;margin-bottom:24px}
-.inp{font-family:'Caveat',cursive;font-size:1.05rem;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;width:100%;outline:none;background:#fafbff;color:var(--text);margin-bottom:16px}
+.inp{font-family:'Poppins',sans-serif;font-size:.9rem;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;width:100%;outline:none;background:#fafbff;color:var(--text);margin-bottom:16px}
 .inp:focus{border-color:var(--blue)}
 .btn-row{display:flex;gap:10px}
-.btn{padding:12px 0;border-radius:12px;border:none;font-family:'Caveat',cursive;font-weight:700;font-size:1.1rem;cursor:pointer;flex:1;transition:.15s;letter-spacing:.2px}
+.btn{padding:12px 0;border-radius:10px;border:none;font-family:'Poppins',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;flex:1;transition:.15s}
 .btn:active{transform:scale(.97)}
-.btn-navy{background:linear-gradient(135deg,#3d2c8d,#7b52ab);color:#fff;box-shadow:0 3px 12px rgba(90,50,150,.3)}
-.btn-green{background:linear-gradient(135deg,#2e7d32,#43a047);color:#fff;box-shadow:0 3px 12px rgba(46,125,50,.3)}
-.btn-ghost{background:#f9f5ff;color:var(--navy);border:1.5px solid var(--border)}
+.btn-navy{background:var(--navy);color:#fff}
+.btn-green{background:var(--green);color:#fff}
+.btn-ghost{background:#f0f4ff;color:var(--navy);border:1.5px solid var(--border)}
 
 /* FIREBASE SETUP */
 .setup-card{background:#fff;border-radius:16px;padding:22px;margin:20px 14px;box-shadow:var(--shadow);border-left:5px solid var(--orange)}
@@ -581,18 +121,18 @@ body{font-family:'Caveat',cursive;font-size:19px;background:var(--bg);color:var(
 .cal-wrap{padding:16px 12px 80px}
 .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .cal-nav button{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:8px 18px;cursor:pointer;font-weight:700;font-size:1.1rem;color:var(--navy)}
-.cal-month{font-family:'Caveat',cursive;font-weight:700;font-size:1.7rem;color:var(--navy);text-align:center}
+.cal-month{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.4rem;color:var(--navy);text-align:center}
 .cal-year{font-size:.78rem;color:#888;text-align:center}
 .day-headers{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px}
 .day-hdr{text-align:center;font-size:.68rem;font-weight:700;color:#999;padding:4px 0}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
-.cal-day{aspect-ratio:1;border:1.5px solid #e4d8ff;border-radius:12px;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:3px;transition:.12s;position:relative}
+.cal-day{aspect-ratio:1;border:1.5px solid #e8eaf6;border-radius:10px;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:3px;transition:.12s;position:relative}
 .cal-day:active{transform:scale(.94)}
-.cal-day.today{border:2px solid var(--purple);box-shadow:0 0 0 3px rgba(123,82,171,.2);background:linear-gradient(135deg,#f3e5ff,#fff)}
+.cal-day.today{border:2px solid var(--blue);box-shadow:0 0 0 3px rgba(21,101,192,.15)}
 .cal-day.has-plan{background:#fff}
-.cal-day.done-day{background:linear-gradient(135deg,#e8f5e9,#f0fff4);border-color:#a5d6a7}
-.cal-day.inprog-day{background:linear-gradient(135deg,#fffde7,#fff8e1);border-color:#ffe082}
-.cal-day-num{font-weight:700;font-size:1rem;color:var(--navy);line-height:1}
+.cal-day.done-day{background:#e8f5e9;border-color:#a5d6a7}
+.cal-day.inprog-day{background:#fffde7;border-color:#fff176}
+.cal-day-num{font-weight:700;font-size:.82rem;color:var(--navy);line-height:1}
 .cal-day.past .cal-day-num{color:#bbb}
 .cal-day.today .cal-day-num{color:var(--blue)}
 .cal-prog-bar{width:75%;height:3px;background:#e0e4f4;border-radius:2px;overflow:hidden}
@@ -608,37 +148,37 @@ body{font-family:'Caveat',cursive;font-size:19px;background:var(--bg);color:var(
 .day-back button{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:7px 14px;cursor:pointer;font-weight:700;color:var(--navy);font-size:.88rem;font-family:Poppins,sans-serif}
 .day-back button:active{transform:scale(.97)}
 .day-title{flex:1}
-.day-title h2{font-family:'Caveat',cursive;font-weight:700;font-size:1.5rem;color:var(--navy);line-height:1.2}
-.day-title p{font-size:.88rem;color:#888;margin-top:2px}
+.day-title h2{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.05rem;color:var(--navy);line-height:1.2}
+.day-title p{font-size:.72rem;color:#888;margin-top:2px}
 .edit-toggle{background:var(--navy);color:#fff;border:none;border-radius:9px;padding:7px 12px;cursor:pointer;font-weight:700;font-size:.78rem;font-family:Poppins,sans-serif}
 .edit-toggle:active{transform:scale(.97)}
 
 /* PROGRESS RING CARD */
-.ring-card{background:linear-gradient(135deg,#3d2c8d,#7b52ab);border-radius:18px;padding:18px 20px;margin-bottom:14px;display:flex;align-items:center;gap:16px;box-shadow:0 6px 24px rgba(90,50,150,.25)}
+.ring-card{background:linear-gradient(135deg,#1a237e,#283593);border-radius:16px;padding:18px 20px;margin-bottom:14px;display:flex;align-items:center;gap:16px}
 .ring-wrap{flex-shrink:0}
 .ring-info{flex:1;color:#fff}
-.ring-name{font-family:'Caveat',cursive;font-weight:700;font-size:1.5rem;line-height:1.2}
-.ring-tagline{font-size:1.05rem;opacity:.85;font-style:italic;margin:4px 0 10px;font-family:'Caveat',cursive}
+.ring-name{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.05rem;line-height:1.2}
+.ring-tagline{font-size:.75rem;opacity:.8;font-style:italic;margin:4px 0 10px}
 .ring-stats{display:flex;gap:14px}
 .ring-stat{text-align:center}
 .ring-stat-n{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.3rem;line-height:1}
 .ring-stat-l{font-size:.62rem;opacity:.7}
 
 /* MOTIVATION */
-.motivation{background:linear-gradient(135deg,#fff8e1,#fff3e0);border-radius:14px;padding:12px 16px;margin-bottom:12px;border-left:4px solid var(--gold);font-size:1.3rem;font-style:italic;color:#5d4037;font-family:'Caveat',cursive;font-weight:600;box-shadow:0 2px 10px rgba(255,179,0,.15)}
+.motivation{background:#fff;border-radius:12px;padding:11px 14px;margin-bottom:12px;border-left:4px solid var(--gold);font-size:.8rem;font-style:italic;color:#555}
 
 /* SESSIONS */
-.session-card{background:#fff;border-radius:16px;margin-bottom:10px;overflow:hidden;box-shadow:0 3px 14px rgba(90,50,150,.1);border:1.5px solid #ede0ff}
-.session-card.all-done{border:2px solid #a5d6a7;background:linear-gradient(135deg,#f0fff4,#fff)}
+.session-card{background:#fff;border-radius:14px;margin-bottom:10px;overflow:hidden;box-shadow:var(--shadow)}
+.session-card.all-done{border:2px solid #a5d6a7}
 .sess-header{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;user-select:none}
 .sess-header:active{background:#fafbff}
 .sess-icon{font-size:1.3rem;flex-shrink:0}
 .sess-info{flex:1}
-.sess-label{font-weight:700;font-size:1.2rem;color:var(--navy);font-family:'Caveat',cursive}
-.sess-sub{font-size:1rem;color:#888;margin-top:1px}
+.sess-label{font-weight:800;font-size:.88rem;color:var(--navy);font-family:'Nunito',sans-serif}
+.sess-sub{font-size:.7rem;color:#888;margin-top:1px}
 .sess-right{display:flex;align-items:center;gap:6px}
-.sess-pct{font-size:1.05rem;font-weight:700;color:var(--green)}
-.done-badge{background:var(--green);color:#fff;font-size:.78rem;font-weight:800;padding:2px 8px;border-radius:8px}
+.sess-pct{font-size:.72rem;font-weight:700;color:var(--green)}
+.done-badge{background:var(--green);color:#fff;font-size:.62rem;font-weight:800;padding:2px 8px;border-radius:8px}
 .chevron{font-size:.75rem;color:#bbb;transition:transform .2s}
 .chevron.open{transform:rotate(180deg)}
 .sess-prog{height:3px;background:#f0f2ff}
@@ -648,12 +188,12 @@ body{font-family:'Caveat',cursive;font-size:19px;background:var(--bg);color:var(
 /* TICK ROWS */
 .tick-row{display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:9px;cursor:pointer;margin-bottom:3px;border:1.5px solid transparent;transition:.12s}
 .tick-row:active{transform:scale(.98)}
-.tick-row.done{background:linear-gradient(135deg,#f0fff4,#e8f5e9);border-color:#c8e6c9}
-.tick-box{width:22px;height:22px;border-radius:6px;border:2px solid #ce93d8;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s;font-size:.85rem;color:#fff}
-.tick-row.done .tick-box{background:#66bb6a;border-color:#66bb6a}
-.tick-label{font-size:1.2rem;font-weight:600;flex:1}
+.tick-row.done{background:#f0fff4;border-color:#c8e6c9}
+.tick-box{width:22px;height:22px;border-radius:6px;border:2px solid #bdbdbd;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s;font-size:.85rem;color:#fff}
+.tick-row.done .tick-box{background:var(--green);border-color:var(--green)}
+.tick-label{font-size:.8rem;font-weight:500;flex:1}
 .tick-row.done .tick-label{text-decoration:line-through;color:#bbb}
-.sess-goal{font-size:.88rem;color:#666;background:#f0f4ff;border-radius:8px;padding:6px 10px;margin-top:6px}
+.sess-goal{font-size:.72rem;color:#666;background:#f0f4ff;border-radius:8px;padding:6px 10px;margin-top:6px}
 
 /* MINI GRID */
 .mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
@@ -672,32 +212,32 @@ body{font-family:'Caveat',cursive;font-size:19px;background:var(--bg);color:var(
 .mini-tick.done .mini-tick-label{text-decoration:line-through;color:#bbb}
 
 /* DAILY TARGETS */
-.targets-card{background:linear-gradient(135deg,#3d2c8d,#7b52ab);border-radius:16px;padding:14px 16px;margin-bottom:12px;box-shadow:0 4px 18px rgba(90,50,150,.2)}
-.targets-title{color:var(--gold);font-weight:800;font-size:1rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.targets-card{background:linear-gradient(135deg,#1a237e,#283593);border-radius:14px;padding:14px 16px;margin-bottom:12px}
+.targets-title{color:var(--gold);font-weight:800;font-size:.78rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
 .targets-pills{display:flex;flex-wrap:wrap;gap:7px}
-.target-pill{background:rgba(255,255,255,.15);border:none;border-radius:8px;padding:6px 12px;color:#fff;font-size:.9rem;font-weight:600;cursor:pointer;font-family:Poppins,sans-serif;transition:.12s}
+.target-pill{background:rgba(255,255,255,.15);border:none;border-radius:8px;padding:6px 12px;color:#fff;font-size:.74rem;font-weight:600;cursor:pointer;font-family:Poppins,sans-serif;transition:.12s}
 .target-pill:active{transform:scale(.95)}
 .target-pill.done{background:rgba(46,125,50,.55);text-decoration:line-through;opacity:.8}
 
 /* COMPLETE BANNER */
-.complete-banner{background:linear-gradient(135deg,#e8f5e9,#f0fff4);border:2px solid #a5d6a7;border-radius:16px;padding:20px;text-align:center;margin-top:8px;box-shadow:0 4px 16px rgba(46,125,50,.15)}
-.complete-banner .emoji{font-size:3.5rem}
-.complete-banner h3{font-family:'Caveat',cursive;font-weight:700;color:var(--green);font-size:2rem;margin:4px 0 2px}
-.complete-banner p{color:#388e3c;font-size:1.15rem;font-family:'Caveat',cursive}
+.complete-banner{background:#e8f5e9;border:2px solid #a5d6a7;border-radius:14px;padding:18px;text-align:center;margin-top:8px}
+.complete-banner .emoji{font-size:2.5rem}
+.complete-banner h3{font-family:'Nunito',sans-serif;font-weight:900;color:var(--green);font-size:1.1rem;margin:4px 0 2px}
+.complete-banner p{color:#388e3c;font-size:.82rem}
 
 /* NO PLAN */
-.no-plan{text-align:center;padding:60px 20px;background:#fff;border-radius:18px;border:2px dashed #d7c8f5}
+.no-plan{text-align:center;padding:60px 20px;background:#fff;border-radius:16px;border:2px dashed #c5cae9}
 .no-plan .emoji{font-size:3rem;margin-bottom:10px}
-.no-plan h3{color:#888;font-weight:700;margin-bottom:8px;font-family:'Caveat',cursive;font-size:1.6rem}
-.no-plan p{color:#aaa;font-size:1rem;margin-bottom:16px}
+.no-plan h3{color:#888;font-weight:700;margin-bottom:8px}
+.no-plan p{color:#aaa;font-size:.82rem;margin-bottom:16px}
 
 /* EDITOR */
 .editor-wrap{padding:14px 12px 80px}
 .e-card{background:#fff;border-radius:16px;padding:18px 16px;margin-bottom:14px;box-shadow:var(--shadow)}
 .e-card-title{font-weight:800;font-size:.9rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
-.e-inp{font-family:'Caveat',cursive;font-size:1rem;padding:8px 12px;border:1.5px solid var(--border);border-radius:9px;width:100%;outline:none;background:#fafbff;color:var(--text)}
+.e-inp{font-family:'Poppins',sans-serif;font-size:.84rem;padding:8px 12px;border:1.5px solid var(--border);border-radius:9px;width:100%;outline:none;background:#fafbff;color:var(--text)}
 .e-inp:focus{border-color:var(--blue)}
-.e-label{font-size:.9rem;font-weight:700;color:#666;display:block;margin-bottom:3px;margin-top:8px}
+.e-label{font-size:.73rem;font-weight:600;color:#666;display:block;margin-bottom:3px;margin-top:8px}
 .e-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .sess-editor{background:#f8f9ff;border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid #e0e4f4;position:relative}
 .task-row{display:flex;gap:6px;margin-bottom:5px;align-items:center}
@@ -707,7 +247,7 @@ body{font-family:'Caveat',cursive;font-size:19px;background:var(--bg);color:var(
 .add-task-btn:hover{border-color:var(--blue);color:var(--blue)}
 .remove-sess-btn{position:absolute;top:10px;right:10px;background:none;border:1px solid #e53935;border-radius:7px;padding:3px 9px;font-size:.72rem;cursor:pointer;color:#e53935;font-family:Poppins,sans-serif}
 .add-section-btn{background:none;border:1.5px dashed var(--border);border-radius:10px;padding:9px 0;width:100%;font-size:.84rem;cursor:pointer;color:#777;font-family:Poppins,sans-serif;margin-top:4px}
-.publish-btn{background:linear-gradient(135deg,#3d2c8d,#7b52ab);color:#fff;border:none;border-radius:14px;padding:13px 40px;font-weight:700;font-size:1.2rem;cursor:pointer;font-family:'Caveat',cursive;display:block;margin:0 auto;transition:.15s;box-shadow:0 4px 16px rgba(90,50,150,.3)}
+.publish-btn{background:var(--navy);color:#fff;border:none;border-radius:12px;padding:13px 40px;font-weight:700;font-size:1rem;cursor:pointer;font-family:Poppins,sans-serif;display:block;margin:0 auto;transition:.15s}
 .publish-btn:active{transform:scale(.97)}
 .publish-btn:disabled{background:#aaa;cursor:not-allowed}
 
@@ -722,7 +262,7 @@ body{font-family:'Caveat',cursive;font-size:19px;background:var(--bg);color:var(
 code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color:var(--navy)}
 
 /* TOAST */
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:linear-gradient(135deg,#3d2c8d,#7b52ab);color:#fff;padding:10px 20px;border-radius:12px;font-size:.82rem;font-weight:600;z-index:500;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 16px rgba(90,50,150,.4)}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a237e;color:#fff;padding:10px 20px;border-radius:10px;font-size:.82rem;font-weight:600;z-index:500;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* OFFLINE BANNER */
@@ -734,16 +274,16 @@ code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color
 .tab-bar.show{display:flex}
 .tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:none;background:none;cursor:pointer;padding:6px 0;transition:.15s;color:#999;font-family:Poppins,sans-serif}
 .tab-btn:active{transform:scale(.92)}
-.tab-btn.active{color:var(--purple)}
+.tab-btn.active{color:var(--navy)}
 .tab-icon{font-size:1.3rem;line-height:1}
-.tab-label{font-size:.75rem;font-weight:700;letter-spacing:.3px;text-transform:uppercase}
-.tab-btn.active .tab-label{color:var(--purple)}
+.tab-label{font-size:.6rem;font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+.tab-btn.active .tab-label{color:var(--navy)}
 .screen{min-height:calc(100vh - 52px - 58px)}
 
 /* LEADERBOARD */
 .lb-wrap{padding:14px 12px 20px}
 .lb-header{text-align:center;margin-bottom:18px}
-.lb-header h2{font-family:'Caveat',cursive;font-weight:700;font-size:1.7rem;color:var(--navy)}
+.lb-header h2{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.4rem;color:var(--navy)}
 .lb-header p{font-size:.78rem;color:#888;margin-top:2px}
 .lb-date-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:18px}
 .lb-date-btn{background:#fff;border:1.5px solid var(--border);border-radius:9px;padding:6px 14px;cursor:pointer;font-weight:700;color:var(--navy);font-size:.88rem;font-family:Poppins,sans-serif}
@@ -785,7 +325,7 @@ code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color
 /* PEER VIEW */
 .peer-back{display:flex;align-items:center;gap:10px;margin-bottom:16px}
 .peer-back button{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:7px 14px;cursor:pointer;font-weight:700;color:var(--navy);font-size:.88rem;font-family:Poppins,sans-serif}
-.peer-banner{background:linear-gradient(135deg,#3d2c8d,#7b52ab);border-radius:18px;padding:16px 20px;margin-bottom:14px;display:flex;align-items:center;gap:14px;color:#fff;box-shadow:0 4px 18px rgba(90,50,150,.2)}
+.peer-banner{background:linear-gradient(135deg,#1a237e,#283593);border-radius:16px;padding:16px 20px;margin-bottom:14px;display:flex;align-items:center;gap:14px;color:#fff}
 .peer-big-avatar{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:1.4rem;color:#fff;flex-shrink:0;border:3px solid rgba(255,255,255,.4)}
 .peer-banner-info{flex:1}
 .peer-banner-name{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem}
@@ -799,7 +339,7 @@ code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color
 /* USER MANAGEMENT */
 .um-wrap{padding:14px 12px 20px}
 .um-header{text-align:center;margin-bottom:18px}
-.um-header h2{font-family:'Caveat',cursive;font-weight:700;font-size:1.7rem;color:var(--navy)}
+.um-header h2{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.4rem;color:var(--navy)}
 .um-header p{font-size:.78rem;color:#888;margin-top:2px}
 .um-stats{display:flex;gap:10px;margin-bottom:18px}
 .um-stat-card{flex:1;background:#fff;border-radius:12px;padding:12px;text-align:center;box-shadow:var(--shadow)}
@@ -821,65 +361,233 @@ code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;display:none}
 .modal-overlay.show{display:flex}
 .modal-box{background:#fff;border-radius:20px;padding:28px 24px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-.modal-box h3{font-family:'Caveat',cursive;font-weight:700;font-size:1.4rem;color:var(--navy);margin-bottom:6px}
+.modal-box h3{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.2rem;color:var(--navy);margin-bottom:6px}
 .modal-box p{font-size:.82rem;color:#666;margin-bottom:18px;line-height:1.5}
-.modal-inp{font-family:'Caveat',cursive;font-size:1.05rem;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;width:100%;outline:none;background:#fafbff;color:var(--text);margin-bottom:14px}
+.modal-inp{font-family:'Poppins',sans-serif;font-size:.9rem;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;width:100%;outline:none;background:#fafbff;color:var(--text);margin-bottom:14px}
 .modal-inp:focus{border-color:var(--blue)}
 .modal-btns{display:flex;gap:10px}
-.modal-cancel{flex:1;padding:11px;border-radius:10px;border:1.5px solid var(--border);background:#fff;font-family:'Caveat',cursive;font-weight:700;font-size:1rem;cursor:pointer;color:#666}
-.modal-confirm{flex:1;padding:11px;border-radius:10px;border:none;font-family:'Caveat',cursive;font-weight:700;font-size:1rem;cursor:pointer;color:#fff}
+.modal-cancel{flex:1;padding:11px;border-radius:10px;border:1.5px solid var(--border);background:#fff;font-family:Poppins,sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;color:#666}
+.modal-confirm{flex:1;padding:11px;border-radius:10px;border:none;font-family:Poppins,sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;color:#fff}
 .modal-confirm.green{background:var(--green)}
 .modal-confirm.red{background:#c62828}
+
+/* ═══════════ NOTEBOOK THEME OVERLAY ═══════════ */
+:root {
+  --ink:#2c1a5e; --paper:#fffef5; --line:#b8d4f8; --red-margin:#f4a0a0;
+  --pencil:#4a3728; --highlight:#fff176; --doodle:#7c5cbf;
+}
+body {
+  font-family:'Patrick Hand',cursive !important;
+  background: var(--paper)
+    repeating-linear-gradient(transparent, transparent 27px, var(--line) 27px, var(--line) 28px)
+    !important;
+  background-attachment: local !important;
+}
+/* Red margin line */
+body::before {
+  content:'';position:fixed;left:42px;top:0;bottom:0;width:2px;
+  background:var(--red-margin);z-index:0;pointer-events:none;opacity:.6;
+}
+/* Spiral holes */
+body::after {
+  content:'⬤\A⬤\A⬤\A⬤\A⬤\A⬤\A⬤\A⬤\A⬤\A⬤\A⬤\A⬤\A⬤\A⬤\A⬤\A⬤\A⬤\A⬤\A⬤\A⬤';
+  white-space:pre;position:fixed;left:10px;top:30px;font-size:14px;
+  color:#ccc;line-height:28px;z-index:0;pointer-events:none;
+}
+.nav {
+  font-family:'Caveat',cursive !important;
+  background: linear-gradient(135deg,#3d2785,#5e35b1) !important;
+  border-bottom: 3px solid #7c5cbf !important;
+  position:relative;
+}
+.nav::after {
+  content:'✏️ 📐 ⭐ 🌟 💡';
+  position:absolute;right:160px;top:50%;transform:translateY(-50%);
+  font-size:.7rem;letter-spacing:4px;opacity:.5;
+}
+.nav-title { font-family:'Caveat',cursive !important; font-size:1.2rem !important; letter-spacing:1px; }
+/* All cards get paper feel */
+.login-card,.e-card,.session-card,.ring-card,.setup-card,.mini-card,
+.lb-row,.um-row,.um-stat-card,.modal-box,.peer-banner,.targets-card {
+  border-radius:4px !important;
+  box-shadow: 3px 3px 0 #d1c4e9, 1px 1px 8px rgba(0,0,0,.08) !important;
+}
+.session-card, .e-card, .um-stat-card, .lb-row, .um-row {
+  background: #fffef5 !important;
+  border-left: 3px solid var(--doodle) !important;
+  border-top: 1px dashed #c5b8e8 !important;
+}
+/* Headings handwritten */
+h1,h2,h3,.nav-title,.cal-month,.sess-label,.ring-name,.day-title h2,
+.e-card-title,.um-header h2,.targets-title,.login-card h1,.lb-uname,.um-name {
+  font-family:'Caveat',cursive !important;
+  letter-spacing:.5px;
+}
+/* Body text handwritten */
+p,.btn,.inp,.e-inp,.tick-label,.mini-tick-label,.motivation,.sess-sub,
+.ring-tagline,.nav-btn,.day-back button,.edit-toggle,.add-task-btn,
+.add-section-btn,.publish-btn,.step-text,.um-pass,.lb-streak {
+  font-family:'Patrick Hand',cursive !important;
+}
+/* Inputs notebook style */
+.inp,.e-inp,.modal-inp,.setup-card textarea {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 2px solid var(--doodle) !important;
+  border-radius: 0 !important;
+  font-family:'Caveat',cursive !important;
+  font-size:1rem !important;
+  color: var(--pencil) !important;
+}
+.inp:focus,.e-inp:focus,.modal-inp:focus { border-bottom-color:#e91e63 !important; outline:none !important; }
+/* Buttons doodle style */
+.btn,.edit-toggle,.publish-btn,.add-task-btn,.add-section-btn,.um-edit-btn,.um-del-btn,
+.cal-nav button,.day-back button,.peer-tab,.target-pill,.modal-cancel,.modal-confirm {
+  font-family:'Caveat',cursive !important;
+  font-size:.95rem !important;
+  border-radius: 6px !important;
+  border-width: 2px !important;
+  letter-spacing:.3px;
+}
+.btn-navy,.btn-green,.publish-btn,.edit-toggle {
+  background: var(--doodle) !important;
+  border: 2px solid #4a148c !important;
+  box-shadow: 2px 2px 0 #4a148c !important;
+}
+.btn-navy:active,.btn-green:active,.publish-btn:active { transform: translate(2px,2px) !important; box-shadow: none !important; }
+/* Motivation quote — sticky note look */
+.motivation {
+  background: #fff9c4 !important;
+  border: none !important;
+  border-left: 4px solid #f9a825 !important;
+  transform: rotate(-0.5deg);
+  box-shadow: 2px 3px 6px rgba(0,0,0,.1), 3px 3px 0 #f9a825 !important;
+  font-family:'Caveat',cursive !important;
+  font-size:.95rem !important;
+  color:#5d4037 !important;
+  position:relative;
+}
+.motivation::before { content:'📌'; position:absolute; top:-8px; right:10px; font-size:1rem; }
+/* Calendar notebook feel */
+.cal-day {
+  background: var(--paper) !important;
+  border: 1.5px solid #c5b8e8 !important;
+  border-radius: 4px !important;
+  font-family:'Caveat',cursive !important;
+}
+.cal-day.today { border: 2.5px solid #e91e63 !important; box-shadow: 0 0 0 2px rgba(233,30,99,.2) !important; }
+.cal-day-num { font-family:'Caveat',cursive !important; font-size:.9rem !important; }
+.day-hdr { font-family:'Caveat',cursive !important; color:#7c5cbf !important; }
+.cal-month { color:#3d2785 !important; text-shadow: 1px 1px 0 #c5b8e8; }
+/* Tick boxes — hand-drawn feel */
+.tick-box,.mini-tick-box {
+  border-radius: 3px !important;
+  border: 2px solid var(--pencil) !important;
+}
+.tick-row.done .tick-box,.mini-tick.done .mini-tick-box {
+  background: #4caf50 !important;
+  border-color: #2e7d32 !important;
+}
+/* Complete banner — party notebook */
+.complete-banner {
+  background: linear-gradient(135deg,#f3e5f5,#e8f5e9) !important;
+  border: 2px dashed #7c5cbf !important;
+  font-family:'Caveat',cursive !important;
+  position:relative;
+  overflow:hidden;
+}
+.complete-banner::before {
+  content:'🌟 ⭐ 🏆 🎉 ✨ 🌈 🎊 🏅 💪 🔥';
+  position:absolute;top:4px;left:0;right:0;
+  font-size:.8rem;letter-spacing:4px;opacity:.4;
+  text-align:center;
+}
+/* No plan — notebook doodle */
+.no-plan {
+  border: 2px dashed var(--doodle) !important;
+  background: var(--paper) !important;
+  font-family:'Caveat',cursive !important;
+}
+/* Progress ring card */
+.ring-card {
+  background: linear-gradient(135deg,#3d2785,#5e35b1) !important;
+  border: 3px solid #7c5cbf !important;
+  border-radius:6px !important;
+}
+/* Toast */
+.toast {
+  font-family:'Caveat',cursive !important;
+  font-size:1rem !important;
+  background: #3d2785 !important;
+  border: 2px solid #7c5cbf !important;
+  border-radius: 8px !important;
+  box-shadow: 3px 3px 0 #4a148c !important;
+}
+/* Doodle decorations on login */
+.login-card { position:relative; overflow:visible !important; }
+.login-card::before {
+  content:'📚✏️📖🎯💡🌟';
+  position:absolute;top:-18px;left:50%;transform:translateX(-50%);
+  font-size:1.2rem;letter-spacing:8px;
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,.2));
+}
+.login-card::after {
+  content:'"Dream big. Study hard. Never give up! 🚀"';
+  display:block;font-family:'Caveat',cursive;font-size:.85rem;
+  color:#9c27b0;margin-top:14px;font-style:italic;
+  border-top:1px dashed #ce93d8;padding-top:10px;
+}
+/* Doodle stars on session cards */
+.session-card.all-done::after {
+  content:'⭐ NAILED IT! 🎉';
+  display:block;font-family:'Caveat',cursive;
+  text-align:center;font-size:.85rem;color:#388e3c;
+  padding:4px;background:#f1f8e9;letter-spacing:4px;
+}
+/* Targets card */
+.targets-card { background: linear-gradient(135deg,#3d2785,#5e35b1) !important; border-radius:6px !important; }
+.targets-title { font-family:'Caveat',cursive !important; font-size:1rem !important; }
+.target-pill { font-family:'Caveat',cursive !important; font-size:.85rem !important; }
+/* Nav bottom tabs */
+.tab-bar { font-family:'Patrick Hand',cursive !important; background:#fffef5 !important;
+  border-top: 2px solid #c5b8e8 !important; }
+.tab-item { font-family:'Patrick Hand',cursive !important; }
+.tab-item.active { color: var(--doodle) !important; }
+/* Editor session blocks */
+.sess-editor {
+  background: #fafaf0 !important;
+  border: 1.5px dashed #c5b8e8 !important;
+  border-left: 4px solid var(--doodle) !important;
+  border-radius:4px !important;
+}
+/* Leaderboard */
+.lb-podium .lb-block { border-radius:3px !important; }
+/* Modal */
+.modal-box {
+  background: var(--paper) !important;
+  border: 2px solid var(--doodle) !important;
+  box-shadow: 4px 4px 0 #4a148c !important;
+  font-family:'Patrick Hand',cursive !important;
+}
+.modal-box h3 { font-family:'Caveat',cursive !important; }
+/* Scrollbar */
+::-webkit-scrollbar { width:6px; }
+::-webkit-scrollbar-track { background:#f0ecff; }
+::-webkit-scrollbar-thumb { background:#9c88cc; border-radius:3px; }
+/* ═══════════ END NOTEBOOK THEME ═══════════ */
 </style>
 </head>
 <body>
 
-<!-- ══ NOTEBOOK DOODLES (decorative, pointer-events:none) ══ -->
-<svg class="doodle-float" style="top:60px;left:2px;width:36px;height:120px" viewBox="0 0 36 120" xmlns="http://www.w3.org/2000/svg">
-  <!-- spiral binding rings -->
-  <ellipse cx="18" cy="15"  rx="10" ry="6" fill="none" stroke="#7b52ab" stroke-width="2"/>
-  <ellipse cx="18" cy="35"  rx="10" ry="6" fill="none" stroke="#7b52ab" stroke-width="2"/>
-  <ellipse cx="18" cy="55"  rx="10" ry="6" fill="none" stroke="#7b52ab" stroke-width="2"/>
-  <ellipse cx="18" cy="75"  rx="10" ry="6" fill="none" stroke="#7b52ab" stroke-width="2"/>
-  <ellipse cx="18" cy="95"  rx="10" ry="6" fill="none" stroke="#7b52ab" stroke-width="2"/>
-  <ellipse cx="18" cy="115" rx="10" ry="6" fill="none" stroke="#7b52ab" stroke-width="2"/>
-</svg>
-
-<!-- floating doodles top-right -->
-<svg class="doodle-float" style="top:70px;right:6px;width:55px;height:140px;opacity:.13" viewBox="0 0 55 140" xmlns="http://www.w3.org/2000/svg">
-  <!-- tiny star -->
-  <path d="M27 5 L29 13 L37 13 L31 18 L33 26 L27 21 L21 26 L23 18 L17 13 L25 13Z" fill="#ffe082" stroke="#ffb300" stroke-width="1"/>
-  <!-- cloud -->
-  <circle cx="20" cy="50" r="7" fill="none" stroke="#b2dfdb" stroke-width="1.5"/>
-  <circle cx="30" cy="47" r="9" fill="none" stroke="#b2dfdb" stroke-width="1.5"/>
-  <circle cx="40" cy="50" r="7" fill="none" stroke="#b2dfdb" stroke-width="1.5"/>
-  <rect x="13" y="50" width="34" height="10" rx="2" fill="none" stroke="#b2dfdb" stroke-width="1.5"/>
-  <!-- music note -->
-  <path d="M28 80 L28 100 Q23 103 23 98 Q23 93 28 96" fill="none" stroke="#f48fb1" stroke-width="1.5"/>
-  <circle cx="23" cy="100" r="4" fill="#f48fb1" opacity=".7"/>
-  <line x1="34" y1="75" x2="34" y2="90" stroke="#f48fb1" stroke-width="1.5"/>
-  <circle cx="30" cy="92" r="4" fill="#f48fb1" opacity=".7"/>
-  <!-- arrow doodle -->
-  <path d="M20 118 Q30 112 40 118" fill="none" stroke="#d7c8f5" stroke-width="1.5"/>
-  <path d="M37 115 L40 118 L37 121" fill="none" stroke="#d7c8f5" stroke-width="1.5"/>
-</svg>
-
-<!-- bottom-left corner doodle -->
-<svg class="doodle-float" style="bottom:70px;left:50px;width:70px;height:70px;opacity:.1" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg">
-  <path d="M35 5 C55 5 65 20 65 35 C65 50 55 65 35 65 C15 65 5 50 5 35 C5 20 15 5 35 5Z" fill="none" stroke="#7b52ab" stroke-width="1.5" stroke-dasharray="4 3"/>
-  <path d="M35 15 C48 15 55 24 55 35 C55 46 48 55 35 55 C22 55 15 46 15 35 C15 24 22 15 35 15Z" fill="none" stroke="#f48fb1" stroke-width="1"/>
-  <circle cx="35" cy="35" r="6" fill="#ffe082" opacity=".6"/>
-</svg>
-
 <!-- OFFLINE BAR -->
-<div class="offline-bar" id="offline-bar">📵 Offline — changes will sync when you're back online! 🔄</div>
+<div class="offline-bar" id="offline-bar">📵 Offline — changes will sync when reconnected</div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <!-- NAV (hidden on login/setup) -->
 <div class="nav" id="nav" style="display:none">
-  <span class="nav-title">📚 Study Planner ✨</span>
+  <span class="nav-title">✏️ Study Planner</span>
   <div class="sync-dot off" id="sync-dot" title="Connection status"></div>
   <span class="nav-badge" id="role-badge" style="background:var(--gold);color:var(--navy)"></span>
   <button class="nav-btn" onclick="showEditMyNameModal()" title="Edit my name">✏️</button>
@@ -929,16 +637,11 @@ code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color
 <!-- ══ SCREEN: LOGIN ══ -->
 <div class="screen" id="screen-login">
   <div class="login-wrap">
-    <div class="login-card" style="position:relative;overflow:visible">
-      <!-- washi tape strip across top -->
-      <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%) rotate(-1.5deg);width:80px;height:22px;background:rgba(255,236,130,.8);border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,.1);z-index:5"></div>
-      <!-- mini doodle stickers -->
-      <div style="position:absolute;top:8px;right:12px;font-size:1.4rem;transform:rotate(12deg);opacity:.7">📎</div>
-      <div style="position:absolute;bottom:12px;left:10px;font-size:1.1rem;transform:rotate(-8deg);opacity:.6">🌸</div>
-      <div style="font-size:3rem">🌟</div>
-      <div id="login-date-display" style="font-family:'Caveat',cursive;font-weight:700;font-size:1.1rem;color:var(--purple);margin:4px 0 2px"></div>
-      <h1 style="font-size:2rem">Study Planner 📚</h1>
-      <p>Let's crush it together! 💪</p>
+    <div class="login-card">
+      <div style="font-size:3rem">📅</div>
+      <div id="login-date-display" style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;color:var(--navy);margin:4px 0 2px"></div>
+      <h1 style="font-size:1.5rem">Study Planner</h1>
+      <p>Daily collaborative study tracker</p>
       <input class="inp" id="login-name" placeholder="Your name…" maxlength="30" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
       <input class="inp" id="login-pass" type="password" placeholder="Password…" maxlength="20" onkeydown="if(event.key==='Enter')doLogin(pendingRole||'user')">
       <div class="btn-row">
@@ -1008,14 +711,16 @@ const DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const COLORS = ['#1a237e','#2e7d32','#6a1b9a','#e65100','#00695c','#c62828'];
 const ICONS = ['🌅','🌤️','🌙','📖','✏️','🔬','💡','🎯'];
 const QUOTES = [
-  "✨ You've got this! Every page you read is a step closer to your dream!",
-  "🌟 Small steps every day lead to BIG results — keep going!",
-  "💪 Your future self is cheering you on right now!",
-  "🚀 The secret is to START — you're already here, that's amazing!",
-  "🌈 Consistency beats perfection — show up and shine!",
-  "☀️ Today's effort is tomorrow's success. Believe in yourself!",
-  "🎯 Focus. Breathe. You are more capable than you think!",
-  "💫 Every expert was once a beginner. Keep learning, keep growing!",
+  "✏️ Small daily improvements = staggering results! Keep scribbling forward~",
+  "📖 The secret of getting ahead is just getting started. Pick up your pen! 🚀",
+  "🌟 Consistency is the hallmark of the unbeatable. You've got this!",
+  "💪 Push yourself — nobody else can write YOUR story for you!",
+  "⭐ Every page of notes is a step closer to your dream. Fill it up!",
+  "🎯 One focused hour beats five distracted ones. Lock in! 🔒",
+  "📚 Your future self will thank you for studying today. Trust the process~",
+  "🌈 Difficult roads lead to beautiful destinations. Keep walking!",
+  "✨ You didn't come this far to only come this far. Finish strong!",
+  "🏆 Champions train when they don't feel like it. That's the secret sauce 🍯",
 ];
 
 let db = null;
@@ -1376,14 +1081,14 @@ function changeMonth(dir) {
 }
 
 const CAL_QUOTES = [
-  {e:'🔥', t:'Every day is a new opportunity to grow!'},
-  {e:'⚡', t:'Consistency beats perfection every time.'},
-  {e:'🏆', t:'Champions train even when they don\'t feel like it.'},
-  {e:'🌟', t:'Your daily effort compounds into greatness.'},
-  {e:'💪', t:'One more task done. One step closer to success!'},
-  {e:'🎯', t:'Focus on progress, not perfection.'},
-  {e:'🚀', t:'Small steps daily = giant leaps yearly.'},
-  {e:'🌈', t:'Stay consistent. Your results are coming.'},
+  {e:'🔥', t:'Every day is a fresh page — write something great on it!'},
+  {e:'✏️', t:'Consistency is just showing up with your pencil every day~'},
+  {e:'🏆', t:'Champions study even when Netflix is calling. Stay strong!'},
+  {e:'🌟', t:'Your daily notes compound into brilliance. Keep going!'},
+  {e:'📌', t:'One more task ticked. One step closer to your dream!'},
+  {e:'🎯', t:'Progress over perfection. Fill those checkboxes!'},
+  {e:'🚀', t:'Small study sessions daily = giant leaps yearly!'},
+  {e:'🌈', t:'Stay consistent. Your breakthrough is around the corner~'},
 ];
 
 function renderCalendar() {
@@ -1564,31 +1269,31 @@ function getMyProgress(date) {
 
 // Rich quote bank — categorised by progress level
 const QUOTES_START = [
-  {q:"The secret of getting ahead is getting started.", a:"Mark Twain", e:"🚀"},
-  {q:"You don't have to be great to start, but you have to start to be great.", a:"Zig Ziglar", e:"⚡"},
-  {q:"One step at a time is all it takes to get you there.", a:"Emily Dickinson", e:"👣"},
-  {q:"The journey of a thousand miles begins with one step.", a:"Lao Tzu", e:"🌏"},
-  {q:"Start where you are. Use what you have. Do what you can.", a:"Arthur Ashe", e:"💪"},
-  {q:"Believe you can and you're halfway there.", a:"Theodore Roosevelt", e:"🌟"},
-  {q:"Your future is created by what you do today, not tomorrow.", a:"Robert Kiyosaki", e:"🔥"},
-  {q:"Dream big. Start small. Act now.", a:"Robin Sharma", e:"🎯"},
+  {q:"The secret of getting ahead is just getting started~ ✏️", a:"Mark Twain", e:"🚀"},
+  {q:"You don't have to be great to start, but you MUST start to be great!", a:"Zig Ziglar", e:"⚡"},
+  {q:"One page of notes at a time is all it takes to get there.", a:"Emily Dickinson", e:"📖"},
+  {q:"The journey of 1000 miles begins with opening your notebook.", a:"Lao Tzu", e:"🌏"},
+  {q:"Start where you are. Use what you have. Do what you can!", a:"Arthur Ashe", e:"💪"},
+  {q:"Believe you can and you're already halfway there! 🌟", a:"Theodore Roosevelt", e:"🌟"},
+  {q:"Your future is created by what you write down TODAY, not tomorrow.", a:"Robert Kiyosaki", e:"🔥"},
+  {q:"Dream big. Scribble small. Act NOW! 🎯", a:"Robin Sharma", e:"🎯"},
 ];
 const QUOTES_MID = [
-  {q:"Keep going. Everything you need will come to you at the perfect time.", a:"Anonymous", e:"⏩"},
-  {q:"You are doing better than you think.", a:"Anonymous", e:"💡"},
-  {q:"Push yourself because no one else is going to do it for you.", a:"Anonymous", e:"💥"},
-  {q:"Success is the sum of small efforts repeated day in and day out.", a:"Robert Collier", e:"📈"},
-  {q:"Hard work beats talent when talent doesn't work hard.", a:"Tim Notke", e:"🏆"},
-  {q:"Don't watch the clock; do what it does. Keep going.", a:"Sam Levenson", e:"⏰"},
-  {q:"The difference between ordinary and extraordinary is that little extra.", a:"Jimmy Johnson", e:"✨"},
-  {q:"Concentrate all your thoughts upon the work at hand.", a:"Alexander Graham Bell", e:"🎯"},
+  {q:"Keep going! Everything you need will come at the perfect time~ 📌", a:"Anonymous", e:"⏩"},
+  {q:"You are doing WAY better than you think! Keep those checkboxes coming!", a:"Anonymous", e:"💡"},
+  {q:"Push yourself because no one else is going to sharpen your pencil for you!", a:"Anonymous", e:"💥"},
+  {q:"Success = small tick marks repeated day in, day out. You're doing it! ✅", a:"Robert Collier", e:"📈"},
+  {q:"Hard work beats talent when talent doesn't open the notebook. 📚", a:"Tim Notke", e:"🏆"},
+  {q:"Don't watch the clock — keep scribbling. It does. 🕐", a:"Sam Levenson", e:"⏰"},
+  {q:"The difference between ordinary & extraordinary is that little extra effort!", a:"Jimmy Johnson", e:"✨"},
+  {q:"Concentrate all your energy on the task at hand. You're almost there~", a:"Alexander Graham Bell", e:"🎯"},
 ];
 const QUOTES_DONE = [
-  {q:"Well done is better than well said.", a:"Benjamin Franklin", e:"🏅"},
-  {q:"Success is not final; failure is not fatal. It is the courage to continue that counts.", a:"Winston Churchill", e:"👑"},
-  {q:"You did it! Champions keep playing until they get it right.", a:"Billie Jean King", e:"🎊"},
-  {q:"The harder you work, the luckier you get.", a:"Gary Player", e:"🍀"},
-  {q:"Today you are one step closer to your dream.", a:"Anonymous", e:"🌈"},
+  {q:"LOOK AT YOU! You crushed it today! 🏅 Well done is better than well said!", a:"Benjamin Franklin", e:"🏅"},
+  {q:"You did it! Champions keep showing up until they get it right. And you DID! 🎊", a:"Winston Churchill", e:"👑"},
+  {q:"Today's completed page is tomorrow's head start. You're unstoppable! 🔥", a:"Billie Jean King", e:"🎊"},
+  {q:"The harder you work, the luckier you get. Today proves it! 🍀", a:"Gary Player", e:"🍀"},
+  {q:"TODAY you moved one giant step closer to your dream! Celebrate! 🌈🎉", a:"Anonymous", e:"🌈"},
 ];
 
 // Day themes — rotate by date hash
@@ -2676,80 +2381,6 @@ self.addEventListener('fetch',e=>{
   const swURL = URL.createObjectURL(swBlob);
   navigator.serviceWorker.register(swURL).catch(()=>{});
 }
-
-/* ═══════════════════════════════════════════
-   NOTEBOOK DOODLE ENHANCER
-   Adds washi tape + sticker accents to dynamic cards
-═══════════════════════════════════════════ */
-(function notebookDoodles() {
-  const tapeColors = [
-    'rgba(255,236,130,.7)',
-    'rgba(255,182,193,.65)',
-    'rgba(180,210,255,.65)',
-    'rgba(180,240,200,.65)',
-    'rgba(220,200,255,.65)',
-  ];
-  const doodleEmojis = ['🌸','⭐','🍀','🌈','✨','🦋','🌻','💫','🎀','🌷'];
-  const cornerEmojis  = ['📌','🔖','📎','🖊️','✏️'];
-
-  function pickRandom(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
-
-  // Observe DOM for session cards and add tape + sticker decorations
-  const observer = new MutationObserver(() => {
-    // Session cards — tape top-left + corner emoji
-    document.querySelectorAll('.session-card:not([data-notebook])').forEach(card => {
-      card.setAttribute('data-notebook','1');
-      card.style.position = 'relative';
-      card.style.overflow = 'visible';
-      card.style.marginTop = '18px';
-
-      // washi tape strip
-      const tape = document.createElement('div');
-      tape.style.cssText = `
-        position:absolute; top:-10px; left:${12+Math.random()*30}px;
-        width:${45+Math.random()*25}px; height:18px;
-        background:${pickRandom(tapeColors)};
-        border-radius:3px; transform:rotate(${(Math.random()-0.5)*4}deg);
-        box-shadow:0 1px 3px rgba(0,0,0,.08); z-index:2; pointer-events:none;
-      `;
-      card.appendChild(tape);
-
-      // corner sticker emoji
-      const sticker = document.createElement('span');
-      sticker.textContent = pickRandom(doodleEmojis);
-      sticker.style.cssText = `
-        position:absolute; top:6px; right:8px;
-        font-size:.95rem; opacity:.55;
-        transform:rotate(${(Math.random()-0.5)*20}deg);
-        pointer-events:none; z-index:2;
-      `;
-      card.appendChild(sticker);
-    });
-
-    // e-cards (editor cards) — corner pin emoji
-    document.querySelectorAll('.e-card:not([data-notebook])').forEach(card => {
-      card.setAttribute('data-notebook','1');
-      card.style.position = 'relative';
-      const pin = document.createElement('span');
-      pin.textContent = pickRandom(cornerEmojis);
-      pin.style.cssText = `
-        position:absolute; top:-10px; right:12px;
-        font-size:1rem; opacity:.6;
-        transform:rotate(${(Math.random()-0.5)*15}deg);
-        pointer-events:none; z-index:3;
-      `;
-      card.appendChild(pin);
-    });
-
-    // leaderboard rows — tiny doodle accent
-    document.querySelectorAll('.lb-row:not([data-notebook])').forEach(row => {
-      row.setAttribute('data-notebook','1');
-      row.style.background = 'var(--paper2)';
-    });
-  });
-  observer.observe(document.body, { childList:true, subtree:true });
-})();
-
 </script>
 </body>
 </html>
