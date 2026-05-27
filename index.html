@@ -827,6 +827,9 @@ function signOut() {
   Object.values(planListeners).forEach(off => off && off());
   Object.values(progListeners).forEach(off => off && off());
   planListeners = {}; progListeners = {};
+  if (editingStatusListener && db) { db.ref('editingStatus').off('value', editingStatusListener); editingStatusListener = null; }
+  if (isEditing && selectedDate === todayStr()) setEditingStatus(selectedDate, false);
+  isEditing = false;
   allPlans = {}; allProgress = {}; allUsersData = {};
   userName = ''; userRole = ''; pendingRole = 'user';
   localStorage.removeItem('session');
@@ -840,10 +843,14 @@ function signOut() {
 ═══════════════════════════════════════════ */
 function startListeners() {
   if (!db) return;
+  startEditingStatusListener();
   db.ref('plans').on('value', snap => {
     allPlans = snap.val() || {};
     if (document.getElementById('screen-calendar').classList.contains('active')) renderCalendar();
-    if (!isEditing && document.getElementById('screen-day').classList.contains('active')) renderDayView(selectedDate);
+    if (!isEditing && document.getElementById('screen-day').classList.contains('active')) {
+      // If user was seeing the creating-banner and plan just published, show it now
+      renderDayView(selectedDate);
+    }
     if (document.getElementById('screen-leaderboard').classList.contains('active')) renderLeaderboard();
     if (document.getElementById('screen-peer').classList.contains('active')) renderPeerView();
   });
@@ -1152,6 +1159,26 @@ function renderDayView(date) {
   </div>`;
 
   if (!plan) {
+    if (userRole !== 'creator' && date === todayStr()) {
+      // Check if creator is currently editing today
+      if (db) {
+        db.ref('editingStatus').get().then(snap => {
+          const status = snap.val();
+          if (status && status.date === todayStr()) {
+            renderCreatingBanner();
+          } else {
+            html += `<div class="no-plan">
+              <div style="font-size:4rem;margin-bottom:8px">📭</div>
+              <h3>No plan yet</h3>
+              <p>The creator hasn't published a plan for this day yet.</p>
+            </div>`;
+            container.innerHTML = html;
+          }
+        });
+        container.innerHTML = html + `<div style="text-align:center;padding:40px;color:#aaa;font-size:.85rem">Loading…</div>`;
+        return;
+      }
+    }
     html += `<div class="no-plan">
       <div style="font-size:4rem;margin-bottom:8px">📭</div>
       <h3>No plan yet</h3>
@@ -1458,6 +1485,51 @@ async function toggleTask(date, key, el) {
 /* ═══════════════════════════════════════════
    EDITOR
 ═══════════════════════════════════════════ */
+
+// ── Firebase editing-status helpers ──────────────────────────────────────────
+function setEditingStatus(dateStr, active) {
+  if (!db) return;
+  if (active) {
+    db.ref('editingStatus').set({ date: dateStr, by: userName, ts: Date.now() });
+  } else {
+    db.ref('editingStatus').remove();
+  }
+}
+
+let editingStatusListener = null;
+function startEditingStatusListener() {
+  if (!db || editingStatusListener) return;
+  editingStatusListener = db.ref('editingStatus').on('value', snap => {
+    const status = snap.val();
+    // Only affects non-creators viewing the day screen
+    if (userRole === 'creator') return;
+    if (!document.getElementById('screen-day').classList.contains('active')) return;
+    if (status && status.date === todayStr() && selectedDate === todayStr()) {
+      renderCreatingBanner();
+    } else {
+      // Re-render normally if banner was showing
+      const banner = document.getElementById('creating-banner');
+      if (banner) renderDayView(selectedDate);
+    }
+  });
+}
+
+function renderCreatingBanner() {
+  const container = document.getElementById('day-content');
+  if (document.getElementById('creating-banner')) return; // already showing
+  container.innerHTML = `<div id="creating-banner" style="text-align:center;padding:60px 24px">
+    <div style="font-size:3.5rem;margin-bottom:14px">✏️</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1.2rem;color:var(--navy);margin-bottom:8px">Plan Being Created</div>
+    <div style="color:#888;font-size:.85rem;line-height:1.6;max-width:280px;margin:0 auto">The creator is building today's plan. It'll appear here as soon as it's published!</div>
+    <div style="margin-top:24px;display:flex;justify-content:center;gap:6px">
+      <div style="width:8px;height:8px;border-radius:50%;background:var(--navy);animation:dot-pulse 1.4s ease-in-out infinite"></div>
+      <div style="width:8px;height:8px;border-radius:50%;background:var(--navy);animation:dot-pulse 1.4s ease-in-out .2s infinite"></div>
+      <div style="width:8px;height:8px;border-radius:50%;background:var(--navy);animation:dot-pulse 1.4s ease-in-out .4s infinite"></div>
+    </div>
+  </div>
+  <style>@keyframes dot-pulse{0%,80%,100%{transform:scale(0);opacity:.3}40%{transform:scale(1);opacity:1}}</style>`;
+}
+
 function openEditor(date) {
   isEditing = true;
   selectedDate = date;
@@ -1465,195 +1537,299 @@ function openEditor(date) {
     examName:'Study Plan', tagline:'Plan Your Day, Ace Your Exam!',
     totalTime:'', sessions:[], miniSegments:[], dailyTargets:[], date
   };
-  renderEditor();
-  // Only switch screen if not already on the day screen
+  // Broadcast editing status to users only when editing today
+  if (date === todayStr()) setEditingStatus(date, true);
+  buildEditorDOM();
   if (!document.getElementById('screen-day').classList.contains('active')) showScreen('day');
 }
 
-function renderEditor() {
+// ── Build editor entirely via DOM (no innerHTML re-render on add/remove) ──────
+function buildEditorDOM() {
   const plan = editingPlan;
-  const inp = 'class="e-inp"';
-  let html = `<div class="day-back">
-    <button onclick="cancelEditor()">‹ Back</button>
-    <div class="day-title"><h2>${fmtDisplay(selectedDate)}</h2><p>Edit Plan</p></div>
-  </div>`;
+  const wrap = document.getElementById('day-content');
 
-  // Meta
-  html += `<div class="e-card">
-    <div class="e-card-title" style="color:var(--navy)">🏷️ Plan Details</div>
-    <div class="e-grid2">
-      <div><label class="e-label">Exam / Course</label><input ${inp} id="e-examName" value="${esc(plan.examName||'')}" placeholder="SBI PO 2026"></div>
-      <div><label class="e-label">Total Study Time</label><input ${inp} id="e-totalTime" value="${esc(plan.totalTime||'')}" placeholder="7–8 Hrs"></div>
+  wrap.innerHTML = `
+    <div class="day-back">
+      <button onclick="cancelEditor()">‹ Back</button>
+      <div class="day-title"><h2>${fmtDisplay(selectedDate)}</h2><p>Edit Plan</p></div>
     </div>
-    <label class="e-label">Tagline</label>
-    <input ${inp} id="e-tagline" value="${esc(plan.tagline||'')}" placeholder="Plan Your Day, Ace Your Exam!">
-  </div>`;
+    <div class="e-card">
+      <div class="e-card-title" style="color:var(--navy)">🏷️ Plan Details</div>
+      <div class="e-grid2">
+        <div><label class="e-label">Exam / Course</label><input class="e-inp" id="e-examName" value="${esc(plan.examName||'')}" placeholder="SBI PO 2026" oninput="editingPlan.examName=this.value"></div>
+        <div><label class="e-label">Total Study Time</label><input class="e-inp" id="e-totalTime" value="${esc(plan.totalTime||'')}" placeholder="7–8 Hrs" oninput="editingPlan.totalTime=this.value"></div>
+      </div>
+      <label class="e-label">Tagline</label>
+      <input class="e-inp" id="e-tagline" value="${esc(plan.tagline||'')}" placeholder="Plan Your Day, Ace Your Exam!" oninput="editingPlan.tagline=this.value">
+    </div>
+    <div class="e-card">
+      <div class="e-card-title" style="color:var(--blue)">📚 Study Sessions</div>
+      <div id="sessions-editor"></div>
+      <button class="add-section-btn" onclick="addEditorSession()">＋ Add Session</button>
+    </div>
+    <div class="e-card">
+      <div class="e-card-title" style="color:var(--orange)">📰 Short Segments</div>
+      <div id="mini-editor" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
+      <button class="add-section-btn" onclick="addEditorMini()">＋ Add Short Segment</button>
+    </div>
+    <div class="e-card">
+      <div class="e-card-title" style="color:var(--green)">🎯 Daily Targets</div>
+      <div id="targets-editor"></div>
+      <button class="add-section-btn" onclick="addEditorTarget()">＋ Add Target</button>
+    </div>
+    <button class="publish-btn" id="publish-btn" onclick="publishPlan()">💾 Publish Plan</button>`;
 
-  // Sessions
-  html += `<div class="e-card">
-    <div class="e-card-title" style="color:var(--blue)">📚 Study Sessions</div>
-    <div id="sessions-editor">`;
-  (plan.sessions||[]).forEach((s,si) => { html += renderSessionEditor(s,si); });
-  html += `</div>
-    <button class="add-section-btn" onclick="addEditorSession()">＋ Add Session</button>
-  </div>`;
-
-  // Mini segments
-  html += `<div class="e-card">
-    <div class="e-card-title" style="color:var(--orange)">📰 Short Segments</div>
-    <div id="mini-editor" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">`;
-  (plan.miniSegments||[]).forEach((m,mi) => { html += renderMiniEditor(m,mi); });
-  html += `</div>
-    <button class="add-section-btn" onclick="addEditorMini()">＋ Add Short Segment</button>
-  </div>`;
-
-  // Targets
-  html += `<div class="e-card">
-    <div class="e-card-title" style="color:var(--green)">🎯 Daily Targets</div>
-    <div id="targets-editor">`;
-  (plan.dailyTargets||[]).forEach((t,ti) => { html += renderTargetEditor(t,ti); });
-  html += `</div>
-    <button class="add-section-btn" onclick="addEditorTarget()">＋ Add Target</button>
-  </div>`;
-
-  html += `<button class="publish-btn" id="publish-btn" onclick="publishPlan()">💾 Publish Plan</button>`;
-
-  document.getElementById('day-content').innerHTML = html;
+  // Populate dynamic sections via DOM (not innerHTML)
+  (plan.sessions||[]).forEach(s => appendSessionNode(s));
+  (plan.miniSegments||[]).forEach(m => appendMiniNode(m));
+  (plan.dailyTargets||[]).forEach((t,ti) => appendTargetNode(t, ti));
 }
 
-function renderSessionEditor(s,si) {
+// ── Session DOM node ──────────────────────────────────────────────────────────
+function appendSessionNode(s) {
   const colorOptions = ['#1a237e','#2e7d32','#6a1b9a','#c62828','#00695c','#e65100','#0277bd','#558b2f'];
-  return `<div class="sess-editor" id="sess-ed-${s.id}">
+  const div = document.createElement('div');
+  div.className = 'sess-editor';
+  div.id = 'sess-ed-' + s.id;
+  div.innerHTML = `
     <button class="remove-sess-btn" onclick="removeEditorSession('${s.id}')">🗑 Remove</button>
     <div class="e-grid2">
-      <div><label class="e-label">Label (e.g. Morning)</label><input class="e-inp" data-field="label" placeholder="Morning" value="${esc(s.label||'')}" oninput="updateSess('${s.id}','label',this.value)"></div>
-      <div><label class="e-label">Duration (e.g. 2 Hours)</label><input class="e-inp" data-field="duration" placeholder="2 Hours" value="${esc(s.duration||'')}" oninput="updateSess('${s.id}','duration',this.value)"></div>
+      <div><label class="e-label">Label (e.g. Morning)</label>
+        <input class="e-inp" placeholder="Morning" value="${esc(s.label||'')}"></div>
+      <div><label class="e-label">Duration (e.g. 2 Hours)</label>
+        <input class="e-inp" placeholder="2 Hours" value="${esc(s.duration||'')}"></div>
     </div>
     <div class="e-grid2">
-      <div><label class="e-label">Time Slot (e.g. 7:00 AM – 9:00 AM)</label><input class="e-inp" data-field="timeSlot" placeholder="7:00 AM – 9:00 AM" value="${esc(s.timeSlot||'')}" oninput="updateSess('${s.id}','timeSlot',this.value)"></div>
+      <div><label class="e-label">Time Slot</label>
+        <input class="e-inp" placeholder="7:00 AM – 9:00 AM" value="${esc(s.timeSlot||'')}"></div>
       <div><label class="e-label">Subject Header Color</label>
-        <select class="e-inp" data-field="subjectColor" onchange="updateSess('${s.id}','subjectColor',this.value)">
-          ${colorOptions.map(c=>`<option value="${c}" ${(s.subjectColor||'#1a237e')===c?'selected':''} style="background:${c};color:#fff">${c}</option>`).join('')}
-        </select>
-      </div>
+        <select class="e-inp">
+          ${colorOptions.map(c=>`<option value="${c}" ${(s.subjectColor||'#1a237e')===c?'selected':''}>${c}</option>`).join('')}
+        </select></div>
     </div>
-    <label class="e-label">Subject (e.g. Reasoning (Pre + Mains))</label>
-    <input class="e-inp" data-field="subject" placeholder="Reasoning (Pre + Mains)" value="${esc(s.subject||'')}" oninput="updateSess('${s.id}','subject',this.value)">
+    <label class="e-label">Subject</label>
+    <input class="e-inp" placeholder="Reasoning (Pre + Mains)" value="${esc(s.subject||'')}">
     <label class="e-label">Goal</label>
-    <input class="e-inp" data-field="goal" placeholder="Accuracy + puzzle solving speed" value="${esc(s.goal||'')}" oninput="updateSess('${s.id}','goal',this.value)">
+    <input class="e-inp" placeholder="Accuracy + puzzle solving speed" value="${esc(s.goal||'')}">
     <label class="e-label">Tasks</label>
-    <div id="tasks-ed-${s.id}">
-      ${(s.tasks||[]).map((t,ti)=>`<div class="task-row"><input class="e-inp" value="${esc(t)}" oninput="updateTask('${s.id}',${ti},this.value)"><button class="del-btn" onclick="removeTask('${s.id}',${ti})">✕</button></div>`).join('')}
-    </div>
-    <button class="add-task-btn" onclick="addTaskToSess('${s.id}')">＋ Task</button>
-  </div>`;
+    <div class="tasks-list"></div>
+    <button class="add-task-btn" onclick="addTaskToSess('${s.id}')">＋ Task</button>`;
+
+  // Wire inputs directly to editingPlan object
+  const inputs = div.querySelectorAll('input.e-inp');
+  inputs[0].oninput = e => { s.label = e.target.value; };
+  inputs[1].oninput = e => { s.duration = e.target.value; };
+  inputs[2].oninput = e => { s.timeSlot = e.target.value; };
+  inputs[3].oninput = e => { s.subject = e.target.value; };
+  inputs[4].oninput = e => { s.goal = e.target.value; };
+  div.querySelector('select').onchange = e => { s.subjectColor = e.target.value; };
+
+  // Populate tasks
+  const tasksList = div.querySelector('.tasks-list');
+  (s.tasks||[]).forEach((t, ti) => appendTaskNode(tasksList, s, ti, t));
+
+  document.getElementById('sessions-editor').appendChild(div);
 }
 
-function renderMiniEditor(m,mi) {
+function appendTaskNode(container, s, ti, value) {
+  const row = document.createElement('div');
+  row.className = 'task-row';
+  row.dataset.ti = ti;
+  const inp = document.createElement('input');
+  inp.className = 'e-inp';
+  inp.value = value || '';
+  inp.oninput = e => { s.tasks[ti] = e.target.value; };
+  const btn = document.createElement('button');
+  btn.className = 'del-btn';
+  btn.textContent = '✕';
+  btn.onclick = () => removeTask(s.id, ti);
+  row.appendChild(inp);
+  row.appendChild(btn);
+  container.appendChild(row);
+  return row;
+}
+
+// ── Mini DOM node ─────────────────────────────────────────────────────────────
+function appendMiniNode(m) {
   const colorOptions = ['#1a237e','#2e7d32','#6a1b9a','#c62828','#00695c','#e65100','#0277bd','#558b2f'];
-  return `<div class="sess-editor" id="mini-ed-${m.id}" style="padding:12px">
+  const div = document.createElement('div');
+  div.className = 'sess-editor';
+  div.id = 'mini-ed-' + m.id;
+  div.style.padding = '12px';
+  div.innerHTML = `
     <button class="del-btn" style="position:absolute;top:8px;right:8px" onclick="removeEditorMini('${m.id}')">✕</button>
-    <label class="e-label">Title</label><input class="e-inp" data-field="title" value="${esc(m.title||'')}" placeholder="Current Affairs" oninput="updateMini('${m.id}','title',this.value)">
-    <label class="e-label">Duration</label><input class="e-inp" data-field="duration" value="${esc(m.duration||'')}" placeholder="40 min" oninput="updateMini('${m.id}','duration',this.value)">
-    <label class="e-label">Time Slot</label><input class="e-inp" data-field="timeSlot" value="${esc(m.timeSlot||'')}" placeholder="6:00 PM – 6:40 PM" oninput="updateMini('${m.id}','timeSlot',this.value)">
+    <label class="e-label">Title</label><input class="e-inp" value="${esc(m.title||'')}" placeholder="Current Affairs">
+    <label class="e-label">Duration</label><input class="e-inp" value="${esc(m.duration||'')}" placeholder="40 min">
+    <label class="e-label">Time Slot</label><input class="e-inp" value="${esc(m.timeSlot||'')}" placeholder="6:00 PM – 6:40 PM">
     <label class="e-label">Header Color</label>
-    <select class="e-inp" data-field="subjectColor" onchange="updateMini('${m.id}','subjectColor',this.value)">
-      ${colorOptions.map(c=>`<option value="${c}" ${(m.subjectColor||'#c62828')===c?'selected':''}>${c}</option>`).join('')}
-    </select>
+    <select class="e-inp">${colorOptions.map(c=>`<option value="${c}" ${(m.subjectColor||'#c62828')===c?'selected':''}>${c}</option>`).join('')}</select>
     <label class="e-label">Tasks</label>
-    <div id="minitasks-ed-${m.id}">
-      ${(m.tasks||[]).map((t,ti)=>`<div class="task-row"><input class="e-inp" value="${esc(t)}" onchange="updateMiniTask('${m.id}',${ti},this.value)"><button class="del-btn" onclick="removeMiniTask('${m.id}',${ti})">✕</button></div>`).join('')}
-    </div>
-    <button class="add-task-btn" onclick="addMiniTask('${m.id}')">＋ Task</button>
-  </div>`;
+    <div class="tasks-list"></div>
+    <button class="add-task-btn" onclick="addMiniTask('${m.id}')">＋ Task</button>`;
+
+  const inputs = div.querySelectorAll('input.e-inp');
+  inputs[0].oninput = e => { m.title = e.target.value; };
+  inputs[1].oninput = e => { m.duration = e.target.value; };
+  inputs[2].oninput = e => { m.timeSlot = e.target.value; };
+  div.querySelector('select').onchange = e => { m.subjectColor = e.target.value; };
+
+  const tasksList = div.querySelector('.tasks-list');
+  (m.tasks||[]).forEach((t, ti) => appendMiniTaskNode(tasksList, m, ti, t));
+
+  document.getElementById('mini-editor').appendChild(div);
 }
 
-function renderTargetEditor(t,ti) {
-  return `<div class="task-row" id="target-ed-${ti}"><input class="e-inp" value="${esc(t)}" placeholder="Target…" oninput="updateTarget(${ti},this.value)"><button class="del-btn" onclick="removeTarget(${ti})">✕</button></div>`;
+function appendMiniTaskNode(container, m, ti, value) {
+  const row = document.createElement('div');
+  row.className = 'task-row';
+  const inp = document.createElement('input');
+  inp.className = 'e-inp';
+  inp.value = value || '';
+  inp.oninput = e => { m.tasks[ti] = e.target.value; };
+  const btn = document.createElement('button');
+  btn.className = 'del-btn';
+  btn.textContent = '✕';
+  btn.onclick = () => removeMiniTask(m.id, ti);
+  row.appendChild(inp);
+  row.appendChild(btn);
+  container.appendChild(row);
 }
 
-// ── Save all live input values into editingPlan before any re-render ──
-function saveEditorState() {
-  // Meta fields
-  const en = document.getElementById('e-examName'); if(en) editingPlan.examName = en.value;
-  const tl = document.getElementById('e-tagline');  if(tl) editingPlan.tagline  = tl.value;
-  const tt = document.getElementById('e-totalTime');if(tt) editingPlan.totalTime = tt.value;
-
-  // Session fields — use data-field attributes for reliable lookup
-  (editingPlan.sessions||[]).forEach(s => {
-    const block = document.getElementById('sess-ed-' + s.id);
-    if (!block) return;
-    ['label','duration','timeSlot','subject','goal'].forEach(f => {
-      const el = block.querySelector(`[data-field="${f}"]`);
-      if (el) s[f] = el.value;
-    });
-    const colorEl = block.querySelector('[data-field="subjectColor"]');
-    if (colorEl) s.subjectColor = colorEl.value;
-    // Task inputs inside this session
-    const taskBlock = document.getElementById('tasks-ed-' + s.id);
-    if (taskBlock) {
-      taskBlock.querySelectorAll('input.e-inp').forEach((inp, ti) => { s.tasks[ti] = inp.value; });
-    }
-  });
-
-  // Mini segment fields — use data-field attributes
-  (editingPlan.miniSegments||[]).forEach(m => {
-    const block = document.getElementById('mini-ed-' + m.id);
-    if (!block) return;
-    ['title','duration','timeSlot'].forEach(f => {
-      const el = block.querySelector(`[data-field="${f}"]`);
-      if (el) m[f] = el.value;
-    });
-    const colorEl = block.querySelector('[data-field="subjectColor"]');
-    if (colorEl) m.subjectColor = colorEl.value;
-    const taskBlock = document.getElementById('minitasks-ed-' + m.id);
-    if (taskBlock) {
-      taskBlock.querySelectorAll('input.e-inp').forEach((inp, ti) => { m.tasks[ti] = inp.value; });
-    }
-  });
-
-  // Daily targets
-  const targBlock = document.getElementById('targets-editor');
-  if (targBlock) {
-    targBlock.querySelectorAll('input.e-inp').forEach((inp, ti) => {
-      if (ti < editingPlan.dailyTargets.length) editingPlan.dailyTargets[ti] = inp.value;
-    });
-  }
+// ── Target DOM node ───────────────────────────────────────────────────────────
+function appendTargetNode(value, ti) {
+  const container = document.getElementById('targets-editor');
+  const row = document.createElement('div');
+  row.className = 'task-row';
+  row.id = 'target-ed-' + ti;
+  const inp = document.createElement('input');
+  inp.className = 'e-inp';
+  inp.value = value || '';
+  inp.placeholder = 'Target…';
+  inp.oninput = e => { editingPlan.dailyTargets[ti] = e.target.value; };
+  const btn = document.createElement('button');
+  btn.className = 'del-btn';
+  btn.textContent = '✕';
+  btn.onclick = () => removeTarget(ti);
+  row.appendChild(inp);
+  row.appendChild(btn);
+  container.appendChild(row);
 }
 
-// Session ops
+// ── Session ops (DOM-only, no full re-render) ─────────────────────────────────
 function updateSess(id,k,v){ const s=editingPlan.sessions.find(s=>s.id===id); if(s) s[k]=v; }
-function removeEditorSession(id){ saveEditorState(); editingPlan.sessions=editingPlan.sessions.filter(s=>s.id!==id); renderEditor(); }
-function addEditorSession(){ saveEditorState(); editingPlan.sessions.push({id:'s_'+Date.now(),label:'',duration:'',timeSlot:'',subjectColor:'#1a237e',subject:'',goal:'',tasks:[]}); renderEditor(); }
-function addTaskToSess(id){ saveEditorState(); const s=editingPlan.sessions.find(s=>s.id===id); if(s){s.tasks.push(''); renderEditor();} }
+
+function addEditorSession() {
+  const s = {id:'s_'+Date.now(),label:'',duration:'',timeSlot:'',subjectColor:'#1a237e',subject:'',goal:'',tasks:[]};
+  editingPlan.sessions.push(s);
+  appendSessionNode(s);
+  // Scroll new session into view
+  const el = document.getElementById('sess-ed-' + s.id);
+  if (el) el.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function removeEditorSession(id) {
+  editingPlan.sessions = editingPlan.sessions.filter(s => s.id !== id);
+  const el = document.getElementById('sess-ed-' + id);
+  if (el) el.remove();
+}
+
+function addTaskToSess(sessId) {
+  const s = editingPlan.sessions.find(s => s.id === sessId);
+  if (!s) return;
+  const ti = s.tasks.length;
+  s.tasks.push('');
+  const sessEl = document.getElementById('sess-ed-' + sessId);
+  if (!sessEl) return;
+  const tasksList = sessEl.querySelector('.tasks-list');
+  const newRow = appendTaskNode(tasksList, s, ti, '');
+  if (newRow) { const inp = newRow.querySelector('input'); if(inp) inp.focus(); }
+}
+
 function updateTask(id,ti,v){ const s=editingPlan.sessions.find(s=>s.id===id); if(s)s.tasks[ti]=v; }
-function removeTask(id,ti){ saveEditorState(); const s=editingPlan.sessions.find(s=>s.id===id); if(s){s.tasks.splice(ti,1); renderEditor();} }
 
-// Mini ops
+function removeTask(sessId, ti) {
+  const s = editingPlan.sessions.find(s => s.id === sessId);
+  if (!s) return;
+  s.tasks.splice(ti, 1);
+  // Rebuild just that session's task list
+  const sessEl = document.getElementById('sess-ed-' + sessId);
+  if (!sessEl) return;
+  const tasksList = sessEl.querySelector('.tasks-list');
+  tasksList.innerHTML = '';
+  s.tasks.forEach((t, newTi) => appendTaskNode(tasksList, s, newTi, t));
+}
+
+// ── Mini ops ─────────────────────────────────────────────────────────────────
 function updateMini(id,k,v){ const m=editingPlan.miniSegments.find(m=>m.id===id); if(m) m[k]=v; }
-function removeEditorMini(id){ saveEditorState(); editingPlan.miniSegments=editingPlan.miniSegments.filter(m=>m.id!==id); renderEditor(); }
-function addEditorMini(){ saveEditorState(); editingPlan.miniSegments.push({id:'m_'+Date.now(),title:'',duration:'',timeSlot:'',subjectColor:'#c62828',tasks:[]}); renderEditor(); }
-function addMiniTask(id){ saveEditorState(); const m=editingPlan.miniSegments.find(m=>m.id===id); if(m){m.tasks.push(''); renderEditor();} }
+
+function addEditorMini() {
+  const m = {id:'m_'+Date.now(),title:'',duration:'',timeSlot:'',subjectColor:'#c62828',tasks:[]};
+  editingPlan.miniSegments.push(m);
+  appendMiniNode(m);
+}
+
+function removeEditorMini(id) {
+  editingPlan.miniSegments = editingPlan.miniSegments.filter(m => m.id !== id);
+  const el = document.getElementById('mini-ed-' + id);
+  if (el) el.remove();
+}
+
+function addMiniTask(miniId) {
+  const m = editingPlan.miniSegments.find(m => m.id === miniId);
+  if (!m) return;
+  const ti = m.tasks.length;
+  m.tasks.push('');
+  const miniEl = document.getElementById('mini-ed-' + miniId);
+  if (!miniEl) return;
+  const tasksList = miniEl.querySelector('.tasks-list');
+  appendMiniTaskNode(tasksList, m, ti, '');
+}
+
 function updateMiniTask(id,ti,v){ const m=editingPlan.miniSegments.find(m=>m.id===id); if(m)m.tasks[ti]=v; }
-function removeMiniTask(id,ti){ saveEditorState(); const m=editingPlan.miniSegments.find(m=>m.id===id); if(m){m.tasks.splice(ti,1); renderEditor();} }
 
-// Target ops
+function removeMiniTask(miniId, ti) {
+  const m = editingPlan.miniSegments.find(m => m.id === miniId);
+  if (!m) return;
+  m.tasks.splice(ti, 1);
+  const miniEl = document.getElementById('mini-ed-' + miniId);
+  if (!miniEl) return;
+  const tasksList = miniEl.querySelector('.tasks-list');
+  tasksList.innerHTML = '';
+  m.tasks.forEach((t, newTi) => appendMiniTaskNode(tasksList, m, newTi, t));
+}
+
+// ── Target ops ────────────────────────────────────────────────────────────────
 function updateTarget(ti,v){ editingPlan.dailyTargets[ti]=v; }
-function removeTarget(ti){ saveEditorState(); editingPlan.dailyTargets.splice(ti,1); renderEditor(); }
-function addEditorTarget(){ saveEditorState(); editingPlan.dailyTargets.push(''); renderEditor(); }
 
-function cancelEditor() { isEditing = false; renderDayView(selectedDate); }
+function addEditorTarget() {
+  const ti = editingPlan.dailyTargets.length;
+  editingPlan.dailyTargets.push('');
+  appendTargetNode('', ti);
+}
+
+function removeTarget(ti) {
+  editingPlan.dailyTargets.splice(ti, 1);
+  // Rebuild target list
+  const container = document.getElementById('targets-editor');
+  container.innerHTML = '';
+  editingPlan.dailyTargets.forEach((t, newTi) => appendTargetNode(t, newTi));
+}
+
+function cancelEditor() {
+  isEditing = false;
+  if (selectedDate === todayStr()) setEditingStatus(selectedDate, false);
+  renderDayView(selectedDate);
+}
 
 async function publishPlan() {
-  // Sync all live input values into editingPlan before publishing
-  saveEditorState();
-
   const btn = document.getElementById('publish-btn');
   btn.disabled = true; btn.textContent = '💾 Publishing…';
   try {
-    await db.ref(`plans/${selectedDate}`).set(editingPlan);
+    await db.ref('plans/' + selectedDate).set(editingPlan);
     allPlans[selectedDate] = editingPlan;
     isEditing = false;
+    // Clear editing status so users see the new plan
+    if (selectedDate === todayStr()) setEditingStatus(selectedDate, false);
     showToast('✅ Plan published!');
     renderDayView(selectedDate);
   } catch(e) {
@@ -1661,6 +1837,10 @@ async function publishPlan() {
     btn.disabled=false; btn.textContent='💾 Publish Plan';
   }
 }
+
+// Keep old renderEditor as no-op (safety)
+function renderEditor() { buildEditorDOM(); }
+function saveEditorState() {}
 
 /* ═══════════════════════════════════════════
    LEADERBOARD
