@@ -75,28 +75,458 @@ document.write('<link rel="manifest" href="' + manifestURL + '">');
 
 <style>
 :root {
-  --navy:#3d2c8d; --blue:#5c6bc0; --green:#2e7d32; --purple:#7b52ab;
+  --navy:#3d2c8d; --blue:#5c6bc0; --green:#388e3c; --purple:#7b52ab;
   --red:#e53935; --orange:#fb8c00; --teal:#00897b; --gold:#ffb300;
-  --bg:#fff9f0; --border:#d7c8f5; --text:#2d2047; --white:#fff;
+  --bg:#fdf8f0; --border:#d7c8f5; --text:#2d2047; --white:#fff;
   --shadow:0 4px 18px rgba(90,50,150,.13);
   --pink:#f48fb1; --peach:#ffe0b2; --mint:#b2dfdb; --lavender:#e8d5ff;
+  /* notebook palette */
+  --paper:#fdf8f0;
+  --paper2:#fff9f2;
+  --ruled:#e8ddd0;
+  --margin:#f4b8c1;
+  --ink:#2d2047;
+  --ink-light:#7a6a8a;
+  --tape-yellow:rgba(255,236,130,.75);
+  --tape-pink:rgba(255,182,193,.7);
+  --tape-blue:rgba(180,210,255,.7);
+  --tape-green:rgba(180,240,200,.7);
+  --sticker-bg:#fff9c4;
 }
 
 /* ── GLOBAL HANDWRITTEN FONT ── */
-* {
-  font-family: 'Caveat', cursive !important;
-}
-/* Keep monospace for code/config only */
+* { font-family: 'Caveat', cursive !important; }
 code, textarea, .setup-card textarea, #fb-config-input {
   font-family: monospace !important;
 }
 
-/* ── WARM BACKGROUND TEXTURE ── */
+/* ══════════════════════════════════════
+   NOTEBOOK PAPER BODY
+══════════════════════════════════════ */
 body {
-  background: var(--bg);
+  background-color: var(--paper);
+  /* Ruled lines */
   background-image:
-    radial-gradient(circle at 20% 20%, rgba(255,183,77,.08) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(186,104,200,.07) 0%, transparent 50%);
+    /* red margin line */
+    linear-gradient(90deg, transparent 44px, var(--margin) 44px, var(--margin) 46px, transparent 46px),
+    /* horizontal ruled lines every 32px */
+    repeating-linear-gradient(
+      180deg,
+      transparent,
+      transparent 31px,
+      var(--ruled) 31px,
+      var(--ruled) 32px
+    ),
+    /* subtle paper grain */
+    radial-gradient(circle at 30% 20%, rgba(255,200,100,.06) 0%, transparent 60%),
+    radial-gradient(circle at 75% 80%, rgba(180,140,220,.05) 0%, transparent 60%);
+  min-height: 100vh;
+}
+
+/* ══════════════════════════════════════
+   TAPE STRIP MIXIN  (applied via ::before/::after on cards)
+══════════════════════════════════════ */
+.tape::before {
+  content:'';
+  position:absolute;
+  top:-10px; left:50%;
+  transform:translateX(-50%) rotate(-2deg);
+  width:60px; height:22px;
+  background:var(--tape-yellow);
+  border-radius:3px;
+  box-shadow:0 1px 3px rgba(0,0,0,.1);
+  z-index:2;
+}
+.tape-pink::before  { background:var(--tape-pink);  transform:translateX(-50%) rotate(1.5deg); }
+.tape-blue::before  { background:var(--tape-blue);  transform:translateX(-50%) rotate(-1deg); width:50px; }
+.tape-green::before { background:var(--tape-green); transform:translateX(-50%) rotate(2deg); width:55px; }
+
+/* ══════════════════════════════════════
+   DOODLE CORNER SVG (injected via pseudo on wrappers)
+══════════════════════════════════════ */
+.doodle-corner::after {
+  content:'';
+  position:absolute;
+  bottom:10px; right:10px;
+  width:60px; height:60px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'%3E%3Ccircle cx='10' cy='10' r='4' fill='none' stroke='%23d7c8f5' stroke-width='1.5'/%3E%3Ccircle cx='10' cy='10' r='8' fill='none' stroke='%23f4b8c1' stroke-width='1' stroke-dasharray='2 2'/%3E%3Cpath d='M25 8 Q30 2 35 8 Q40 14 35 20 Q30 26 25 20 Q20 14 25 8Z' fill='none' stroke='%23b8e0d4' stroke-width='1.5'/%3E%3Cpath d='M45 30 Q50 26 55 30 Q55 36 50 38 Q45 36 45 30Z' fill='%23ffe0b2' stroke='%23ffb300' stroke-width='1'/%3E%3Cline x1='2' y1='40' x2='20' y2='55' stroke='%23d7c8f5' stroke-width='1' stroke-dasharray='3 2'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity:.6;
+  pointer-events:none;
+}
+
+/* ══════════════════════════════════════
+   NAV — looks like a notebook header band
+══════════════════════════════════════ */
+.nav {
+  background: linear-gradient(135deg,#3d2c8d,#7b52ab);
+  /* washi tape top edge */
+  border-bottom: 3px solid var(--tape-yellow);
+  position:sticky; top:0; z-index:200;
+  display:flex; align-items:center; padding:0 14px; height:56px; gap:10px;
+  box-shadow:0 3px 16px rgba(90,50,150,.3);
+}
+.nav::before {
+  content:'🌸 ✦ ⭐ ✦ 🌸';
+  position:absolute;
+  top:0; right:60px;
+  font-size:.55rem;
+  color:rgba(255,255,255,.25);
+  letter-spacing:4px;
+  pointer-events:none;
+}
+
+/* ══════════════════════════════════════
+   CARDS — notebook paper look
+══════════════════════════════════════ */
+.session-card, .e-card, .ring-card,
+.targets-card, .lb-row, .um-row, .um-stat-card,
+.mini-card, .modal-box {
+  position: relative;
+}
+
+/* session cards look like torn notebook pages */
+.session-card {
+  background: var(--paper2);
+  border-radius: 4px 16px 16px 4px !important;
+  border-left: 4px solid var(--margin) !important;
+  border-top: 1.5px solid var(--ruled) !important;
+  border-bottom: 1.5px solid var(--ruled) !important;
+  border-right: 1.5px solid var(--ruled) !important;
+  box-shadow: 2px 3px 12px rgba(90,50,150,.1), 4px 5px 0 rgba(200,180,220,.15) !important;
+  /* ruled lines inside card */
+  background-image: repeating-linear-gradient(
+    180deg, transparent, transparent 31px, rgba(220,210,240,.3) 31px, rgba(220,210,240,.3) 32px
+  );
+}
+.session-card.all-done {
+  border-left: 4px solid #81c784 !important;
+  background-image: repeating-linear-gradient(
+    180deg, transparent, transparent 31px, rgba(180,230,180,.25) 31px, rgba(180,230,180,.25) 32px
+  );
+}
+
+/* e-cards look like sticky-note paper */
+.e-card {
+  background: var(--sticker-bg);
+  border-radius: 3px 3px 14px 3px !important;
+  box-shadow: 2px 3px 0 rgba(0,0,0,.08), 3px 5px 16px rgba(90,50,150,.1) !important;
+  border: 1.5px solid rgba(255,200,0,.3) !important;
+}
+.e-card::after {
+  content:'';
+  position:absolute;
+  top:0; right:0;
+  width:0; height:0;
+  border-style:solid;
+  border-width: 0 20px 20px 0;
+  border-color: transparent rgba(255,179,0,.25) transparent transparent;
+  border-radius:0 3px 0 0;
+}
+
+/* login card = notebook cover */
+.login-card {
+  background: var(--paper);
+  border-radius: 6px 6px 6px 6px !important;
+  border: 2px solid var(--ruled) !important;
+  border-left: 8px solid var(--navy) !important;
+  box-shadow: 4px 4px 0 rgba(90,50,150,.15), 6px 8px 24px rgba(90,50,150,.18) !important;
+  background-image: repeating-linear-gradient(
+    180deg, transparent, transparent 31px, var(--ruled) 31px, var(--ruled) 32px
+  );
+  position: relative;
+  overflow: visible !important;
+}
+/* notebook cover doodles in corners */
+.login-card::before {
+  content: '🌷 ✿ 🌼 ✿ 🌷';
+  position:absolute; top:-14px; left:50%;
+  transform:translateX(-50%);
+  font-size:.85rem;
+  letter-spacing:4px;
+  pointer-events:none;
+}
+.login-card::after {
+  content:'';
+  position:absolute; bottom:16px; right:16px;
+  width:70px; height:70px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 70 70'%3E%3Ccircle cx='20' cy='20' r='12' fill='none' stroke='%23d7c8f5' stroke-width='2'/%3E%3Ccircle cx='20' cy='20' r='5' fill='%23f4b8c1'/%3E%3Cpath d='M35 5 Q42 15 35 25 Q28 15 35 5Z' fill='%23b8e0d4' stroke='%2300897b' stroke-width='1'/%3E%3Cpath d='M50 35 L60 28 L65 40 L55 50 Z' fill='none' stroke='%23ffb300' stroke-width='1.5' stroke-dasharray='3 2'/%3E%3Ccircle cx='55' cy='58' r='7' fill='%23ffe0b2' stroke='%23fb8c00' stroke-width='1.5'/%3E%3Cpath d='M5 50 Q10 40 20 50 Q10 60 5 50Z' fill='%23f48fb1' opacity='.6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-size:contain;
+  opacity:.5; pointer-events:none;
+}
+
+/* ring-card = journal entry header */
+.ring-card {
+  border-radius: 4px 16px 16px 4px !important;
+  border-left: 6px solid var(--gold) !important;
+  position: relative; overflow: visible !important;
+}
+.ring-card::before {
+  content: '📖 today\'s progress';
+  position:absolute; top:-14px; left:16px;
+  font-size:.8rem; color:var(--ink-light);
+  font-style:italic; pointer-events:none;
+}
+
+/* motivation = sticky note */
+.motivation {
+  border-radius: 3px 3px 14px 3px !important;
+  transform: rotate(-0.5deg);
+  box-shadow: 2px 2px 0 rgba(0,0,0,.07), 3px 4px 14px rgba(255,179,0,.2) !important;
+  position: relative;
+}
+.motivation::after {
+  content:'';
+  position:absolute; top:0; right:0;
+  width:0; height:0;
+  border-style:solid; border-width:0 16px 16px 0;
+  border-color:transparent rgba(255,160,0,.3) transparent transparent;
+}
+
+/* complete banner = confetti-decorated */
+.complete-banner {
+  border-radius: 16px !important;
+  position: relative; overflow: hidden;
+}
+.complete-banner::before {
+  content:'🎉 🌟 ✨ 🎊 💫 🌈 🎉';
+  display:block; font-size:1rem; letter-spacing:3px;
+  margin-bottom:4px; animation: confetti-drift 3s ease-in-out infinite alternate;
+}
+@keyframes confetti-drift {
+  from { letter-spacing:3px; opacity:.8; }
+  to   { letter-spacing:6px; opacity:1; }
+}
+
+/* no-plan = doodle empty page */
+.no-plan {
+  border-radius: 6px !important;
+  background-image:
+    repeating-linear-gradient(180deg, transparent, transparent 31px, var(--ruled) 31px, var(--ruled) 32px) !important;
+  background-color: var(--paper2) !important;
+  border: 2px dashed var(--margin) !important;
+}
+
+/* calendar days = small squares of graph paper */
+.cal-day {
+  border-radius: 6px !important;
+  background-color: var(--paper2) !important;
+  border: 1px solid var(--ruled) !important;
+  background-image:
+    linear-gradient(var(--ruled) 1px, transparent 1px),
+    linear-gradient(90deg, var(--ruled) 1px, transparent 1px) !important;
+  background-size: 8px 8px !important;
+}
+.cal-day.today {
+  border: 2px solid var(--purple) !important;
+  background-color: #f5eeff !important;
+  box-shadow: 0 0 0 3px rgba(123,82,171,.15) !important;
+}
+.cal-day.done-day {
+  background-color: #eaf7ec !important;
+  border: 1.5px solid #81c784 !important;
+}
+.cal-day.inprog-day {
+  background-color: #fffde7 !important;
+  border: 1.5px solid #ffe082 !important;
+}
+
+/* tab bar = notebook bottom edge */
+.tab-bar {
+  border-top: 3px solid var(--margin) !important;
+  background: var(--paper) !important;
+  background-image: linear-gradient(90deg, transparent 44px, var(--margin) 44px, var(--margin) 45px, transparent 45px) !important;
+}
+.tab-btn.active {
+  color: var(--navy) !important;
+  border-top: 3px solid var(--navy);
+  margin-top:-3px;
+}
+.tab-btn.active .tab-label { color: var(--navy) !important; }
+
+/* modal = torn paper note */
+.modal-box {
+  background: var(--paper2) !important;
+  border: 2px solid var(--ruled) !important;
+  border-left: 6px solid var(--purple) !important;
+  background-image: repeating-linear-gradient(
+    180deg, transparent, transparent 31px, var(--ruled) 31px, var(--ruled) 32px
+  ) !important;
+  box-shadow: 4px 4px 0 rgba(90,50,150,.12), 0 20px 60px rgba(0,0,0,.2) !important;
+}
+
+/* leaderboard rows = bookmarks */
+.lb-row {
+  border-radius: 4px 14px 14px 4px !important;
+  border-left: 4px solid var(--margin) !important;
+  background: var(--paper2) !important;
+}
+.lb-row.rank1-row { border-left: 4px solid var(--gold) !important; }
+.lb-row.rank2-row { border-left: 4px solid #90a4ae !important; }
+.lb-row.rank3-row { border-left: 4px solid #a1887f !important; }
+
+/* ══════════════════════════════════════
+   INPUTS — feel like writing on paper
+══════════════════════════════════════ */
+.inp, .e-inp, .modal-inp {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 2px solid var(--ruled) !important;
+  border-radius: 0 !important;
+  padding: 8px 4px !important;
+  font-size: 1.1rem !important;
+}
+.inp:focus, .e-inp:focus, .modal-inp:focus {
+  border-bottom-color: var(--purple) !important;
+  outline: none !important;
+  background: rgba(123,82,171,.03) !important;
+}
+
+/* ══════════════════════════════════════
+   WASHI TAPE STRIPS on key headings
+══════════════════════════════════════ */
+.cal-wrap > div:first-child::before,
+.lb-wrap::before,
+.day-wrap::before,
+.um-wrap::before {
+  content: '';
+  display: block;
+  height: 20px;
+  margin: 0 -12px 16px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--tape-yellow) 0px, var(--tape-yellow) 30px,
+    var(--tape-pink)   30px, var(--tape-pink)   60px,
+    var(--tape-blue)   60px, var(--tape-blue)   90px,
+    var(--tape-green)  90px, var(--tape-green) 120px
+  );
+  opacity: .55;
+  border-radius: 2px;
+}
+
+/* ══════════════════════════════════════
+   DOODLE SIDEBAR — floating SVG doodles
+══════════════════════════════════════ */
+.cal-wrap::after,
+.day-wrap::after,
+.lb-wrap::after {
+  content: '';
+  position: fixed;
+  right: -10px; top: 30%;
+  width: 80px; height: 200px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 200'%3E%3C!-- star --%3E%3Cpath d='M40 8 L43 18 L53 18 L45 24 L48 34 L40 28 L32 34 L35 24 L27 18 L37 18Z' fill='%23ffe082' stroke='%23ffb300' stroke-width='1'/%3E%3C!-- flower --%3E%3Ccircle cx='40' cy='70' r='6' fill='%23f48fb1'/%3E%3Ccircle cx='40' cy='57' r='5' fill='%23fce4ec'/%3E%3Ccircle cx='51' cy='63' r='5' fill='%23fce4ec'/%3E%3Ccircle cx='51' cy='77' r='5' fill='%23fce4ec'/%3E%3Ccircle cx='40' cy='83' r='5' fill='%23fce4ec'/%3E%3Ccircle cx='29' cy='77' r='5' fill='%23fce4ec'/%3E%3Ccircle cx='29' cy='63' r='5' fill='%23fce4ec'/%3E%3C!-- lightning --%3E%3Cpath d='M45 100 L35 118 L42 118 L33 138 L50 116 L43 116Z' fill='%23ffe082' stroke='%23fb8c00' stroke-width='1'/%3E%3C!-- heart --%3E%3Cpath d='M40 168 C40 168 25 155 25 145 C25 138 32 134 40 143 C48 134 55 138 55 145 C55 155 40 168 40 168Z' fill='%23f48fb1' stroke='%23e91e63' stroke-width='1'/%3E%3C!-- spiral --%3E%3Cpath d='M40 185 Q47 185 47 192 Q47 199 40 199 Q33 199 33 192 Q33 186 38 185' fill='none' stroke='%23b2dfdb' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: .18;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ══════════════════════════════════════
+   PAPER HOLE PUNCHES (left side decoration)
+══════════════════════════════════════ */
+body::before {
+  content: '';
+  position: fixed;
+  left: 0; top: 0;
+  width: 46px; height: 100vh;
+  background:
+    radial-gradient(circle 8px at 23px 80px,  #fff 6px, var(--ruled) 7px, transparent 8px),
+    radial-gradient(circle 8px at 23px 200px, #fff 6px, var(--ruled) 7px, transparent 8px),
+    radial-gradient(circle 8px at 23px 320px, #fff 6px, var(--ruled) 7px, transparent 8px),
+    radial-gradient(circle 8px at 23px 440px, #fff 6px, var(--ruled) 7px, transparent 8px),
+    radial-gradient(circle 8px at 23px 560px, #fff 6px, var(--ruled) 7px, transparent 8px),
+    radial-gradient(circle 8px at 23px 680px, #fff 6px, var(--ruled) 7px, transparent 8px),
+    radial-gradient(circle 8px at 23px 800px, #fff 6px, var(--ruled) 7px, transparent 8px);
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* ensure content clears margin line */
+.cal-wrap, .day-wrap, .editor-wrap, .lb-wrap,
+.um-wrap, .fb-screen, .login-wrap {
+  padding-left: 58px !important;
+}
+/* nav stays full width */
+.nav { padding-left: 58px !important; }
+
+/* ══════════════════════════════════════
+   STICKER-STYLE BADGES & TAGS
+══════════════════════════════════════ */
+.done-badge {
+  background: var(--green) !important;
+  border-radius: 4px !important;
+  font-size:.75rem !important;
+  transform: rotate(-1deg);
+  display: inline-block;
+}
+.nav-badge {
+  border-radius: 4px !important;
+  transform: rotate(1deg);
+  display: inline-block !important;
+}
+
+/* ══════════════════════════════════════
+   PROGRESS BARS — pencil-sketch style
+══════════════════════════════════════ */
+.sess-prog, .lb-ubar-wrap, .cal-prog-bar {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--ruled) 0px, var(--ruled) 3px,
+    transparent 3px, transparent 6px
+  ) !important;
+  border-radius: 2px !important;
+}
+
+/* ══════════════════════════════════════
+   FLOATING DOODLE ELEMENTS (injected via JS)
+══════════════════════════════════════ */
+.doodle-float {
+  position:fixed; pointer-events:none; z-index:0; opacity:.12;
+}
+
+/* ══════════════════════════════════════
+   PEER / READONLY BANNER
+══════════════════════════════════════ */
+.peer-banner {
+  border-radius: 4px 16px 16px 4px !important;
+  border-left: 6px solid var(--gold) !important;
+}
+
+/* ══════════════════════════════════════
+   OFFLINE BAR — washi tape style
+══════════════════════════════════════ */
+.offline-bar {
+  background: repeating-linear-gradient(
+    90deg,
+    #ff8a80 0px, #ff8a80 20px,
+    #ff5252 20px, #ff5252 40px
+  ) !important;
+  color: #fff !important;
+  font-size:.9rem !important;
+}
+
+/* ══════════════════════════════════════
+   TICK BOX — hand-drawn checkbox feel
+══════════════════════════════════════ */
+.tick-box {
+  border: 2px solid var(--ink-light) !important;
+  border-radius: 3px !important;
+  background: transparent !important;
+}
+.tick-row.done .tick-box {
+  background: var(--green) !important;
+  border-color: var(--green) !important;
+  border-radius: 3px !important;
+}
+
+/* ══════════════════════════════════════
+   RING NAME (today's label) on progress card
+══════════════════════════════════════ */
+.ring-tagline {
+  font-size:1rem !important;
+  opacity:.9 !important;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overscroll-behavior:none}
@@ -392,6 +822,43 @@ code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color
 </head>
 <body>
 
+<!-- ══ NOTEBOOK DOODLES (decorative, pointer-events:none) ══ -->
+<svg class="doodle-float" style="top:60px;left:2px;width:36px;height:120px" viewBox="0 0 36 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- spiral binding rings -->
+  <ellipse cx="18" cy="15"  rx="10" ry="6" fill="none" stroke="#7b52ab" stroke-width="2"/>
+  <ellipse cx="18" cy="35"  rx="10" ry="6" fill="none" stroke="#7b52ab" stroke-width="2"/>
+  <ellipse cx="18" cy="55"  rx="10" ry="6" fill="none" stroke="#7b52ab" stroke-width="2"/>
+  <ellipse cx="18" cy="75"  rx="10" ry="6" fill="none" stroke="#7b52ab" stroke-width="2"/>
+  <ellipse cx="18" cy="95"  rx="10" ry="6" fill="none" stroke="#7b52ab" stroke-width="2"/>
+  <ellipse cx="18" cy="115" rx="10" ry="6" fill="none" stroke="#7b52ab" stroke-width="2"/>
+</svg>
+
+<!-- floating doodles top-right -->
+<svg class="doodle-float" style="top:70px;right:6px;width:55px;height:140px;opacity:.13" viewBox="0 0 55 140" xmlns="http://www.w3.org/2000/svg">
+  <!-- tiny star -->
+  <path d="M27 5 L29 13 L37 13 L31 18 L33 26 L27 21 L21 26 L23 18 L17 13 L25 13Z" fill="#ffe082" stroke="#ffb300" stroke-width="1"/>
+  <!-- cloud -->
+  <circle cx="20" cy="50" r="7" fill="none" stroke="#b2dfdb" stroke-width="1.5"/>
+  <circle cx="30" cy="47" r="9" fill="none" stroke="#b2dfdb" stroke-width="1.5"/>
+  <circle cx="40" cy="50" r="7" fill="none" stroke="#b2dfdb" stroke-width="1.5"/>
+  <rect x="13" y="50" width="34" height="10" rx="2" fill="none" stroke="#b2dfdb" stroke-width="1.5"/>
+  <!-- music note -->
+  <path d="M28 80 L28 100 Q23 103 23 98 Q23 93 28 96" fill="none" stroke="#f48fb1" stroke-width="1.5"/>
+  <circle cx="23" cy="100" r="4" fill="#f48fb1" opacity=".7"/>
+  <line x1="34" y1="75" x2="34" y2="90" stroke="#f48fb1" stroke-width="1.5"/>
+  <circle cx="30" cy="92" r="4" fill="#f48fb1" opacity=".7"/>
+  <!-- arrow doodle -->
+  <path d="M20 118 Q30 112 40 118" fill="none" stroke="#d7c8f5" stroke-width="1.5"/>
+  <path d="M37 115 L40 118 L37 121" fill="none" stroke="#d7c8f5" stroke-width="1.5"/>
+</svg>
+
+<!-- bottom-left corner doodle -->
+<svg class="doodle-float" style="bottom:70px;left:50px;width:70px;height:70px;opacity:.1" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg">
+  <path d="M35 5 C55 5 65 20 65 35 C65 50 55 65 35 65 C15 65 5 50 5 35 C5 20 15 5 35 5Z" fill="none" stroke="#7b52ab" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <path d="M35 15 C48 15 55 24 55 35 C55 46 48 55 35 55 C22 55 15 46 15 35 C15 24 22 15 35 15Z" fill="none" stroke="#f48fb1" stroke-width="1"/>
+  <circle cx="35" cy="35" r="6" fill="#ffe082" opacity=".6"/>
+</svg>
+
 <!-- OFFLINE BAR -->
 <div class="offline-bar" id="offline-bar">📵 Offline — changes will sync when you're back online! 🔄</div>
 
@@ -450,7 +917,12 @@ code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color
 <!-- ══ SCREEN: LOGIN ══ -->
 <div class="screen" id="screen-login">
   <div class="login-wrap">
-    <div class="login-card">
+    <div class="login-card" style="position:relative;overflow:visible">
+      <!-- washi tape strip across top -->
+      <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%) rotate(-1.5deg);width:80px;height:22px;background:rgba(255,236,130,.8);border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,.1);z-index:5"></div>
+      <!-- mini doodle stickers -->
+      <div style="position:absolute;top:8px;right:12px;font-size:1.4rem;transform:rotate(12deg);opacity:.7">📎</div>
+      <div style="position:absolute;bottom:12px;left:10px;font-size:1.1rem;transform:rotate(-8deg);opacity:.6">🌸</div>
       <div style="font-size:3rem">🌟</div>
       <div id="login-date-display" style="font-family:'Caveat',cursive;font-weight:700;font-size:1.1rem;color:var(--purple);margin:4px 0 2px"></div>
       <h1 style="font-size:2rem">Study Planner 📚</h1>
@@ -2192,6 +2664,80 @@ self.addEventListener('fetch',e=>{
   const swURL = URL.createObjectURL(swBlob);
   navigator.serviceWorker.register(swURL).catch(()=>{});
 }
+
+/* ═══════════════════════════════════════════
+   NOTEBOOK DOODLE ENHANCER
+   Adds washi tape + sticker accents to dynamic cards
+═══════════════════════════════════════════ */
+(function notebookDoodles() {
+  const tapeColors = [
+    'rgba(255,236,130,.7)',
+    'rgba(255,182,193,.65)',
+    'rgba(180,210,255,.65)',
+    'rgba(180,240,200,.65)',
+    'rgba(220,200,255,.65)',
+  ];
+  const doodleEmojis = ['🌸','⭐','🍀','🌈','✨','🦋','🌻','💫','🎀','🌷'];
+  const cornerEmojis  = ['📌','🔖','📎','🖊️','✏️'];
+
+  function pickRandom(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+
+  // Observe DOM for session cards and add tape + sticker decorations
+  const observer = new MutationObserver(() => {
+    // Session cards — tape top-left + corner emoji
+    document.querySelectorAll('.session-card:not([data-notebook])').forEach(card => {
+      card.setAttribute('data-notebook','1');
+      card.style.position = 'relative';
+      card.style.overflow = 'visible';
+      card.style.marginTop = '18px';
+
+      // washi tape strip
+      const tape = document.createElement('div');
+      tape.style.cssText = `
+        position:absolute; top:-10px; left:${12+Math.random()*30}px;
+        width:${45+Math.random()*25}px; height:18px;
+        background:${pickRandom(tapeColors)};
+        border-radius:3px; transform:rotate(${(Math.random()-0.5)*4}deg);
+        box-shadow:0 1px 3px rgba(0,0,0,.08); z-index:2; pointer-events:none;
+      `;
+      card.appendChild(tape);
+
+      // corner sticker emoji
+      const sticker = document.createElement('span');
+      sticker.textContent = pickRandom(doodleEmojis);
+      sticker.style.cssText = `
+        position:absolute; top:6px; right:8px;
+        font-size:.95rem; opacity:.55;
+        transform:rotate(${(Math.random()-0.5)*20}deg);
+        pointer-events:none; z-index:2;
+      `;
+      card.appendChild(sticker);
+    });
+
+    // e-cards (editor cards) — corner pin emoji
+    document.querySelectorAll('.e-card:not([data-notebook])').forEach(card => {
+      card.setAttribute('data-notebook','1');
+      card.style.position = 'relative';
+      const pin = document.createElement('span');
+      pin.textContent = pickRandom(cornerEmojis);
+      pin.style.cssText = `
+        position:absolute; top:-10px; right:12px;
+        font-size:1rem; opacity:.6;
+        transform:rotate(${(Math.random()-0.5)*15}deg);
+        pointer-events:none; z-index:3;
+      `;
+      card.appendChild(pin);
+    });
+
+    // leaderboard rows — tiny doodle accent
+    document.querySelectorAll('.lb-row:not([data-notebook])').forEach(row => {
+      row.setAttribute('data-notebook','1');
+      row.style.background = 'var(--paper2)';
+    });
+  });
+  observer.observe(document.body, { childList:true, subtree:true });
+})();
+
 </script>
 </body>
 </html>
