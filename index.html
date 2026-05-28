@@ -1,4 +1,4 @@
-<!-- Version 13-3-->
+<!-- Version 13-3 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -934,11 +934,6 @@ code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color
   <div class="day-wrap" id="day-content"></div>
 </div>
 
-<!-- ══ SCREEN: GOALS ══ -->
-<div class="screen" id="screen-goals">
-  <div class="goals-wrap" id="goals-content"></div>
-</div>
-
 <!-- ══ SCREEN: LEADERBOARD ══ -->
 <div class="screen" id="screen-leaderboard">
   <div class="lb-wrap" id="lb-content"></div>
@@ -964,10 +959,6 @@ code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color
   <button class="tab-btn active" id="tab-my" onclick="switchTab('my')">
     <span class="tab-icon">📅</span>
     <span class="tab-label">My Plan</span>
-  </button>
-  <button class="tab-btn" id="tab-goals" onclick="switchTab('goals')">
-    <span class="tab-icon">🎯</span>
-    <span class="tab-label">Goals</span>
   </button>
   <button class="tab-btn" id="tab-lb" onclick="switchTab('lb')">
     <span class="tab-icon">🏆</span>
@@ -1480,29 +1471,6 @@ function renderCalendar() {
     </div>
   </div>
 
-  <!-- ── Today's notices ── -->
-  ${(()=>{
-    const todayPlan = allPlans[today];
-    const todayNotices = todayPlan ? (todayPlan.notices||[]).filter(n=>n.text) : [];
-    if (!todayNotices.length) return '';
-    const NCONF = {
-      deadline:['⏰','#c62828','#fff5f5','#ffcdd2'],
-      exam:    ['📝','#6a1b9a','#f9f0ff','#e1bee7'],
-      event:   ['📅','#1565c0','#f0f4ff','#bbdefb'],
-      reminder:['🔔','#e65100','#fff8f0','#ffe0b2'],
-      info:    ['ℹ️','#00695c','#f0faf8','#b2dfdb'],
-    };
-    return `<div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px">
-      ${todayNotices.map(n=>{
-        const [em,col,bg,border] = NCONF[n.type||'reminder']||NCONF.reminder;
-        return `<div style="background:${bg};border:1.5px solid ${border};border-left:4px solid ${col};border-radius:10px;padding:7px 10px;display:flex;align-items:center;gap:8px">
-          <span style="font-size:1rem;flex-shrink:0">${em}</span>
-          <span style="font-size:.8rem;font-weight:700;color:${col};flex:1">${esc(n.text)}</span>
-        </div>`;
-      }).join('')}
-    </div>`;
-  })()}
-
   <!-- ── Daily quote strip ── -->
   <div style="background:#fff;border-radius:14px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 14px rgba(26,35,126,.08);border-left:4px solid ${calAccent}">
     <span style="font-size:1.5rem;flex-shrink:0">${cq.e}</span>
@@ -1741,6 +1709,26 @@ function renderDayView(date) {
     <span style="font-style:italic;font-size:.8rem">"${quote.q}"</span>
     <div style="font-size:.68rem;color:#9e7c60;margin-top:2px;font-weight:600">— ${quote.a}</div>
   </div>`;
+
+  // ── Notices & Reminders ──
+  if ((plan.notices||[]).length) {
+    const NCONF = {
+      deadline:['⏰','#c62828','#fff5f5','#ffcdd2'],
+      exam:    ['📝','#6a1b9a','#f9f0ff','#e1bee7'],
+      event:   ['📅','#1565c0','#f0f4ff','#bbdefb'],
+      reminder:['🔔','#e65100','#fff8f0','#ffe0b2'],
+      info:    ['ℹ️','#00695c','#f0faf8','#b2dfdb'],
+    };
+    html += `<div style="margin-bottom:10px;display:flex;flex-direction:column;gap:5px">`;
+    (plan.notices||[]).filter(n=>n.text).forEach(n => {
+      const [em,col,bg,border] = NCONF[n.type||'reminder']||NCONF.reminder;
+      html += `<div style="background:${bg};border:1.5px solid ${border};border-left:4px solid ${col};border-radius:10px;padding:7px 10px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:1rem;flex-shrink:0">${em}</span>
+        <span style="font-size:.8rem;font-weight:700;color:${col};flex:1">${esc(n.text)}</span>
+      </div>`;
+    });
+    html += `</div>`;
+  }
 
   // ── Milestone nudge ──
   const milestone = [...MILESTONES].reverse().find(m => pct >= m.at);
