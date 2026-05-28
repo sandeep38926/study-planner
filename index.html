@@ -1,4 +1,4 @@
-<!-- Version 13-2 -->
+<!-- Version 13-4 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -934,6 +934,11 @@ code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color
   <div class="day-wrap" id="day-content"></div>
 </div>
 
+<!-- ══ SCREEN: GOALS ══ -->
+<div class="screen" id="screen-goals">
+  <div class="goals-wrap" id="goals-content"></div>
+</div>
+
 <!-- ══ SCREEN: LEADERBOARD ══ -->
 <div class="screen" id="screen-leaderboard">
   <div class="lb-wrap" id="lb-content"></div>
@@ -959,6 +964,10 @@ code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color
   <button class="tab-btn active" id="tab-my" onclick="switchTab('my')">
     <span class="tab-icon">📅</span>
     <span class="tab-label">My Plan</span>
+  </button>
+  <button class="tab-btn" id="tab-goals" onclick="switchTab('goals')">
+    <span class="tab-icon">🎯</span>
+    <span class="tab-label">Goals</span>
   </button>
   <button class="tab-btn" id="tab-lb" onclick="switchTab('lb')">
     <span class="tab-icon">🏆</span>
@@ -1435,42 +1444,64 @@ function renderCalendar() {
 
   let html = `
   <!-- ── Hero banner ── -->
-  <div style="background:${calGrad};border-radius:20px;padding:18px 16px 16px;margin-bottom:14px;position:relative;overflow:hidden">
-    <div style="position:absolute;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.05);top:-40px;right:-30px"></div>
-    <div style="position:absolute;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.06);bottom:-20px;left:10px"></div>
+  <div style="background:${calGrad};border-radius:16px;padding:11px 12px 10px;margin-bottom:10px;position:relative;overflow:hidden">
+    <div style="position:absolute;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.05);top:-28px;right:-20px"></div>
 
     <!-- month nav -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;position:relative">
-      <button onclick="changeMonth(-1)" style="background:rgba(255,255,255,.15);border:none;border-radius:10px;width:36px;height:36px;color:#fff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center">‹</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;position:relative">
+      <button onclick="changeMonth(-1)" style="background:rgba(255,255,255,.15);border:none;border-radius:8px;width:30px;height:30px;color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center">‹</button>
       <div style="text-align:center">
-        <div style="font-family:'Nunito',sans-serif;font-weight:900;color:#fff;font-size:1.5rem;line-height:1">${MONTH_NAMES[calMonth]}</div>
-        <div style="color:rgba(255,255,255,.6);font-size:1rem;margin-top:2px">${calYear}</div>
+        <div style="font-family:'Nunito',sans-serif;font-weight:900;color:#fff;font-size:1.2rem;line-height:1">${MONTH_NAMES[calMonth]}</div>
+        <div style="color:rgba(255,255,255,.6);font-size:.8rem;margin-top:1px">${calYear}</div>
       </div>
-      <button onclick="changeMonth(1)" style="background:rgba(255,255,255,.15);border:none;border-radius:10px;width:36px;height:36px;color:#fff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center">›</button>
+      <button onclick="changeMonth(1)" style="background:rgba(255,255,255,.15);border:none;border-radius:8px;width:30px;height:30px;color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center">›</button>
     </div>
 
     <!-- monthly stats row -->
-    <div style="display:flex;gap:8px;margin-bottom:14px">
+    <div style="display:flex;gap:6px;margin-bottom:8px">
       ${[
         [`${completedDays}/${plannedDays}`,'Days Done','📅'],
         [`${monthPct}%`,'Progress','📊'],
-        [`${streakCount}`,'Day Streak','🔥'],
+        [`${streakCount}`,'Streak','🔥'],
         [`${doneTasks}/${totalTasks}`,'Tasks','✅'],
-      ].map(([v,l,e])=>`<div style="flex:1;background:rgba(255,255,255,.12);border-radius:10px;padding:7px 4px;text-align:center">
-        <div style="font-size:1rem;margin-bottom:1px">${e}</div>
-        <div style="font-family:'Nunito',sans-serif;font-weight:900;color:#fff;font-size:1.1rem;line-height:1">${v}</div>
-        <div style="font-size:.55rem;color:rgba(255,255,255,.65);margin-top:1px">${l}</div>
+      ].map(([v,l,e])=>`<div style="flex:1;background:rgba(255,255,255,.12);border-radius:8px;padding:5px 3px;text-align:center">
+        <div style="font-size:.75rem;margin-bottom:1px">${e}</div>
+        <div style="font-family:'Nunito',sans-serif;font-weight:900;color:#fff;font-size:.95rem;line-height:1">${v}</div>
+        <div style="font-size:.5rem;color:rgba(255,255,255,.65);margin-top:1px">${l}</div>
       </div>`).join('')}
     </div>
 
     <!-- monthly progress bar -->
-    <div style="height:5px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden;margin-bottom:6px">
+    <div style="height:4px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden;margin-bottom:4px">
       <div style="height:100%;width:${monthPct}%;background:${calAccent};border-radius:3px;transition:width .6s ease"></div>
     </div>
     <div style="display:flex;justify-content:space-between">
-      ${[0,25,50,75,100].map(v=>`<span style="font-size:.55rem;color:rgba(255,255,255,.4)">${v}%</span>`).join('')}
+      ${[0,25,50,75,100].map(v=>`<span style="font-size:.5rem;color:rgba(255,255,255,.4)">${v}%</span>`).join('')}
     </div>
   </div>
+
+  <!-- ── Today's notices ── -->
+  ${(()=>{
+    const todayPlan = allPlans[today];
+    const todayNotices = todayPlan ? (todayPlan.notices||[]).filter(n=>n.text) : [];
+    if (!todayNotices.length) return '';
+    const NCONF = {
+      deadline:['⏰','#c62828','#fff5f5','#ffcdd2'],
+      exam:    ['📝','#6a1b9a','#f9f0ff','#e1bee7'],
+      event:   ['📅','#1565c0','#f0f4ff','#bbdefb'],
+      reminder:['🔔','#e65100','#fff8f0','#ffe0b2'],
+      info:    ['ℹ️','#00695c','#f0faf8','#b2dfdb'],
+    };
+    return `<div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px">
+      ${todayNotices.map(n=>{
+        const [em,col,bg,border] = NCONF[n.type||'reminder']||NCONF.reminder;
+        return `<div style="background:${bg};border:1.5px solid ${border};border-left:4px solid ${col};border-radius:10px;padding:7px 10px;display:flex;align-items:center;gap:8px">
+          <span style="font-size:1rem;flex-shrink:0">${em}</span>
+          <span style="font-size:.8rem;font-weight:700;color:${col};flex:1">${esc(n.text)}</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+  })()}
 
   <!-- ── Daily quote strip ── -->
   <div style="background:#fff;border-radius:14px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 14px rgba(26,35,126,.08);border-left:4px solid ${calAccent}">
@@ -1511,11 +1542,13 @@ function renderCalendar() {
       else if (isPast && !plan) { bg='#fafafa'; numColor='#ccc'; border='#f0f0f0'; }
 
       const emoji = allDone?'✅':inProg?'📖':isToday?'⭐':plan?'📋':'';
+      const hasNotices = plan && (plan.notices||[]).some(n=>n.text);
 
       return `<div onclick="openDay('${ds}')"
         style="aspect-ratio:1;border-radius:12px;background:${bg};border:1.5px solid ${border};cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:3px;box-shadow:${shadow};transition:transform .12s,box-shadow .12s;position:relative"
         onmousedown="this.style.transform='scale(.93)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(.93)'" ontouchend="this.style.transform=''">
         ${isToday?`<div style="position:absolute;top:-1px;right:-1px;width:8px;height:8px;background:${calAccent};border-radius:50%;border:1.5px solid #fff"></div>`:''}
+        ${hasNotices&&!isToday?`<div style="position:absolute;top:-1px;left:-1px;width:7px;height:7px;background:#c62828;border-radius:50%;border:1.5px solid #fff" title="Has notices"></div>`:''}
         <span style="font-weight:900;font-size:1.05rem;color:${numColor};line-height:1">${d}</span>
         ${emoji?`<span style="font-size:.65rem;line-height:1">${emoji}</span>`:''}
         ${plan&&!allDone&&keys.length?`<div style="width:70%;height:2.5px;background:#e0e4f4;border-radius:2px;overflow:hidden;margin-top:1px">
@@ -1906,7 +1939,7 @@ function openEditor(date) {
   selectedDate = date;
   editingPlan = allPlans[date] ? JSON.parse(JSON.stringify(allPlans[date])) : {
     examName:'Study Plan', tagline:'Plan Your Day, Ace Your Exam!',
-    totalTime:'', sessions:[], miniSegments:[], dailyTargets:[], date
+    totalTime:'', sessions:[], miniSegments:[], dailyTargets:[], notices:[], date
   };
   renderEditor();
   showScreen('day'); // editor renders inside day screen
@@ -1956,6 +1989,16 @@ function renderEditor() {
   (plan.dailyTargets||[]).forEach((t,ti) => { html += renderTargetEditor(t,ti); });
   html += `</div>
     <button class="add-section-btn" onclick="addEditorTarget()">＋ Add Target</button>
+  </div>`;
+
+  // Notices
+  html += `<div class="e-card">
+    <div class="e-card-title" style="color:#c62828">📌 Notices & Reminders</div>
+    <div style="font-size:.72rem;color:#888;margin-bottom:8px">Add important dates, deadlines or reminders visible to all students on this day.</div>
+    <div id="notices-editor">`;
+  (plan.notices||[]).forEach((n,ni) => { html += renderNoticeEditor(n,ni); });
+  html += `</div>
+    <button class="add-section-btn" onclick="addEditorNotice()">＋ Add Notice</button>
   </div>`;
 
   html += `<button class="publish-btn" id="publish-btn" onclick="publishPlan()">💾 Publish Plan</button>`;
@@ -2034,6 +2077,28 @@ function removeMiniTask(id,ti){ const m=editingPlan.miniSegments.find(m=>m.id===
 function updateTarget(ti,v){ editingPlan.dailyTargets[ti]=v; }
 function removeTarget(ti){ editingPlan.dailyTargets.splice(ti,1); renderEditor(); }
 function addEditorTarget(){ editingPlan.dailyTargets.push(''); renderEditor(); }
+
+// ── Notice helpers ──
+function renderNoticeEditor(n, ni) {
+  const NOTICE_TYPES = [
+    {val:'deadline', label:'⏰ Deadline',  col:'#c62828'},
+    {val:'exam',     label:'📝 Exam',      col:'#6a1b9a'},
+    {val:'event',    label:'📅 Event',     col:'#1565c0'},
+    {val:'reminder', label:'🔔 Reminder',  col:'#e65100'},
+    {val:'info',     label:'ℹ️ Info',       col:'#00695c'},
+  ];
+  const typeOpts = NOTICE_TYPES.map(t =>
+    `<option value="${t.val}" ${(n.type||'reminder')===t.val?'selected':''}>${t.label}</option>`
+  ).join('');
+  return `<div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
+    <select class="e-inp" style="width:130px;flex-shrink:0" onchange="updateNotice(${ni},'type',this.value)">${typeOpts}</select>
+    <input class="e-inp" style="flex:1" placeholder="e.g. Last day of form filling" value="${esc(n.text||'')}" onchange="updateNotice(${ni},'text',this.value)">
+    <button onclick="removeNotice(${ni})" style="background:#fce4ec;border:none;border-radius:8px;padding:5px 8px;cursor:pointer;color:#c62828;font-size:.8rem;flex-shrink:0">🗑</button>
+  </div>`;
+}
+function addEditorNotice(){ if(!editingPlan.notices) editingPlan.notices=[]; editingPlan.notices.push({type:'reminder',text:''}); renderEditor(); }
+function updateNotice(ni,field,v){ if(!editingPlan.notices) editingPlan.notices=[]; editingPlan.notices[ni][field]=v; }
+function removeNotice(ni){ editingPlan.notices.splice(ni,1); renderEditor(); }
 
 function cancelEditor() { renderDayView(selectedDate); }
 
