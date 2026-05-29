@@ -1,4 +1,4 @@
-<!-- Version 13-3 -->
+<!-- Version 13-8 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -735,17 +735,36 @@ code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color
 .offline-bar.show{display:block}
 
 /* BOTTOM TAB BAR */
-.tab-bar{position:fixed;bottom:0;left:0;right:0;height:58px;background:#fff;border-top:1px solid #e0e4f4;display:none;z-index:300;box-shadow:0 -4px 18px rgba(26,35,126,.1)}
+.tab-bar{position:fixed;bottom:0;left:0;right:0;height:48px;background:#fff;border-top:1px solid #e0e4f4;display:none;z-index:300;box-shadow:0 -4px 18px rgba(26,35,126,.1)}
 .tab-bar.show{display:flex}
-.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:none;background:none;cursor:pointer;padding:6px 0;transition:.15s;color:#999;font-family:Poppins,sans-serif}
+.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border:none;background:none;cursor:pointer;padding:4px 0;transition:.15s;color:#999;font-family:Poppins,sans-serif}
 .tab-btn:active{transform:scale(.92)}
 .tab-btn.active{color:var(--purple)}
-.tab-icon{font-size:1.3rem;line-height:1}
-.tab-label{font-size:1rem;font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+.tab-icon{font-size:1.05rem;line-height:1}
+.tab-label{font-size:.6rem;font-weight:700;letter-spacing:.3px;text-transform:uppercase}
 .tab-btn.active .tab-label{color:var(--purple)}
-.screen{min-height:calc(100vh - 52px - 58px)}
+.screen{min-height:calc(100vh - 52px - 48px)}
 
 /* LEADERBOARD */
+.goals-wrap{padding:14px 10px 80px}
+.g-plan-card{background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(26,35,126,.08);margin-bottom:14px;overflow:hidden;border:1.5px solid #e8eaf6}
+.g-plan-header{padding:12px 14px;display:flex;align-items:center;justify-content:space-between}
+.g-plan-title{font-family:'Patrick Hand',cursive;font-weight:700;font-size:1.05rem;color:#fff}
+.g-plan-meta{font-size:.7rem;color:rgba(255,255,255,.75);margin-top:2px}
+.g-plan-body{padding:10px 14px 12px}
+.g-task-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f0f4ff}
+.g-task-row:last-child{border-bottom:none}
+.g-check{width:20px;height:20px;border-radius:6px;border:2px solid #c5cae9;background:#fff;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.75rem;transition:.12s}
+.g-check.done{background:var(--purple);border-color:var(--purple);color:#fff}
+.g-task-text{font-size:.82rem;color:var(--navy);flex:1;line-height:1.3}
+.g-task-text.done{text-decoration:line-through;color:#aaa}
+.g-prog-bar{height:5px;background:#e8eaf6;border-radius:3px;overflow:hidden;margin-top:8px}
+.g-prog-fill{height:100%;border-radius:3px;transition:width .4s ease}
+.g-prog-label{font-size:.65rem;color:#888;margin-top:3px;text-align:right}
+.g-section-tab{flex:1;padding:7px 0;border:none;border-radius:9px;background:none;font-family:Poppins,sans-serif;font-size:.78rem;font-weight:700;color:#888;cursor:pointer;transition:.15s}
+.g-section-tab.active{background:#fff;color:var(--navy);box-shadow:0 2px 8px rgba(26,35,126,.1)}
+.g-add-btn{width:100%;padding:10px;background:linear-gradient(135deg,#7b52ab,#3d2c8d);color:#fff;border:none;border-radius:12px;font-family:'Patrick Hand',cursive;font-weight:700;font-size:1rem;cursor:pointer;margin-top:8px}
+.g-section-label{font-family:'Patrick Hand',cursive;font-weight:700;font-size:.85rem;color:#999;text-transform:uppercase;letter-spacing:.5px;margin:10px 0 4px;padding-left:2px}
 .lb-wrap{padding:14px 12px 20px}
 .lb-header{text-align:center;margin-bottom:18px}
 .lb-header h2{font-family:'Patrick Hand',cursive;font-weight:700;font-size:1.7rem;color:var(--navy)}
@@ -934,6 +953,11 @@ code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color
   <div class="day-wrap" id="day-content"></div>
 </div>
 
+<!-- ══ SCREEN: GOALS ══ -->
+<div class="screen" id="screen-goals">
+  <div class="goals-wrap" id="goals-content"></div>
+</div>
+
 <!-- ══ SCREEN: LEADERBOARD ══ -->
 <div class="screen" id="screen-leaderboard">
   <div class="lb-wrap" id="lb-content"></div>
@@ -959,6 +983,10 @@ code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color
   <button class="tab-btn active" id="tab-my" onclick="switchTab('my')">
     <span class="tab-icon">📅</span>
     <span class="tab-label">My Plan</span>
+  </button>
+  <button class="tab-btn" id="tab-goals" onclick="switchTab('goals')">
+    <span class="tab-icon">🎯</span>
+    <span class="tab-label">Schedules</span>
   </button>
   <button class="tab-btn" id="tab-lb" onclick="switchTab('lb')">
     <span class="tab-icon">🏆</span>
@@ -1032,6 +1060,7 @@ function scheduleMidnightRefresh() {
     const activeId = (document.querySelector('.screen.active') || {}).id;
     if      (activeId === 'screen-calendar')    renderCalendar();
     else if (activeId === 'screen-day')         renderDayView(selectedDate);
+    else if (activeId === 'screen-goals')       renderGoals();
     else if (activeId === 'screen-leaderboard') renderLeaderboard();
 
     // Re-schedule for the next midnight
@@ -1161,6 +1190,7 @@ function showScreen(name) {
   // Show users tab only for creator
   document.getElementById('tab-users').style.display = (!noNav && userRole==='creator') ? 'flex' : 'none';
   if (name === 'calendar') { activeTab='my'; updateTabBar(); renderCalendar(); }
+  if (name === 'goals')    { activeTab='goals'; updateTabBar(); renderGoals(); }
   if (name === 'leaderboard') { activeTab='lb'; updateTabBar(); renderLeaderboard(); }
   if (name === 'users') { activeTab='users'; updateTabBar(); renderUserManagement(); }
 }
@@ -1180,6 +1210,8 @@ function switchTab(tab) {
     renderDayView(selectedDate);
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('screen-day').classList.add('active');
+  } else if (tab === 'goals') {
+    showScreen('goals');
   } else if (tab === 'lb') {
     showScreen('leaderboard');
   } else if (tab === 'users') {
@@ -1338,7 +1370,7 @@ function signOut() {
   Object.values(planListeners).forEach(off => off && off());
   Object.values(progListeners).forEach(off => off && off());
   planListeners = {}; progListeners = {};
-  allPlans = {}; allProgress = {}; allUsersData = {};
+  allPlans = {}; allProgress = {}; allUsersData = {}; allLongPlans = {}; allLongProgress = {};
   userName = ''; userRole = ''; pendingRole = 'user';
   localStorage.removeItem('session');
   document.getElementById('login-name').value = '';
@@ -1365,6 +1397,14 @@ function startListeners() {
     if (document.getElementById('screen-leaderboard').classList.contains('active')) renderLeaderboard();
     if (document.getElementById('screen-peer').classList.contains('active')) renderPeerView();
     if (document.getElementById('screen-users').classList.contains('active')) renderUserManagement();
+  });
+  db.ref('longplans').on('value', snap => {
+    allLongPlans = snap.val() || {};
+    if (activeTab==='goals') renderGoals();
+  });
+  db.ref('longprogress').on('value', snap => {
+    allLongProgress = snap.val() || {};
+    if (activeTab==='goals') renderGoals();
   });
   db.ref('users').on('value', snap => {
     allUsersData = snap.val() || {};
@@ -1436,7 +1476,7 @@ function renderCalendar() {
   let html = `
   <!-- ── Hero banner ── -->
   <div style="background:${calGrad};border-radius:16px;padding:11px 12px 10px;margin-bottom:10px;position:relative;overflow:hidden">
-    <div style="position:absolute;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.05);top:-28px;right:-20px"></div>
+    <div style="position:absolute;width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.05);top:-20px;right:-14px"></div>
 
     <!-- month nav -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;position:relative">
@@ -1710,8 +1750,8 @@ function renderDayView(date) {
     <div style="font-size:.68rem;color:#9e7c60;margin-top:2px;font-weight:600">— ${quote.a}</div>
   </div>`;
 
-  // ── Notices & Reminders ──
-  if ((plan.notices||[]).length) {
+  // ── Notices for this day ──
+  if (plan && (plan.notices||[]).some(n=>n.text)) {
     const NCONF = {
       deadline:['⏰','#c62828','#fff5f5','#ffcdd2'],
       exam:    ['📝','#6a1b9a','#f9f0ff','#e1bee7'],
@@ -1719,12 +1759,12 @@ function renderDayView(date) {
       reminder:['🔔','#e65100','#fff8f0','#ffe0b2'],
       info:    ['ℹ️','#00695c','#f0faf8','#b2dfdb'],
     };
-    html += `<div style="margin-bottom:10px;display:flex;flex-direction:column;gap:5px">`;
+    html += `<div style="display:flex;flex-direction:column;gap:4px;margin-bottom:8px">`;
     (plan.notices||[]).filter(n=>n.text).forEach(n => {
       const [em,col,bg,border] = NCONF[n.type||'reminder']||NCONF.reminder;
-      html += `<div style="background:${bg};border:1.5px solid ${border};border-left:4px solid ${col};border-radius:10px;padding:7px 10px;display:flex;align-items:center;gap:8px">
-        <span style="font-size:1rem;flex-shrink:0">${em}</span>
-        <span style="font-size:.8rem;font-weight:700;color:${col};flex:1">${esc(n.text)}</span>
+      html += `<div style="background:${bg};border:1px solid ${border};border-left:3px solid ${col};border-radius:8px;padding:4px 8px;display:inline-flex;align-items:center;gap:5px;max-width:90%">
+        <span style="font-size:.75rem;flex-shrink:0">${em}</span>
+        <span style="font-size:.7rem;font-weight:700;color:${col}">${esc(n.text)}</span>
       </div>`;
     });
     html += `</div>`;
@@ -2106,6 +2146,311 @@ async function publishPlan() {
   } catch(e) {
     showToast('❌ Failed to publish — check connection');
     btn.disabled=false; btn.textContent='💾 Publish Plan';
+  }
+}
+
+
+/* ═══════════════════════════════════════════
+   GOALS  (Weekly / Monthly long-term plans)
+═══════════════════════════════════════════ */
+let editingLongPlan = null;
+let editingLongId   = null;
+// Navigation: which month (0-based offset from today's month)
+let goalsMonthOffset = 0;
+let goalsWeekIdx = 1;   // 1-based week within the current month
+
+const SCHED_MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+// Derive a theme for a given year-month using the same DAY_THEMES palette
+// Key off the 1st of the month so the colour matches that day's plan theme
+function getMonthTheme(year, month) {
+  const ds = `${year}-${String(month+1).padStart(2,'0')}-01`;
+  return getDayTheme(ds);
+}
+
+function getLongProg(planId) {
+  return (allLongProgress[planId] && allLongProgress[planId][userName]) || {};
+}
+
+// Stable plan-key for a specific week/month slot: "w_YYYY_MM_W1" / "m_YYYY_MM"
+function weekPlanKey(year, month, weekNum) {
+  return `w_${year}_${String(month+1).padStart(2,'0')}_W${weekNum}`;
+}
+function monthPlanKey(year, month) {
+  return `m_${year}_${String(month+1).padStart(2,'0')}`;
+}
+
+// How many weeks does a month have (4 or 5)?
+function weeksInMonth(year, month) {
+  const firstDay = new Date(year, month, 1).getDay(); // 0=Sun
+  const days = new Date(year, month+1, 0).getDate();
+  return Math.ceil((firstDay + days) / 7);
+}
+
+// Date range string for a week slot
+function weekDateRange(year, month, weekNum) {
+  const firstOfMonth = new Date(year, month, 1);
+  const firstDow = firstOfMonth.getDay(); // 0=Sun
+  // Week 1 starts on day 1, week 2 starts after (7-firstDow) days etc.
+  const weekStart = weekNum === 1 ? 1 : (8 - firstDow) + (weekNum - 2) * 7;
+  const weekEnd   = Math.min(weekStart + 6, new Date(year, month+1, 0).getDate());
+  const mName     = SCHED_MONTH_NAMES[month].slice(0,3);
+  return `${mName} ${weekStart}–${weekEnd}`;
+}
+
+function renderGoals() {
+  const c = document.getElementById('goals-content');
+  if (!c) return;
+
+  const todayD    = new Date();
+  const baseYear  = todayD.getFullYear();
+  const baseMonth = todayD.getMonth();
+
+  // Resolve current month
+  let d = new Date(baseYear, baseMonth + goalsMonthOffset, 1);
+  const year  = d.getFullYear();
+  const month = d.getMonth();
+
+  const theme     = getMonthTheme(year, month);
+  const monthName = SCHED_MONTH_NAMES[month];
+  const numWeeks  = weeksInMonth(year, month);
+  const mKey      = monthPlanKey(year, month);
+  const monthPlan = allLongPlans[mKey] || null;
+
+  // Clamp week index within this month
+  goalsWeekIdx = Math.max(1, Math.min(goalsWeekIdx, numWeeks));
+  const w     = goalsWeekIdx;
+  const wKey  = weekPlanKey(year, month, w);
+  const wPlan = allLongPlans[wKey] || null;
+  const wProg = getLongProg(wKey);
+  const wTasks = (wPlan && wPlan.tasks) || [];
+  const wDone  = wTasks.filter((_,ti) => wProg[`t_${ti}`]).length;
+  const wPct   = wTasks.length ? Math.round(wDone/wTasks.length*100) : 0;
+  const wRange = wPlan ? (wPlan.dateRange || weekDateRange(year, month, w)) : weekDateRange(year, month, w);
+  const wTitle = wPlan ? (wPlan.title || `Week ${w}`) : `Week ${w}`;
+  const wEmpty = !wPlan || !wTasks.length;
+
+  const mProg  = getLongProg(mKey);
+  const mTasks = (monthPlan && monthPlan.tasks) || [];
+  const mDone  = mTasks.filter((_,ti) => mProg[`t_${ti}`]).length;
+  const mPct   = mTasks.length ? Math.round(mDone/mTasks.length*100) : 0;
+  const mEmpty = !monthPlan || !mTasks.length;
+
+  let html = '';
+
+  // ── Hero banner with month ‹ › navigation ──
+  html += `<div style="background:${theme.grad};border-radius:14px;padding:11px 14px;margin-bottom:10px;position:relative;overflow:hidden">
+    <div style="position:absolute;width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.06);top:-16px;right:-12px"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;position:relative">
+      <div>
+        <div style="font-family:'Patrick Hand',cursive;font-weight:700;font-size:1.1rem;color:#fff">🎯 Schedules</div>
+        <div style="font-size:.68rem;color:rgba(255,255,255,.65);margin-top:1px">Weekly &amp; monthly plans</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <button onclick="goalsMonthOffset--;goalsWeekIdx=1;renderGoals()"
+          style="width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,255,255,.35);background:rgba(255,255,255,.15);color:#fff;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center">‹</button>
+        <span style="font-family:'Nunito',sans-serif;font-weight:900;color:#fff;font-size:.88rem;min-width:76px;text-align:center">${monthName} ${year}</span>
+        <button onclick="goalsMonthOffset++;goalsWeekIdx=1;renderGoals()"
+          style="width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,255,255,.35);background:rgba(255,255,255,.15);color:#fff;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center">›</button>
+      </div>
+    </div>
+  </div>`;
+
+  // ══ WEEKLY — show ONE week at a time ══
+  // Week navigation row: ‹  Week N of M  ›
+  html += `<div style="font-size:.6rem;font-weight:800;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px">📅 WEEKLY</div>`;
+  html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+    <button onclick="goalsWeekIdx--;renderGoals()"
+      style="width:28px;height:28px;border-radius:50%;border:1.5px solid ${w>1?'#c5cae9':'#eee'};background:${w>1?'#f0f4ff':'#fafafa'};color:${w>1?'var(--navy)':'#ccc'};font-size:.9rem;cursor:${w>1?'pointer':'default'};display:flex;align-items:center;justify-content:center"
+      ${w<=1?'disabled':''}>‹</button>
+    <span style="font-family:'Patrick Hand',cursive;font-weight:700;font-size:.9rem;color:var(--navy)">Week ${w} <span style="font-size:.7rem;color:#aaa;font-weight:400">of ${numWeeks}</span></span>
+    <button onclick="goalsWeekIdx++;renderGoals()"
+      style="width:28px;height:28px;border-radius:50%;border:1.5px solid ${w<numWeeks?'#c5cae9':'#eee'};background:${w<numWeeks?'#f0f4ff':'#fafafa'};color:${w<numWeeks?'var(--navy)':'#ccc'};font-size:.9rem;cursor:${w<numWeeks?'pointer':'default'};display:flex;align-items:center;justify-content:center"
+      ${w>=numWeeks?'disabled':''}>›</button>
+  </div>`;
+
+  // Weekly card
+  html += `<div class="g-plan-card" style="margin-bottom:12px">
+    <div class="g-plan-header" style="background:${theme.grad}">
+      <div>
+        <div style="font-size:.56rem;font-weight:800;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">Week ${w} · ${monthName} ${year}</div>
+        <div class="g-plan-title">${esc(wTitle)}</div>
+        <div class="g-plan-meta">${esc(wRange)}${wPlan&&wPlan.subject?' · '+esc(wPlan.subject):''}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
+        ${wEmpty
+          ? `<span style="font-size:.62rem;color:rgba(255,255,255,.45);font-style:italic">Not filled yet</span>`
+          : `<div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1.3rem;color:#fff;line-height:1">${wPct}%</div>
+             <div style="font-size:.58rem;color:rgba(255,255,255,.7)">${wDone}/${wTasks.length} done</div>`}
+        ${userRole==='creator'
+          ? `<button onclick="openGoalEditor('${wKey}','weekly',${year},${month},${w})"
+              style="background:rgba(255,255,255,.2);border:none;border-radius:6px;padding:3px 8px;color:#fff;font-size:.62rem;font-weight:700;cursor:pointer;margin-top:3px">${wEmpty?'＋ Fill':'✏️ Edit'}</button>`
+          : ''}
+      </div>
+    </div>`;
+
+  if (!wEmpty) {
+    html += `<div class="g-plan-body">
+      <div class="g-prog-bar"><div class="g-prog-fill" style="width:${wPct}%;background:${theme.accent}"></div></div>
+      <div class="g-prog-label">${wPct}% complete</div>`;
+    if (wPlan.description) html += `<div style="font-size:.73rem;color:#666;margin:5px 0 3px;line-height:1.4;font-style:italic">${esc(wPlan.description)}</div>`;
+    wTasks.forEach((t, ti) => {
+      const isDone = !!wProg[`t_${ti}`];
+      html += `<div class="g-task-row">
+        <div class="g-check ${isDone?'done':''}" onclick="toggleLongTask('${wKey}',${ti})">${isDone?'✓':''}</div>
+        <span class="g-task-text ${isDone?'done':''}">${esc(t.text)}</span>
+      </div>`;
+    });
+    html += `</div>`;
+  } else {
+    html += `<div style="padding:10px 14px;font-size:.73rem;color:#bbb;font-style:italic">No tasks added for this week yet.</div>`;
+  }
+  html += `</div>`;
+
+  // ══ MONTHLY — always shown below ══
+  html += `<div style="height:1px;background:#e8eaf6;margin:2px 0 10px"></div>`;
+  html += `<div style="font-size:.6rem;font-weight:800;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">🗓️ MONTHLY</div>`;
+
+  html += `<div class="g-plan-card" style="margin-bottom:16px">
+    <div class="g-plan-header" style="background:${theme.grad}">
+      <div>
+        <div style="font-size:.56rem;font-weight:800;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">${monthName} ${year}</div>
+        <div class="g-plan-title">${monthPlan ? esc(monthPlan.title||'Monthly Plan') : 'Monthly Plan'}</div>
+        <div class="g-plan-meta">${monthPlan&&monthPlan.subject ? esc(monthPlan.subject) : ''}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
+        ${mEmpty
+          ? `<span style="font-size:.62rem;color:rgba(255,255,255,.45);font-style:italic">Not filled yet</span>`
+          : `<div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1.3rem;color:#fff;line-height:1">${mPct}%</div>
+             <div style="font-size:.58rem;color:rgba(255,255,255,.7)">${mDone}/${mTasks.length} done</div>`}
+        ${userRole==='creator'
+          ? `<button onclick="openGoalEditor('${mKey}','monthly',${year},${month},0)"
+              style="background:rgba(255,255,255,.2);border:none;border-radius:6px;padding:3px 8px;color:#fff;font-size:.62rem;font-weight:700;cursor:pointer;margin-top:3px">${mEmpty?'＋ Fill':'✏️ Edit'}</button>`
+          : ''}
+      </div>
+    </div>`;
+
+  if (!mEmpty) {
+    html += `<div class="g-plan-body">
+      <div class="g-prog-bar"><div class="g-prog-fill" style="width:${mPct}%;background:${theme.accent}"></div></div>
+      <div class="g-prog-label">${mPct}% complete</div>`;
+    if (monthPlan.description) html += `<div style="font-size:.73rem;color:#666;margin:5px 0 3px;line-height:1.4;font-style:italic">${esc(monthPlan.description)}</div>`;
+    mTasks.forEach((t, ti) => {
+      const isDone = !!mProg[`t_${ti}`];
+      html += `<div class="g-task-row">
+        <div class="g-check ${isDone?'done':''}" onclick="toggleLongTask('${mKey}',${ti})">${isDone?'✓':''}</div>
+        <span class="g-task-text ${isDone?'done':''}">${esc(t.text)}</span>
+      </div>`;
+    });
+    html += `</div>`;
+  } else {
+    html += `<div style="padding:10px 14px;font-size:.73rem;color:#bbb;font-style:italic">No tasks added for this month yet.</div>`;
+  }
+  html += `</div>`;
+
+  c.innerHTML = html;
+}
+
+async function toggleLongTask(planId, ti) {
+  const prog   = getLongProg(planId);
+  const key    = `t_${ti}`;
+  const newVal = !prog[key];
+  if (!allLongProgress[planId]) allLongProgress[planId] = {};
+  if (!allLongProgress[planId][userName]) allLongProgress[planId][userName] = {};
+  allLongProgress[planId][userName][key] = newVal;
+  renderGoals();
+  if (db) {
+    try { await db.ref(`longprogress/${planId}/${userName}/${key}`).set(newVal); }
+    catch(e) { showToast('⚠️ Sync error'); }
+  }
+}
+
+// id = the stable key (e.g. "w_2025_06_W2"), type = 'weekly'|'monthly'
+function openGoalEditor(id, type, year, month, weekNum) {
+  editingLongId = id;
+  if (id && allLongPlans[id]) {
+    editingLongPlan = JSON.parse(JSON.stringify(allLongPlans[id]));
+  } else {
+    // Pre-fill dateRange for weekly
+    const dr = (type==='weekly' && year!=null) ? weekDateRange(year, month, weekNum) : '';
+    editingLongPlan = { type: type||'weekly', title:'', dateRange: dr, subject:'', description:'', tasks:[], sections:[], createdAt: Date.now() };
+  }
+  renderGoalEditorModal();
+}
+
+function renderGoalEditorModal() {
+  const p = editingLongPlan;
+  const typeLabel = p.type === 'weekly' ? 'Weekly' : 'Monthly';
+  let html = `<div style="padding:16px;max-height:80vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="font-family:'Patrick Hand',cursive;font-weight:700;font-size:1.1rem;color:var(--navy)">${editingLongId&&allLongPlans[editingLongId]?'✏️ Edit':'➕ Fill'} ${typeLabel} Plan</div>
+      <button onclick="closeModal()" style="background:#f0f4ff;border:none;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:1rem">✕</button>
+    </div>
+    <label class="e-label">Title</label>
+    <input class="e-inp" placeholder="e.g. Maths Revision Week" value="${esc(p.title||'')}" oninput="editingLongPlan.title=this.value">
+    <label class="e-label">Date Range</label>
+    <input class="e-inp" placeholder="e.g. 2–8 June" value="${esc(p.dateRange||'')}" oninput="editingLongPlan.dateRange=this.value">
+    <label class="e-label">Subject / Focus</label>
+    <input class="e-inp" placeholder="e.g. Physics, All Subjects…" value="${esc(p.subject||'')}" oninput="editingLongPlan.subject=this.value">
+    <label class="e-label">Description (optional)</label>
+    <textarea class="e-inp" rows="2" placeholder="Brief note…" oninput="editingLongPlan.description=this.value" style="resize:none">${esc(p.description||'')}</textarea>
+    <div style="font-family:'Patrick Hand',cursive;font-weight:700;font-size:.92rem;color:var(--navy);margin:10px 0 5px">📋 Tasks / Milestones</div>
+    <div id="goal-tasks-editor">`;
+
+  (p.tasks||[]).forEach((t,ti) => {
+    html += `<div style="display:flex;gap:6px;align-items:center;margin-bottom:5px">
+      <input class="e-inp" style="flex:1;margin:0" placeholder="Task description" value="${esc(t.text||'')}" oninput="editingLongPlan.tasks[${ti}].text=this.value">
+      <button onclick="removeGoalTask(${ti})" style="background:#fce4ec;border:none;border-radius:8px;padding:5px 8px;cursor:pointer;color:#c62828;font-size:.8rem;flex-shrink:0">🗑</button>
+    </div>`;
+  });
+
+  html += `</div>
+    <button onclick="addGoalTask()" style="width:100%;padding:7px;background:#f0f4ff;border:1.5px dashed #c5cae9;border-radius:8px;color:var(--purple);font-weight:700;font-size:.82rem;cursor:pointer;margin-top:2px">＋ Add Task</button>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button onclick="saveGoalPlan()" style="flex:1;padding:10px;background:linear-gradient(135deg,#7b52ab,#3d2c8d);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:.9rem;cursor:pointer">💾 Save</button>
+      <button onclick="closeModal()" style="flex:1;padding:10px;background:#f5f5f5;border:none;border-radius:10px;color:#666;font-weight:700;font-size:.9rem;cursor:pointer">Cancel</button>
+    </div>
+  </div>`;
+
+  document.getElementById('modal-box').innerHTML = html;
+  const ov = document.getElementById('modal-overlay');
+  ov.style.display = '';
+  ov.classList.add('show');
+}
+
+function addGoalTask() {
+  editingLongPlan.tasks.push({ text:'' });
+  renderGoalEditorModal();
+}
+
+function removeGoalTask(ti) {
+  editingLongPlan.tasks.splice(ti,1);
+  renderGoalEditorModal();
+}
+
+async function saveGoalPlan() {
+  const id = editingLongId;
+  if (!id) { showToast('⚠️ No plan ID'); return; }
+  allLongPlans[id] = editingLongPlan;
+  closeModal();
+  renderGoals();
+  if (db) {
+    try { await db.ref(`longplans/${id}`).set(editingLongPlan); showToast('✅ Saved!'); }
+    catch(e) { showToast('⚠️ Save error'); }
+  }
+}
+
+async function deleteGoalPlan(id) {
+  if (!confirm('Delete this plan?')) return;
+  delete allLongPlans[id];
+  delete allLongProgress[id];
+  renderGoals();
+  if (db) {
+    try {
+      await db.ref(`longplans/${id}`).remove();
+      await db.ref(`longprogress/${id}`).remove();
+      showToast('🗑 Deleted');
+    } catch(e) { showToast('⚠️ Delete error'); }
   }
 }
 
@@ -2580,7 +2925,9 @@ function showModal(html) {
   document.getElementById('modal-overlay').classList.add('show');
 }
 function closeModal() {
-  document.getElementById('modal-overlay').classList.remove('show');
+  const o = document.getElementById('modal-overlay');
+  o.classList.remove('show');
+  o.style.display = 'none';
 }
 document.addEventListener('click', e => {
   if (e.target.id === 'modal-overlay') closeModal();
