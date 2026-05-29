@@ -1,4 +1,4 @@
-<!-- Version 13-8 -->
+<!-- Version 14-1 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -446,17 +446,17 @@ body::before {
 /* ensure content clears margin line — reduced side margins */
 .cal-wrap, .day-wrap, .editor-wrap, .lb-wrap,
 .um-wrap, .fb-screen, .login-wrap {
-  padding-left: 26px !important;
-  padding-right: 8px !important;
+  padding-left: 22px !important;
+  padding-right: 12px !important;
 }
 /* nav stays full width */
-.nav { padding-left: 28px !important; }
+.nav { padding-left: 24px !important; }
 
 /* ── tighter card/wrap padding to maximise content width ── */
-.cal-wrap { padding-right: 4px !important; }
-.day-wrap  { padding-right: 4px !important; }
-.lb-wrap   { padding-right: 4px !important; }
-.editor-wrap { padding-right: 4px !important; }
+.cal-wrap { padding-right: 8px !important; }
+.day-wrap  { padding-right: 8px !important; }
+.lb-wrap   { padding-right: 8px !important; }
+.editor-wrap { padding-right: 8px !important; }
 .sess-header { padding: 7px 8px !important; }
 .sess-body   { padding: 8px 8px 10px !important; }
 .ring-card   { padding: 14px 10px !important; }
@@ -985,7 +985,7 @@ code{background:#f0f4ff;border-radius:5px;padding:2px 5px;font-size:.76rem;color
     <span class="tab-label">My Plan</span>
   </button>
   <button class="tab-btn" id="tab-goals" onclick="switchTab('goals')">
-    <span class="tab-icon">🎯</span>
+    <span class="tab-icon">🚀</span>
     <span class="tab-label">Schedules</span>
   </button>
   <button class="tab-btn" id="tab-lb" onclick="switchTab('lb')">
@@ -1211,6 +1211,12 @@ function switchTab(tab) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('screen-day').classList.add('active');
   } else if (tab === 'goals') {
+    // Sync goals view to whichever month the calendar is showing
+    const todayD = new Date();
+    const todayYear = todayD.getFullYear();
+    const todayMonth = todayD.getMonth();
+    goalsMonthOffset = (calYear - todayYear) * 12 + (calMonth - todayMonth);
+    goalsWeekIdx = currentWeekOfMonth(calYear, calMonth);
     showScreen('goals');
   } else if (tab === 'lb') {
     showScreen('leaderboard');
@@ -2159,6 +2165,25 @@ let editingLongId   = null;
 let goalsMonthOffset = 0;
 let goalsWeekIdx = 1;   // 1-based week within the current month
 
+// Returns the 1-based week number within a month for a given date
+function currentWeekOfMonth(year, month) {
+  const todayD = new Date();
+  // If not the current month/year, default to week 1
+  if (year !== todayD.getFullYear() || month !== todayD.getMonth()) return 1;
+  const firstDow = new Date(year, month, 1).getDay(); // 0=Sun
+  const dayOfMonth = todayD.getDate();
+  return Math.ceil((firstDow + dayOfMonth) / 7);
+}
+
+// Shift month offset and land on the correct week
+function shiftGoalsMonth(dir) {
+  goalsMonthOffset += dir;
+  const todayD = new Date();
+  const targetDate = new Date(todayD.getFullYear(), todayD.getMonth() + goalsMonthOffset, 1);
+  goalsWeekIdx = currentWeekOfMonth(targetDate.getFullYear(), targetDate.getMonth());
+  renderGoals();
+}
+
 const SCHED_MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
 // Derive a theme for a given year-month using the same DAY_THEMES palette
@@ -2238,35 +2263,37 @@ function renderGoals() {
 
   let html = '';
 
-  // ── Hero banner with month ‹ › navigation ──
-  html += `<div style="background:${theme.grad};border-radius:14px;padding:11px 14px;margin-bottom:10px;position:relative;overflow:hidden">
-    <div style="position:absolute;width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.06);top:-16px;right:-12px"></div>
+  // ── Compact hero banner with month ‹ › navigation ──
+  html += `<div style="background:${theme.grad};border-radius:11px;padding:7px 10px;margin-bottom:8px;position:relative;overflow:hidden">
+    <div style="position:absolute;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.05);top:-12px;right:-8px"></div>
     <div style="display:flex;align-items:center;justify-content:space-between;position:relative">
       <div>
-        <div style="font-family:'Patrick Hand',cursive;font-weight:700;font-size:1.1rem;color:#fff">🎯 Schedules</div>
-        <div style="font-size:.68rem;color:rgba(255,255,255,.65);margin-top:1px">Weekly &amp; monthly plans</div>
+        <div style="font-family:'Patrick Hand',cursive;font-weight:700;font-size:.88rem;color:#fff;line-height:1.2">🎯 Schedules</div>
+        <div style="font-size:.58rem;color:rgba(255,255,255,.6);margin-top:1px">Weekly &amp; monthly plans</div>
       </div>
-      <div style="display:flex;align-items:center;gap:6px">
-        <button onclick="goalsMonthOffset--;goalsWeekIdx=1;renderGoals()"
-          style="width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,255,255,.35);background:rgba(255,255,255,.15);color:#fff;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center">‹</button>
-        <span style="font-family:'Nunito',sans-serif;font-weight:900;color:#fff;font-size:.88rem;min-width:76px;text-align:center">${monthName} ${year}</span>
-        <button onclick="goalsMonthOffset++;goalsWeekIdx=1;renderGoals()"
-          style="width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,255,255,.35);background:rgba(255,255,255,.15);color:#fff;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center">›</button>
+      <div style="display:flex;align-items:center;gap:5px">
+        <button onclick="shiftGoalsMonth(-1)"
+          style="width:22px;height:22px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.12);color:#fff;font-size:.78rem;cursor:pointer;display:flex;align-items:center;justify-content:center">‹</button>
+        <span style="font-family:'Nunito',sans-serif;font-weight:900;color:#fff;font-size:.82rem;min-width:72px;text-align:center">${monthName} ${year}</span>
+        <button onclick="shiftGoalsMonth(1)"
+          style="width:22px;height:22px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.12);color:#fff;font-size:.78rem;cursor:pointer;display:flex;align-items:center;justify-content:center">›</button>
       </div>
     </div>
   </div>`;
 
   // ══ WEEKLY — show ONE week at a time ══
   // Week navigation row: ‹  Week N of M  ›
-  html += `<div style="font-size:.6rem;font-weight:800;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px">📅 WEEKLY</div>`;
-  html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-    <button onclick="goalsWeekIdx--;renderGoals()"
-      style="width:28px;height:28px;border-radius:50%;border:1.5px solid ${w>1?'#c5cae9':'#eee'};background:${w>1?'#f0f4ff':'#fafafa'};color:${w>1?'var(--navy)':'#ccc'};font-size:.9rem;cursor:${w>1?'pointer':'default'};display:flex;align-items:center;justify-content:center"
-      ${w<=1?'disabled':''}>‹</button>
-    <span style="font-family:'Patrick Hand',cursive;font-weight:700;font-size:.9rem;color:var(--navy)">Week ${w} <span style="font-size:.7rem;color:#aaa;font-weight:400">of ${numWeeks}</span></span>
-    <button onclick="goalsWeekIdx++;renderGoals()"
-      style="width:28px;height:28px;border-radius:50%;border:1.5px solid ${w<numWeeks?'#c5cae9':'#eee'};background:${w<numWeeks?'#f0f4ff':'#fafafa'};color:${w<numWeeks?'var(--navy)':'#ccc'};font-size:.9rem;cursor:${w<numWeeks?'pointer':'default'};display:flex;align-items:center;justify-content:center"
-      ${w>=numWeeks?'disabled':''}>›</button>
+  html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+    <span style="font-size:.58rem;font-weight:800;color:#aaa;letter-spacing:.8px;text-transform:uppercase">📅 WEEKLY</span>
+    <div style="display:flex;align-items:center;gap:6px">
+      <button onclick="goalsWeekIdx--;renderGoals()"
+        style="width:22px;height:22px;border-radius:50%;border:1px solid ${w>1?'#c5cae9':'#eee'};background:${w>1?'#f0f4ff':'#fafafa'};color:${w>1?'var(--navy)':'#ccc'};font-size:.78rem;cursor:${w>1?'pointer':'default'};display:flex;align-items:center;justify-content:center"
+        ${w<=1?'disabled':''}>‹</button>
+      <span style="font-family:'Patrick Hand',cursive;font-weight:700;font-size:.8rem;color:var(--navy)">Week ${w} <span style="font-size:.68rem;color:#aaa;font-weight:400">/ ${numWeeks}</span></span>
+      <button onclick="goalsWeekIdx++;renderGoals()"
+        style="width:22px;height:22px;border-radius:50%;border:1px solid ${w<numWeeks?'#c5cae9':'#eee'};background:${w<numWeeks?'#f0f4ff':'#fafafa'};color:${w<numWeeks?'var(--navy)':'#ccc'};font-size:.78rem;cursor:${w<numWeeks?'pointer':'default'};display:flex;align-items:center;justify-content:center"
+        ${w>=numWeeks?'disabled':''}>›</button>
+    </div>
   </div>`;
 
   // Weekly card
@@ -2308,8 +2335,8 @@ function renderGoals() {
   html += `</div>`;
 
   // ══ MONTHLY — always shown below ══
-  html += `<div style="height:1px;background:#e8eaf6;margin:2px 0 10px"></div>`;
-  html += `<div style="font-size:.6rem;font-weight:800;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">🗓️ MONTHLY</div>`;
+  html += `<div style="height:1px;background:#e8eaf6;margin:2px 0 8px"></div>`;
+  html += `<div style="font-size:.58rem;font-weight:800;color:#aaa;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px">🗓️ MONTHLY</div>`;
 
   html += `<div class="g-plan-card" style="margin-bottom:16px">
     <div class="g-plan-header" style="background:${theme.grad}">
